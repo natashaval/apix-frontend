@@ -1,17 +1,26 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <SideBar :apiData="apiData"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import SideBar from "./components/sidebar/SideBar";
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    SideBar
+  },
+  computed : {
+    apiData : function () {
+      return this.$store.getters['project/get']
+    }
+  }
+  ,created(){
+    // id project di mongodb, akan dibikin dinamis nanti
+    let id = '5c59712d73b2b75a2cc62ebb'
+    this.$store.dispatch('project/fetchProjectData',id)
   }
 }
 </script>
