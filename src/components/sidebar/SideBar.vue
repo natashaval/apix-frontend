@@ -1,7 +1,11 @@
 <template>
     <div>
+        <ProjectBar :apiData="apiData"/>
         <ul>
-            <Section v-for="(value,key) in apiData.sections" v-bind:key="key" :apiData="value" :sectionName="key"/>
+            <Section v-for="(value,key) in apiData.sections"
+                     v-bind:key="key"
+                     :apiData="value"
+                     :sectionApi="key"/>
         </ul>
     </div>
 
@@ -10,12 +14,16 @@
 
 <script>
     import Section from "./SectionBar";
+    import ProjectBar from "./ProjectBar";
 
 
     export default {
         name: "SideBar",
-        components: {Section},
-        props : ['apiData']
+        components: {ProjectBar, Section},
+        props : ['apiData'],
+        methods : {
+
+        }
     }
 </script>
 

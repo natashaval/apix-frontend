@@ -1,9 +1,9 @@
 <template>
     <div>
-        <li v-b-toggle="'section-'+sectionName">{{sectionName}}</li>
-        <b-collapse :id="'section-'+sectionName" class="mt-2">
+        <li v-b-toggle="'section-'+sectionApi" @click="sectionClick">{{sectionApi}}</li>
+        <b-collapse :id="'section-'+sectionApi" class="mt-2">
             <ul>
-                <LinkBar v-for="(value,key) in apiData.paths" v-bind:key="key" :apiData="value" :linkApi="key"/>
+                <PathBar v-for="(value,key) in apiData.paths" v-bind:key="key" :apiData="value" :pathApi="key"/>
             </ul>
         </b-collapse>
     </div>
@@ -11,14 +11,22 @@
 
 <script>
 
-    import LinkBar from './LinkBar'
+    import PathBar from './PathBar'
 
     export default {
-        name: "Section",
+        name: "SectionBar",
         components : {
-            LinkBar
+            PathBar
         },
-        props : ['sectionName','apiData']
+        props : ['sectionApi','apiData'],
+        methods : {
+            sectionClick : function(){
+                this.$router.push({
+                    name :'section-editor',
+                    params: {sectionApi : this.sectionApi}
+                })
+            }
+        }
     }
 </script>
 

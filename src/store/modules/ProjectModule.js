@@ -4,19 +4,23 @@ import axios from 'axios'
 export default{
     namespaced : true,
     state : {
-        projectList : [],
-        project : "asd"//data
+        projects : [],//list project lain, cuma data sederhana (id,nama,...dll)
+        project : {}//menyimpan data detail dari suatu project
     },
     getters : {
         getProjectList(state){
             return state.projects
         },
-        getById(state){
-            return id => state.projects.find(project => project.id === id)
-        },
-        get(state){
+        getProject(state){
             return state.project
+        },
+        getSection(state){
+            if(state.project.sections === undefined){
+                return () => undefined
+            }
+            return (section) => state.project.sections[section]
         }
+
     },
     mutations: {
         ASSIGN_DATA(state,newData){
@@ -24,23 +28,13 @@ export default{
         }
     },
     actions : {
-        fetchProjectData({ commit }, id) {
-            // console.log(commit.getProjectList())
-            // if (this.hasInitDrivers === undefined) {
-            let fetchData = () => axios.get('http://localhost:8080/project/'+id).then(
+        fetchProjectData({ commit }, idProject) {
+            let fetchData = () => axios.get('http://localhost:8080/project/'+idProject).then(
                 (response) => {
                     commit('ASSIGN_DATA', response.data)
                 }
             )
             fetchData()
-            //
-            //     setInterval(function () {
-            //             fetchDrivers()
-            //         }.bind(this)
-            //         , 10000
-            //     )
-            //     this.hasInitDrivers = false
-            // }
         }
     }
 }
