@@ -1,20 +1,13 @@
 <template>
     <div id="app">
-        <SideBar :apiData="apiData"/>
+        <SideBar :apiData="apiData" class="sidebar"/>
         <router-view></router-view>
 
     </div>
 </template>
 
 <script>
-    import 'bootstrap/dist/css/bootstrap.css'
-    import 'bootstrap-vue/dist/bootstrap-vue.css'
     import SideBar from "./components/sidebar/SideBar";
-    import BootstrapVue from 'bootstrap-vue'
-    import Vue from 'vue'
-
-    Vue.use(BootstrapVue)
-
 
     export default {
         name: 'app',
@@ -30,6 +23,8 @@
 </script>
 
 <style>
+    @import "https://use.fontawesome.com/releases/v5.7.1/css/all.css";
+
     #app {
         font-family: 'Avenir', Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
@@ -46,3 +41,4 @@
     }
 
 </style>
+

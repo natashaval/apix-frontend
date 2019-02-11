@@ -14,7 +14,6 @@
             }
         },
         created() {
-            console.log('create section')
         }
     }
 </script>

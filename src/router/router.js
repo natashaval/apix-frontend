@@ -17,6 +17,7 @@ const initProject = (to, from, next) => {
 }
 
 export const router = new VueRouter({
+    mode : 'history',
     routes : [
         {
             name : 'project-editor', path : '/project/:projectId',
