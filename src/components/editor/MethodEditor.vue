@@ -1,11 +1,11 @@
 <template>
-    <h1>method : {{method}}</h1>
+    <h1>method : {{methodApi}}</h1>
 </template>
 
 <script>
     export default {
         name: "MethodEditor",
-        props : ['projectId','pathApi','method']
+        props : ['projectId','sectionApi','pathApi','methodApi']
     }
 </script>
 

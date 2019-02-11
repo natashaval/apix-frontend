@@ -16,7 +16,7 @@
         },
         computed : {
             apiData : function () {
-                return this.$store.getters['project/getProject']
+                return this.$store.getters['project/getProjectData']
             }
         }
     }

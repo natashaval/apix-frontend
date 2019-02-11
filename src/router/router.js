@@ -20,22 +20,22 @@ export const router = new VueRouter({
     mode : 'history',
     routes : [
         {
-            name : 'project-editor', path : '/project/:projectId',
+            name : 'project-editor', path : '/projects/:projectId',
             component : ProjectEditor, props : true,
             beforeEnter: initProject
         },
         {
-            name : 'section-editor', path : '/project/:projectId/sections/:sectionApi',
+            name : 'section-editor', path : '/projects/:projectId/sections/:sectionApi',
             component : SectionEditor, props : true,
             beforeEnter : initProject
         },
         {
-            name : 'path-editor', path : '/project/:projectId/resources/:pathApi',
+            name : 'path-editor', path : '/projects/:projectId/sections/:sectionApi/path/:pathApi',
             component : PathEditor, props : true,
             beforeEnter : initProject
         },
         {
-            name : 'method-editor', path : '/project/:projectId/resources/:pathApi/:method',
+            name : 'method-editor', path : '/projects/:projectId/sections/:sectionApi/paths/:pathApi/methods/:methodApi',
             component : MethodEditor, props : true,
             beforeEnter : initProject
         }

@@ -11,28 +11,18 @@ export default{
         getProjectList(state){
             return state.projects
         },
-        getProject(state){
+        getProjectData(state){
             return state.project
         },
-        getSection(state){
+        getSectionData(state){
             if(state.project.sections === undefined){
                 return () => undefined
             }
             return (section) => state.project.sections[section]
         },
-        getPath(state){
-            return function(path) {
-                let pointer = state.project.sections
-                for(let _key1 in pointer){
-                    for(let _key2 in pointer[_key1].paths){
-                        if(_key2 == path){
-                            return pointer[_key1].paths
-                        }
-                    }
-                }
-            }
+        getPathData(state){
+            return (section, path) => state.project.sections[section].paths[path]
         }
-
     },
     mutations: {
         ASSIGN_DATA(state,newData){

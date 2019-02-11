@@ -10,7 +10,7 @@
         props : ['sectionApi','projectId'],
         computed : {
             apiData(){
-                return this.$store.getters['project/getSection'](this.sectionApi)
+                return this.$store.getters['project/getSectionData'](this.sectionApi)
             }
         },
         created() {

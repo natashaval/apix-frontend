@@ -1,6 +1,6 @@
 <template>
     <div>
-        <li @click="methodClick">{{methodName}}</li>
+        <li @click="methodClick">{{methodApi}}</li>
     </div>
 </template>
 
@@ -8,13 +8,13 @@
     export default {
         name: "MethodBar",
         props : [
-            'methodName','apiData'
+            'methodApi','apiData'
         ],
         methods : {
             methodClick : function () {
                 this.$router.push({
                     name :'method-editor',
-                    params: {method : this.methodName}
+                    params: {methodApi : this.methodApi}
                 })
             }
         }

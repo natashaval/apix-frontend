@@ -5,11 +5,10 @@
 <script>
     export default {
         name: "PathEditor",
-        props : ['pathApi'],
+        props : ['sectionApi','pathApi'],
         computed : {
             apiData() {
-                console.log('fetch '+this.pathApi)
-                return this.$store.getters['project/getPath'](this.pathApi)
+                return this.$store.getters['project/getPathData'](this.sectionApi, this.pathApi)
             }
         }
     }
