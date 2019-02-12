@@ -1,6 +1,6 @@
 <template>
-    //buat edit description
     <div>
+        <!--//buat edit description-->
         <vue-editor v-model="content"></vue-editor>
     </div>
 </template>
