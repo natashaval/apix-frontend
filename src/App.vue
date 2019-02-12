@@ -1,7 +1,7 @@
 <template>
-    <div id="app">
-        <SideBar :apiData="apiData" class="sidebar"/>
-        <router-view></router-view>
+    <div id="app" class="row w-100">
+        <SideBar :apiData="apiData" class="sidebar col-3"/>
+        <router-view class="col-9 main-view"></router-view>
 
     </div>
 </template>
@@ -31,13 +31,27 @@
         -moz-osx-font-smoothing: grayscale;
         text-align: center;
         color: #2c3e50;
-        margin-top: 60px;
+    }
+
+    #app{
+        border: aqua 1px solid;
+        height: 100%;
     }
 
     .sidebar{
         border: red 1px solid;
-        color: red;
-        float: left;
+        height: 100%;
+        position: fixed;
+        overflow-y: scroll;
+    }
+
+    .main-view{
+        border: red 1px solid;
+        height: 100%;
+    }
+
+    body,html{
+        height: 100%;
     }
 
 </style>

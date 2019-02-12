@@ -5,7 +5,7 @@ import SectionEditor from "../components/editor/SectionEditor";
 
 import {store} from '../store'
 import PathEditor from "../components/editor/PathEditor";
-import MethodEditor from "../components/editor/MethodEditor";
+import OperationEditor from "../components/editor/OperationEditor";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -35,8 +35,8 @@ export const router = new VueRouter({
             beforeEnter : initProject
         },
         {
-            name : 'method-editor', path : '/projects/:projectId/sections/:sectionApi/paths/:pathApi/methods/:methodApi',
-            component : MethodEditor, props : true,
+            name : 'operation-editor', path : '/projects/:projectId/sections/:sectionApi/paths/:pathApi/operations/:operationApi',
+            component : OperationEditor, props : true,
             beforeEnter : initProject
         }
     ]

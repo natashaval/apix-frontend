@@ -20,8 +20,11 @@ export default{
             }
             return (section) => state.project.sections[section]
         },
-        getPathData(state){
-            return (section, path) => state.project.sections[section].paths[path]
+        getPathData(state,getters){
+            return (section, path) => getters['getSectionData'](section).paths[path]
+        },
+        getOperationData(state,getters){
+            return (section, path, operation) => getters['getPathData'](section,path).methods[operation]
         }
     },
     mutations: {
