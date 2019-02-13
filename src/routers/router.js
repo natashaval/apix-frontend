@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import ProjectEditor from "../components/editor/ProjectEditor";
-import SectionEditor from "../components/editor/SectionEditor";
+import ProjectEditor from "../components/editors/ProjectEditor";
+import SectionEditor from "../components/editors/SectionEditor";
 
-import {store} from '../store'
-import PathEditor from "../components/editor/PathEditor";
-import OperationEditor from "../components/editor/OperationEditor";
+import {store} from '../stores'
+import PathEditor from "../components/editors/PathEditor";
+import OperationEditor from "../components/editors/OperationEditor";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {

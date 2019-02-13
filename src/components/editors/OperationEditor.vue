@@ -6,7 +6,7 @@
 </template>
 
 <script>
-    import BodyForm from "./form/bodyForm";
+    import BodyForm from "./editor-components/inputs/BodyForm";
     export default {
         name: "OperationEditor",
         components: {BodyForm},

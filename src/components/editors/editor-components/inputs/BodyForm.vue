@@ -15,7 +15,7 @@
                 selected : null,
                 options : [
                     {value : 'application/json', text : 'application/json'},
-                    {value : 'form-data', text : 'multipart/form-data'}
+                    {value : 'inputs-data', text : 'multipart/inputs-data'}
                 ]
             };
         }

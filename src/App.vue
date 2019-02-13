@@ -1,21 +1,18 @@
 <template>
     <div id="app" class="row w-100">
         <SideBar :apiData="apiData" class="sidebar col-3"/>
-        <TreeMenu :apiData="apiData" class="treemenu"></TreeMenu>
         <router-view class="col-9 main-view"></router-view>
 
     </div>
 </template>
 
 <script>
-    import SideBar from "./components/sidebar/SideBar";
-    import TreeMenu from "./components/sidebar/TreeMenu";
+    import SideBar from "./components/sidebars/SideBar";
 
     export default {
         name: 'app',
         components: {
-            SideBar,
-            TreeMenu
+            SideBar
         },
         computed : {
             apiData : function () {
@@ -55,10 +52,6 @@
 
     body,html{
         height: 100%;
-    }
-
-    .treemenu {
-        background: skyblue;
     }
 
 </style>

@@ -1,4 +1,5 @@
 <template>
+    <!--nanti file ini dihapus, untuk contoh saja-->
     <div>
     <h1>section name : {{sectionApi}}</h1>
     </div>
