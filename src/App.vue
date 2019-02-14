@@ -1,8 +1,13 @@
 <template>
     <div id="app" class="row w-100">
-        <SideBar :apiData="apiData" class="sidebar col-3"/>
-        <router-view class="col-9 main-view"></router-view>
-
+        <b-row>
+            <b-col cols="3">
+                <SideBar :apiData="apiData" class="sidebar"/>
+            </b-col>
+            <b-col cols="9">
+                <router-view class="main-view"></router-view>
+            </b-col>
+        </b-row>
     </div>
 </template>
 
@@ -40,14 +45,16 @@
 
     .sidebar{
         border: red 1px solid;
-        height: 100%;
         position: fixed;
         overflow-y: scroll;
+        top: 0;
+        bottom: 0;
     }
 
     .main-view{
         border: red 1px solid;
         height: 100%;
+        overflow-y: scroll;
     }
 
     body,html{
