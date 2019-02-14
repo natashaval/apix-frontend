@@ -1,13 +1,13 @@
 <template>
-    <div id="app" class="row w-100">
-        <b-row>
-            <b-col cols="3">
-                <SideBar :apiData="apiData" class="sidebar"/>
-            </b-col>
-            <b-col cols="9">
-                <router-view class="main-view"></router-view>
-            </b-col>
-        </b-row>
+    <div id="app" class="container-fluid">
+            <b-row>
+                <b-col cols="3" class="sidebar">
+                    <SideBar :apiData="apiData"/>
+                </b-col>
+                <b-col cols="9" class="main-view">
+                    <router-view></router-view>
+                </b-col>
+            </b-row>
     </div>
 </template>
 
@@ -41,24 +41,20 @@
     #app{
         border: aqua 1px solid;
         height: 100%;
+        overflow: hidden;
     }
 
     .sidebar{
         border: red 1px solid;
         position: fixed;
-        overflow-y: scroll;
-        top: 0;
-        bottom: 0;
+        overflow: auto;
+        height: 100vh;
     }
 
     .main-view{
-        border: red 1px solid;
-        height: 100%;
-        overflow-y: scroll;
-    }
-
-    body,html{
-        height: 100%;
+        border: greenyellow 1px solid;
+        height: 100vh;
+        overflow: auto;
     }
 
 </style>
