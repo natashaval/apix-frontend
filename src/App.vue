@@ -57,5 +57,13 @@
         overflow: auto;
     }
 
+    .blue-frame{
+        border: 1px solid blue;
+    }
+
+    .red-frame{
+        border: 1px solid red;
+    }
+
 </style>
 

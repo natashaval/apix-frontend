@@ -1,7 +1,7 @@
 <template>
     <!--nanti dilanjutkan-->
     <div>
-        <b-form-select v-model="selected" :options="options"/>
+        <!--<b-form-select v-model="selected" :options="options"/>-->
     </div>
 </template>
 

@@ -25,6 +25,9 @@ export default{
         },
         getOperationData(state,getters){
             return (section, path, operation) => getters['getPathData'](section,path).methods[operation]
+        },
+        getDataTypes(state){
+            return state.project.definitions
         }
     },
     mutations: {
