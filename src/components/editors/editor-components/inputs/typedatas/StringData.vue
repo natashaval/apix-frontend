@@ -2,7 +2,7 @@
     <div>
         <div class="form-inline float-right" v-for="(key,i) in enumCount" v-bind:key="i">
             <label class="col-4">Enum :</label>
-            <b-input class="col-8" @keydown.native="onEnumTyped(i)" v-model="enums[i]"></b-input>
+            <b-input class="col-8" @keyup.native="onEnumTyped(i)" v-model="enums[i]"></b-input>
         </div>
         <div class="form-inline float-right">
             <label class="col-4">Pattern :</label>
@@ -28,7 +28,6 @@
 <script>
     export default {
         name: "StringData",
-        props : ['data'],
         data : () => ({
             enums : [''],
             enumCount : 1,
@@ -50,6 +49,16 @@
                         this.enumCount--
                         this.enums.pop()
                     }
+                }
+            },
+            getAttributes : function(){
+                return {
+                    type : 'string',
+                    enums : this.enums.slice(0,-1),
+                    pattern : this.pattern,
+                    minLength : this.minLength,
+                    maxLength : this.maxLength,
+                    default : this.defaultVal
                 }
             }
         }

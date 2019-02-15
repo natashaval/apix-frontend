@@ -24,7 +24,17 @@
             minItems : null,
             maxItems : null,
             uniqueItems : false
-        })
+        }),
+        methods : {
+            getAttributes : function () {
+                return {
+                    type : 'array',
+                    minItems : this.minItems,
+                    maxItems : this.maxItems,
+                    uniqueItems : this.uniqueItems
+                }
+            }
+        }
     }
 </script>
 

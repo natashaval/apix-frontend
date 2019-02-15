@@ -2,7 +2,7 @@
     <div>
         <div class="form-inline float-right" v-for="(key,i) in enumCount" v-bind:key="i">
             <label class="col-4">Enum :</label>
-            <b-input class="col-8" @keydown.native="onEnumTyped(i)" v-model="enums[i]"></b-input>
+            <b-input class="col-8" @keyup.native="onEnumTyped(i)" v-model="enums[i]"></b-input>
         </div>
         <div class="form-inline float-right">
             <label class="col-4">Format :</label>
@@ -37,8 +37,7 @@
             format : '',
             minimum : null,
             maximum : null,
-            defaultVal : '',
-            itext : ''
+            defaultVal : ''
         }),
         computed : {
             formats() {
@@ -60,6 +59,16 @@
                         this.enumCount--
                         this.enums.pop()
                     }
+                }
+            },
+            getAttributes : function(){
+                return {
+                    type : this.numericType.toLowerCase(),
+                    enums : this.enums.slice(0,-1),
+                    format : this.format,
+                    minimum : this.minimum,
+                    maximum : this.maximum,
+                    default : this.defaultVal
                 }
             }
         }

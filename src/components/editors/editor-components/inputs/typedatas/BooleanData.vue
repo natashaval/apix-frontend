@@ -12,7 +12,15 @@
         name: "BooleanData",
         data : () => ({
             defaultVal : ''
-        })
+        }),
+        methods : {
+            getAttributes : function () {
+                return {
+                    type : 'boolean',
+                    default : this.defaultVal
+                }
+            }
+        }
     }
 </script>
 
