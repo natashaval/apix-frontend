@@ -15,16 +15,21 @@ export default{
             return state.project
         },
         getSectionData(state){
-            if(state.project.sections === undefined){
-                return () => undefined
+            return (section) => {
+                return (state.project.sections === undefined)? undefined : state.project.sections[section]
             }
-            return (section) => state.project.sections[section]
         },
         getPathData(state,getters){
-            return (section, path) => getters['getSectionData'](section).paths[path]
+            return (section, path) => {
+                let tmp = getters['getSectionData'](section)
+                return (tmp === undefined)?undefined : tmp.paths[path]
+            }
         },
         getOperationData(state,getters){
-            return (section, path, operation) => getters['getPathData'](section,path).methods[operation]
+            return (section, path, operation) => {
+                let tmp = getters['getPathData'](section,path)
+                return (tmp === undefined)?undefined : tmp.methods[operation]
+            }
         },
         getDataTypes(state){
             return state.project.definitions
