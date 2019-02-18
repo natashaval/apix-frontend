@@ -17,6 +17,12 @@ const initProject = (to, from, next) => {
     next()
 }
 
+/*
+const listProjects = () => {
+    store.dispatch('fetchAllProjectsData')
+}
+*/
+
 export const router = new VueRouter({
     mode : 'history',
     routes : [
@@ -43,7 +49,8 @@ export const router = new VueRouter({
         // List of Projects available
         {
             name: 'project-repo', path: '/projects',
-            component: ProjectRepo, props: true
+            component: ProjectRepo, props: true,
+            // beforeEnter: listProjects
         }
 
     ]
