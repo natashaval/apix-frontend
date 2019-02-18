@@ -4,10 +4,6 @@
             <label>Additional properties</label>
             <b-checkbox value="true" v-model="additionalProperties"></b-checkbox>
         </div>
-        <div class="form-inline float-right">
-            <label>Examples</label>
-            <b-input/>
-        </div>
     </div>
 </template>
 

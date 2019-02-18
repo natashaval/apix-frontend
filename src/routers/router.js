@@ -37,7 +37,7 @@ export const router = new VueRouter({
             beforeEnter : initProject
         },
         {
-            name : 'path-editor', path : '/projects/:projectId/sections/:sectionApi/path/:pathApi',
+            name : 'path-editor', path : '/projects/:projectId/sections/:sectionApi/paths/:pathApi',
             component : PathEditor, props : true,
             beforeEnter : initProject
         },
