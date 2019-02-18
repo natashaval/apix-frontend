@@ -7,6 +7,7 @@ import {store} from '../stores'
 import PathEditor from "../components/editors/PathEditor";
 import OperationEditor from "../components/editors/OperationEditor";
 import ProjectAll from "../components/projects/ProjectAll";
+import Mboh from "../components/projects/Mboh";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -43,7 +44,11 @@ export const router = new VueRouter({
         {
             name: 'project-all', path: '/projects',
             component: ProjectAll, props: true,
-
+        },
+        {
+            name: 'mboh', path: '/mboh',
+            component: Mboh
         }
+
     ]
 })

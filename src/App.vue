@@ -1,5 +1,9 @@
 <template>
     <div id="app" class="container-fluid">
+        <b-row>
+            Component
+            <component v-bind:is="layout"></component>
+        </b-row>
             <b-row>
                 <b-col cols="3" class="sidebar" v-if="sideBarStatus">
                     <!--<router-link :to="{name: 'project-all'}" v-if="isOnProjects">Projects</router-link>-->
@@ -14,10 +18,13 @@
                 </b-col>
             </b-row>
     </div>
+
 </template>
 
 <script>
     import SideBar from "./components/sidebars/SideBar";
+    import SingleLayout from "./layouts/SingleLayout";
+    import AllLayout from "./layouts/AllLayout";
 
     export default {
         name: 'app',
@@ -27,11 +34,17 @@
             }
         },
         components: {
-            SideBar
+            SideBar,
+            'single-layout': SingleLayout,
+            'all-layout': AllLayout
         },
         computed : {
             apiData : function () {
                 return this.$store.getters['project/getProjectData']
+            },
+
+            layout: function () {
+                return this.$store.getters['layout/getLayout']
             }
         },
         methods: {
