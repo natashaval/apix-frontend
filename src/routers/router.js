@@ -6,7 +6,7 @@ import SectionEditor from "../components/editors/SectionEditor";
 import {store} from '../stores'
 import PathEditor from "../components/editors/PathEditor";
 import OperationEditor from "../components/editors/OperationEditor";
-import ProjectAll from "../components/projects/ProjectAll";
+import ProjectRepo from "../components/projects/ProjectRepo";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -16,6 +16,12 @@ const initProject = (to, from, next) => {
     }
     next()
 }
+
+/*
+const listProjects = () => {
+    store.dispatch('fetchAllProjectsData')
+}
+*/
 
 export const router = new VueRouter({
     mode : 'history',
@@ -40,10 +46,12 @@ export const router = new VueRouter({
             component : OperationEditor, props : true,
             beforeEnter : initProject
         },
+        // List of Projects available
         {
-            name: 'project-all', path: '/projects',
-            component: ProjectAll, props: true,
-
+            name: 'project-repo', path: '/projects',
+            component: ProjectRepo, props: true,
+            // beforeEnter: listProjects
         }
+
     ]
 })
