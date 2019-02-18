@@ -4,9 +4,9 @@
             Component
             <component v-bind:is="layout"></component>
         </b-row>
-            <b-row>
+            <!--b-row>
                 <b-col cols="3" class="sidebar" v-if="sideBarStatus">
-                    <!--<router-link :to="{name: 'project-all'}" v-if="isOnProjects">Projects</router-link>-->
+                    <router-link :to="{name: 'project-all'}" v-if="isOnProjects">Projects</router-link>
                     <h5 @click="backToProjects">Back to Projects</h5>
                     <h6 @click="toggleNav"> Mboh {{sideBarStatus}}</h6>
                     <SideBar v-show="sideBarStatus" :apiData="apiData"/>
@@ -16,7 +16,7 @@
                     <h3 v-if="['project-all'].indexOf($router.name) > -1">Babi</h3>
                     <router-view></router-view>
                 </b-col>
-            </b-row>
+            </b-row>-->
     </div>
 
 </template>

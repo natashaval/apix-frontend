@@ -18,10 +18,18 @@
         computed : {
             apiData : function () {
                 return this.$store.getters['project/getProjectData']
+            },
+        },
+        methods: {
+            setLayout (layout) {
+                this.$store.commit('layout/SET_LAYOUT', layout);
             }
         },
         props : ['projectId'],
-        created(){
+        mounted: function () {
+            this.$nextTick(function () {
+                this.setLayout('single-layout');
+            });
         }
     }
 </script>
