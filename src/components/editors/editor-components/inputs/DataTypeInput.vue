@@ -9,16 +9,16 @@
                         <b-input v-if="isHasName" class="col-8" v-model="name"></b-input>
                         <label class="col-4">Type :</label>
                         <b-select class="col-8"  v-model="type" @change="selectType">
-                            <option v-for="dataType in dataTypes" v-bind:key="dataType" :value="dataType">{{dataType}}</option>
+                            <option v-for="dataType in dataTypes"
+                                    v-bind:key="dataType.val"
+                                    :value="dataType.val">{{dataType.text}}</option>
+                            <hr/>
+                            <option v-for="(value,name) in customDataTypes"
+                                    v-bind:key="name"
+                                    :value="name">{{name}}</option>
                         </b-select>
                         <label>Required : </label>
                         <b-checkbox v-model="required"/>
-                        <div class="form-inline" v-for="i in arrayDimension" v-bind:key="i">
-                            <label class="col-4">Of :</label>
-                            <b-select class="col-8" @change="selectItemType($event,i)" value="String">
-                                <option v-for="dataType in dataTypes" v-bind:key="dataType" :value="dataType">{{dataType}}</option>
-                            </b-select>
-                        </div>
                     </div>
                     <div v-else>
                         <h3>ini preview basic-kiri</h3>
@@ -51,36 +51,60 @@
                     </div>
                     <div v-bind:style="{display: (isEditing)?moreDisplay:'block'}">
                         <!--more attributes of selected datatype-->
-                        <StringData ref="curDataType" v-if="type === 'String'" :isEditing="isEditing"/>
-                        <ArrayData ref="curDataType" v-else-if="type === 'Array'" :isEditing="isEditing"/>
-                        <ObjectData ref="curDataType" v-else-if="type === 'Object'" :isEditing="isEditing"/>
+                        <StringData ref="curDataType" v-if="type === 'string'"
+                                    :isEditing="isEditing" :schemaData="schemaData"/>
+                        <ArrayData ref="curDataType" v-else-if="type === 'array'"
+                                   :isEditing="isEditing" :schemaData="schemaData"/>
+                        <ObjectData ref="curDataType" v-else-if="type === 'object'"
+                                    :isEditing="isEditing" :schemaData="schemaData"/>
 
-                        <NumericData ref="curDataType" v-else-if="type === 'Number'"
-                                     :numericType="'Number'" :isEditing="isEditing"/>
+                        <NumericData ref="curDataType" v-else-if="type === 'number'"
+                                     :numericType="'Number'" :isEditing="isEditing"
+                                     :schemaData="schemaData"/>
 
-                        <NumericData ref="curDataType" v-else-if="type === 'Integer'"
-                                     :numericType="'Integer'" :isEditing="isEditing"/>
+                        <NumericData ref="curDataType" v-else-if="type === 'integer'"
+                                     :numericType="'Integer'" :isEditing="isEditing"
+                                     :schemaData="schemaData"/>
 
-                        <BooleanData ref="curDataType" v-else-if="type === 'Boolean'" :isEditing="isEditing"/>
-                    </div>
-                    <div v-if="arrayDimension > 0" v-bind:style="{display: moreDisplay}">
-                        <!--more attribues of 'of' of arrayType-->
-                        <ArrayData v-for="i in arrayDimension-1" v-bind:key="i" :ref="'array-'+i"/>
-                    </div>
-                    <div v-if="itemType !== undefined" v-bind:style="{display: moreDisplay}">
-                        <!--more attributes of array-->
-                        <StringData ref="itemDataType" v-if="itemType === 'String'"/>
-                        <ObjectData ref="itemDataType" v-else-if="itemType === 'Object'"/>
-                        <NumericData ref="itemDataType" v-else-if="itemType === 'Number'" :numericType="'Number'"/>
-                        <NumericData ref="itemDataType" v-else-if="itemType === 'Integer'" :numericType="'Integer'"/>
-                        <BooleanData ref="itemDataType" v-else-if="itemType === 'Boolean'"/>
+                        <BooleanData ref="curDataType" v-else-if="type === 'boolean'"
+                                     :isEditing="isEditing"
+                                     :schemaData="schemaData"/>
                     </div>
                 </div>
             </div>
-            <div v-if="type === 'Object' || itemType === 'Object'" style="padding-left: 5%">
+
+            <!--tambahan view jika tipe datanya array-->
+            <div class="form-row blue-frame" v-if="type === 'array'">
+                <div class="row w-100" v-for="(item,i) in items" v-bind:key="i">
+                    <div class="col-6" v-if="isEditing">
+                        <label class="col-4">Of :</label>
+                        <b-select class="col-8" @change="selectItemType($event,i)" v-model="item.type">
+                            <option v-for="dataType in dataTypes"
+                                    v-bind:key="dataType.val"
+                                    :value="dataType.val">{{dataType.text}}</option>
+                        </b-select>
+                    </div>
+                    <div class="col-6">
+                        {{item.type}}
+                        <ArrayData :ref="'array-'+i" v-if="item.type === 'array'" :schemaData="item"/>
+                        <StringData ref="itemDataType" v-else-if="item.type === 'string'"
+                                    :schemaData="item" :isEditing="isEditing"/>
+                        <ObjectData ref="itemDataType" v-else-if="item.type === 'object'"
+                                    :schemaData="lastItem" :isEditing="isEditing"/>
+                        <NumericData ref="itemDataType" v-else-if="item.type === 'number'"
+                                     :numericType="'number'" :schemaData="lastItem" :isEditing="isEditing"/>
+                        <NumericData ref="itemDataType" v-else-if="item.type === 'integer'"
+                                     :numericType="'integer'" schemaData="lastItem" :isEditing="isEditing"/>
+                        <BooleanData ref="itemDataType" v-else-if="item.type === 'boolean'"
+                                     :schemaData="lastItem" :isEditing="isEditing"/>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="type === 'object' || lastItem.type === 'object'" style="padding-left: 5%">
                 <!--child object-->
-                <div v-for="(val,i) in propertiesId" v-bind:key="val">
-                    <DataTypeInput :ref="'property-'+val"/>
+                <div v-for="(val,i) in propertiesId" v-bind:key="val.id">
+                    <DataTypeInput :ref="'property-'+val.id" :parentIsEditing="isEditing" :schemaData="val.schemaData"/>
                     <button @click="deleteProperty(i)">delete property</button>
                 </div>
                 <button @click="addNewProperty">Add more property</button>
@@ -103,43 +127,50 @@
     export default {
         name: "DataTypeInput",
         components: {BooleanData, NumericData, ObjectData, StringData, ArrayData},
+        props : ['parentIsEditing','schemaData'],
         data : () => ({
-                isEditing : false,
-            //urusan general
-                name : '',
-                description : '',
-                type : 'String',
-                required : false,
-                isMoreDisplay : false,
-                example : '',
-                exampleCount : 1,
-                isHasName : true,
+            //data editor
+            isEditing : false,
+            isMoreDisplay : false,
 
-            //urusan array
-                arrayDimension : 0,
-                itemType : '',
+            //data general
+            name : '',
+            isHasName : true,
+            description : '',
+            type : 'string',
+            required : false,
+            example : '',
+            exampleCount : 1,
 
-            //urusan object
-                propertyId : 2,
-                propertiesId : [1]
+            //data array
+            arrayDimension : 0,
+            itemType : '',
+            items : [],
 
-            }),
+            //data object
+            propertyId : 2,
+            propertiesId : [{id : 1}]
+
+        }),
         computed : {
             moreDisplay: function () {
                 return (this.isMoreDisplay)?'block':'none'
             },
             dataTypes : function () {
                 return [
-                    'Object','Array','String','Number','Integer','Boolean',
+                    {text : 'Object', val : 'object'},
+                    {text : 'Array', val : 'array'},
+                    {text : 'String', val : 'string'},
+                    {text : 'Number', val : 'number'},
+                    {text : 'Integer', val : 'integer'},
+                    {text : 'Boolean', val : 'boolean'},
                 ]
             },
-            tes : function () {
+            customDataTypes : function () {
                 return this.$store.getters['project/getDataTypes']
             },
-            previewHtml : function () {
-                let pHtml = ''
-                return pHtml
-
+            lastItem : function () {
+                return (this.items.length === 0)?{}:this.items[this.items.length - 1]
             }
         },
         methods : {
@@ -147,21 +178,19 @@
                 this.isMoreDisplay = ! this.isMoreDisplay
             },
             selectType : function (value) {
-                if(value === 'Array'){
-                    this.arrayDimension = 1
-                    this.itemType = 'String'
-                }
-                else{
-                    this.arrayDimension = 0
+                if(value === 'array'){
+                    this.items = []
+                    this.items.push({type : 'string'})
                 }
             },
             selectItemType : function (value,i) {
-                if(value === 'Array'){
-                    this.arrayDimension += 1
+                if(value === 'array' && i === this.items.length -1 ){
+                    this.items.push({
+                        type : 'string'
+                    })
                 }
                 else{
-                    this.arrayDimension = i
-                    this.itemType = value
+                    this.items = this.items.slice(0,i+1)
                 }
             },
             getData : function () {
@@ -169,22 +198,25 @@
                 res.name = this.name
                 res.description = this.description
                 res.example = this.example
-                if(this.type === 'Object'){
+                if(this.type === 'object' || this.lastItem.type === 'object'){
                     res.properties = {}
                     for(let i=0; i <  this.propertiesId.length; i++){
-                        let id = this.propertiesId[i]
+                        let id = this.propertiesId[i].id
                         let data = this.$refs['property-'+id][0].getData()
                         res.properties[data.name] = data.attributes
                     }
                 }
-                else if(this.type === 'Array'){
+
+                if(this.type === 'array'){
                     let pointer = res
-                    for(let i = 1; i < this.arrayDimension; i++){
+                    //item terakhir bukan array
+                    for(let i = 0; i < this.items.length-1; i++){
                         pointer.items = this.$refs['array-'+i][0].getAttributes()
                         pointer = pointer.items
                     }
-                    pointer.items = this.$refs.itemDataType.getAttributes()
-
+                    pointer.items = this.$refs.itemDataType[0].getAttributes()
+                    pointer.items.properties = res.properties
+                    delete res.properties
                 }
                 return {
                     name : this.name,
@@ -192,7 +224,7 @@
                 }
             },
             addNewProperty : function() {
-                this.propertiesId.push(this.propertyId++)
+                this.propertiesId.push({id : this.propertyId++})
             },
             deleteProperty(i) {
                 this.propertiesId.splice(i,1)
@@ -213,8 +245,54 @@
             },
 
             dump : function () {
-                console.log(this.$refs)
                 console.log(this.getData())
+            }
+        },
+        created(){
+            if(this.parentIsEditing !== undefined){
+                this.isEditing = this.parentIsEditing
+            }
+            if(this.schemaData !== undefined){
+                let sd = this.schemaData
+                this.name = sd.name
+                this.type = sd.type
+                this.description = sd.description
+                this.required = sd.required
+                this.example = sd.example
+
+                if(this.type === 'array'){
+                    this.arrayDimension = 1
+                    let initItems = (pointer) => {
+                        this.items.push(pointer)
+                        if(pointer.type === 'array'){
+                            initItems(pointer.items)
+                        }
+                    }
+
+                    initItems(this.schemaData.items)
+
+                }
+
+                //punya properties/child
+                if(sd.properties !== undefined){
+                    //buang default field
+                    this.propertiesId.pop()
+                    let pr = sd.properties
+                    for(let key in pr){
+                        let tmp = pr[key]
+                        tmp.name = key
+                        this.propertiesId.push({
+                            id : this.propertyId++,
+                            schemaData : pr[key]
+                        })
+                    }
+                }
+            }
+
+
+
+            if(this.type === undefined){
+                this.type = 'string'
             }
         }
     }
