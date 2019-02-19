@@ -46,16 +46,29 @@
 </template>
 
 <script>
+    import CompareUtil from '@/utils/CompareUtil'
+
     export default {
         name: "NumericData",
-        props : ['numericType','isEditing','schemaData'],
+        props : {
+            numericType : String,
+            isEditing : Boolean,
+            schemaData : Object
+        },
         data: () => ({
             enums : [''],
             enumCount : 1,
             format : '',
             minimum : undefined,
             maximum : undefined,
-            defaultVal : undefined
+            defaultVal : undefined,
+            attributesKey : [
+                {keyBefore : 'enum', keyAfter : 'enums', default : []},
+                {key : 'format'},
+                {key : 'minimum'},
+                {key : 'maximum'},
+                {keyBefore : 'default', keyAfter : 'defaultVal'}
+            ]
         }),
         computed : {
             formats() {
@@ -89,22 +102,31 @@
                     default : this.defaultVal
                 }
             },
-            toStringAssignment : function (target,value) {
-                target = (value !== undefined)?value:''
-            }
+            _toString : function (value) {
+                return (value !== undefined)?value.toString():undefined
+            },
+            isEdited : function () {
+                if(!(this.schemaData.type === 'number' || this.schemaData.type === 'integer')){
+                    return true
+                }
+                this.enums.pop()
+                let res = CompareUtil.isChanged(this.schemaData, this._data, this.attributesKey)
+                this.enums.push('')
+                return res
+            },
         },
         created(){
-            if(this.schemaData !== undefined){
+            if(this.schemaData.type === 'number' || this.schemaData.type === 'integer'){
                 let sd = this.schemaData
                 if(sd.enum !== undefined){
-                    this.enums = sd.enum
+                    this.enums = Object.assign([],sd.enum)
                     this.enums.push('')
                     this.enumCount = this.enums.length
                 }
                 this.format = sd.format
-                this.toStringAssignment(this.minimum,sd.minimum)
-                this.toStringAssignment(this.maximum,sd.maximum)
-                this.toStringAssignment(this.defaultVal,sd.default)
+                this.minimum = this._toString(sd.minimum)
+                this.maximum = this._toString(sd.maximum)
+                this.defaultVal = this._toString(sd.default)
             }
         }
     }

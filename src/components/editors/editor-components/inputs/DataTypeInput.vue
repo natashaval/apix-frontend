@@ -59,11 +59,11 @@
                                     :isEditing="isEditing" :schemaData="schemaData"/>
 
                         <NumericData ref="curDataType" v-else-if="type === 'number'"
-                                     :numericType="'Number'" :isEditing="isEditing"
+                                     :numericType="'number'" :isEditing="isEditing"
                                      :schemaData="schemaData"/>
 
                         <NumericData ref="curDataType" v-else-if="type === 'integer'"
-                                     :numericType="'Integer'" :isEditing="isEditing"
+                                     :numericType="'integer'" :isEditing="isEditing"
                                      :schemaData="schemaData"/>
 
                         <BooleanData ref="curDataType" v-else-if="type === 'boolean'"
@@ -86,7 +86,8 @@
                     </div>
                     <div class="col-6">
                         {{item.type}}
-                        <ArrayData :ref="'array-'+i" v-if="item.type === 'array'" :schemaData="item"/>
+                        <ArrayData :ref="'array-'+i" v-if="item.type === 'array'"
+                                   :schemaData="item" :isEditing="isEditing"/>
                         <StringData ref="itemDataType" v-else-if="item.type === 'string'"
                                     :schemaData="item" :isEditing="isEditing"/>
                         <ObjectData ref="itemDataType" v-else-if="item.type === 'object'"
@@ -123,6 +124,8 @@
     import NumericData from "./typedatas/NumericData";
     import BooleanData from "./typedatas/BooleanData";
 
+    import CompareUtil from '@/utils/CompareUtil'
+
 
     export default {
         name: "DataTypeInput",
@@ -149,7 +152,15 @@
 
             //data object
             propertyId : 2,
-            propertiesId : [{id : 1}]
+            propertiesId : [{id : 1}],
+
+            attributesKey : [
+                {key : 'name'},
+                {key : 'type'},
+                {key : 'required'},
+                {key : 'example'},
+                {key : 'description'}
+            ]
 
         }),
         computed : {
@@ -193,31 +204,73 @@
                     this.items = this.items.slice(0,i+1)
                 }
             },
-            getData : function () {
+            isEdited : function () {
+                if(this.schemaData.type !== this.type)return true
+                return CompareUtil.isChanged(this.schemaData, this._data, this.attributesKey)
+
+            },
+            /*
+            * if ada perubahan, return {name,attributes}
+            * else, return undefined
+            * */
+            getChangedData : function () {
+
+                let isEdited = this.isEdited() || this.$refs.curDataType.isEdited()
                 let res = this.$refs.curDataType.getAttributes()
                 res.name = this.name
                 res.description = this.description
                 res.example = this.example
-                if(this.type === 'object' || this.lastItem.type === 'object'){
-                    res.properties = {}
+
+                let getChangedProperties = () => {
+                    let properties = {}
+                    let isEdited = false
                     for(let i=0; i <  this.propertiesId.length; i++){
                         let id = this.propertiesId[i].id
-                        let data = this.$refs['property-'+id][0].getData()
-                        res.properties[data.name] = data.attributes
+                        let data = this.$refs['property-'+id][0].getChangedData()
+                        //jika tidak ada perubahan data dalam child => continue
+                        if(data === undefined)continue
+                        isEdited = true
+                        properties[data.name] = data.attributes
                     }
+                    if(isEdited){return properties}
+                    return undefined
                 }
 
-                if(this.type === 'array'){
+                if(this.type === 'object'){
+                    let propData = getChangedProperties()
+                    //jika childnya juga tidak ada yg berubah
+                    if(propData === undefined)return undefined
+                    isEdited = true
+                    res.properties = propData
+                }
+                else if(this.type === 'array'){
                     let pointer = res
                     //item terakhir bukan array
                     for(let i = 0; i < this.items.length-1; i++){
+                        if(!isEdited){
+                            isEdited |= this.$refs['array-'+i][0].isEdited()
+                        }
                         pointer.items = this.$refs['array-'+i][0].getAttributes()
                         pointer = pointer.items
                     }
+
                     pointer.items = this.$refs.itemDataType[0].getAttributes()
-                    pointer.items.properties = res.properties
-                    delete res.properties
+
+                    if(this.lastItem.type === 'object'){
+                        let propData = getChangedProperties()
+                        if(propData !== undefined){
+                            isEdited |= true
+                            //jika child dari tipe data item array tidak berubah
+                            pointer.items.properties = propData.properties
+                        }
+                    }
+                    else if(!isEdited){
+                        isEdited |= this.$refs.itemDataType[0].isEdited()
+                    }
                 }
+
+                if(!isEdited)return undefined
+
                 return {
                     name : this.name,
                     attributes : res
@@ -245,7 +298,7 @@
             },
 
             dump : function () {
-                console.log(this.getData())
+                console.log(this.getChangedData())
             }
         },
         created(){
@@ -294,6 +347,7 @@
             if(this.type === undefined){
                 this.type = 'string'
             }
+
         }
     }
 </script>

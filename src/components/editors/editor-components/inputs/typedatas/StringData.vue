@@ -44,16 +44,29 @@
 </template>
 
 <script>
+    import CompareUtil from '@/utils/CompareUtil'
+
     export default {
         name: "StringData",
-        props : ['isEditing','schemaData'],
+        props : {
+            isEditing : Boolean,
+            schemaData : Object
+        },
         data : () => ({
             enums : [''],
             enumCount : 1,
-            minLength : null,
-            maxLength : null,
+            minLength : undefined,
+            maxLength : undefined,
             pattern : '',
-            defaultVal : ''
+            defaultVal : '',
+            attributesKey : [
+                {keyBefore : 'enum', keyAfter : 'enums', default : []},
+                {key : 'minLength'},
+                {key : 'maxLength'},
+                {key : 'pattern'},
+                {keyBefore : 'default', keyAfter : 'defaultVal'}
+            ],
+
         }),
         methods : {
             onEnumTyped : function(i) {
@@ -80,22 +93,29 @@
                     default : this.defaultVal
                 }
             },
-            toStringAssignment : function (target,value) {
-                target = (value !== undefined)?value:''
+            isEdited : function () {
+                if(this.schemaData.type !== 'string')return true
+                this.enums.pop()
+                let res = CompareUtil.isChanged(this.schemaData, this._data, this.attributesKey)
+                this.enums.push('')
+                return res
+            },
+            _toString : function (value) {
+                return (value !== undefined)?value.toString():undefined
             }
         },
         created(){
-            if(this.schemaData !== undefined){
+            if(this.schemaData.type === 'string'){
                 let sd = this.schemaData
                 if(sd.enum !== undefined){
-                    this.enums = sd.enum
+                    this.enums = Object.assign([],sd.enum)
                     this.enums.push('')
                     this.enumCount = this.enums.length
                 }
                 this.pattern = sd.pattern
-                this.toStringAssignment(this.minLength,sd.minLength)
-                this.toStringAssignment(this.maxLength,sd.maxLength)
-                this.toStringAssignment(this.defaultVal,sd.default)
+                this.minLength = this._toString(sd.minLength)
+                this.maxLength = this._toString(sd.maxLength)
+                this.defaultVal = this._toString(sd.default)
             }
         }
     }

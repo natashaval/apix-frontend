@@ -13,7 +13,7 @@
             </div>
             <div class="form-inline row float-right">
                 <label>Unique items</label>
-                <b-checkbox></b-checkbox>
+                <b-checkbox v-model="uniqueItems"></b-checkbox>
             </div>
         </div>
         <div v-else>
@@ -29,13 +29,24 @@
 </template>
 
 <script>
+    import CompareUtil from '@/utils/CompareUtil'
+
     export default {
         name: "ArrayData",
-        props : ['isEditing','schemaData'],
+        props : {
+            isEditing : Boolean,
+            schemaData : Object
+        },
         data : () => ({
             minItems : 0,
             maxItems : 0,
-            uniqueItems : false
+            uniqueItems : false,
+
+            attributesKey : [
+                {key : 'minItems'},
+                {key : 'maxItems'},
+                {key : 'uniqueItems',default : false}
+            ]
         }),
         methods : {
             getAttributes : function () {
@@ -45,14 +56,21 @@
                     maxItems : parseInt(this.maxItems),
                     uniqueItems : this.uniqueItems
                 }
+            },
+            isEdited : function () {
+                if(this.schemaData.type !== 'array')return true
+                return CompareUtil.isChanged(this.schemaData, this._data, this.attributesKey)
+            },
+            _toString : function (value) {
+                return (value !== undefined)?value.toString():undefined
             }
         },
         created(){
-            if(this.schemaData !== undefined){
+            if(this.schemaData.type === 'array'){
                 let sd = this.schemaData
-                this.minItems = (sd.minItems !== undefined)?sd.minItems.toString() : ""
-                this.maxItems = (sd.maxItems !== undefined)?sd.maxItems.toString() : ""
-                this.uniqueItems = (sd.uniqueItems !== undefined)?sd.uniqueItems:false
+                this.minItems = this._toString(sd.minItems)
+                this.maxItems = this._toString(sd.maxItems)
+                this.uniqueItems = (sd.uniqueItems === undefined)?false:sd.uniqueItems
             }
         }
     }
