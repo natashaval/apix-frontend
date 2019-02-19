@@ -25,21 +25,20 @@
             </div>
         </div>
         <div v-else class="float-right">
-            <h3>ini preview tambahan dari string</h3>
             <div class="row" v-if="enums.length !== 1">
                 <p class="col-5">enum</p>
                 <div class="col-5">
                     <p v-for="_enum in enums" v-bind:key="_enum">{{_enum}}</p>
                 </div>
             </div>
-            <div class="row" v-if="pattern !== ''">
+            <div class="row" v-if="pattern !== undefined">
                 <p>Pattern : {{pattern}}</p>
             </div>
             <div class="row">
                 <p v-if="minLength != null">Min length : {{minLength}}, </p>
                 <p v-if="maxLength != null">Max length : {{maxLength}}</p>
             </div>
-            <p v-if="defaultVal !== '' ">Default : {{defaultVal}}</p>
+            <p v-if="defaultVal !== undefined ">Default : {{defaultVal}}</p>
         </div>
     </div>
 </template>
@@ -47,7 +46,7 @@
 <script>
     export default {
         name: "StringData",
-        props : ['isEditing'],
+        props : ['isEditing','schemaData'],
         data : () => ({
             enums : [''],
             enumCount : 1,
@@ -80,6 +79,23 @@
                     maxLength : this.maxLength,
                     default : this.defaultVal
                 }
+            },
+            toStringAssignment : function (target,value) {
+                target = (value !== undefined)?value:''
+            }
+        },
+        created(){
+            if(this.schemaData !== undefined){
+                let sd = this.schemaData
+                if(sd.enum !== undefined){
+                    this.enums = sd.enum
+                    this.enums.push('')
+                    this.enumCount = this.enums.length
+                }
+                this.pattern = sd.pattern
+                this.toStringAssignment(this.minLength,sd.minLength)
+                this.toStringAssignment(this.maxLength,sd.maxLength)
+                this.toStringAssignment(this.defaultVal,sd.default)
             }
         }
     }
