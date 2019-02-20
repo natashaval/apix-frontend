@@ -1,13 +1,22 @@
 <template>
     <div>
-        <h4> {{ project.host }} </h4>
+        <h4 @click="projectClick"> {{project.info.title }}</h4>
+        <h6> {{ project.host }} </h6>
     </div>
 </template>
 
 <script>
     export default {
         name: "ProjectsCard",
-        props: ['project']
+        props: ['project'],
+        methods: {
+            projectClick: function () {
+                this.$router.push({
+                    name :'project-editor',
+                    params: {projectId : this.project.id}
+                })
+            }
+        }
     }
 </script>
 

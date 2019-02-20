@@ -2,7 +2,9 @@
     <div>
         <h2>All Layout Repos</h2>
         <router-link to="/projects/5c61963e2fd74228b44ebddd">Swagger PetStore</router-link>
-        {{ projectsData }}
+        <div v-for="project in projectsData" v-bind:key="project.id">
+            <ProjectsCard :project="project" />
+        </div>
     </div>
 </template>
 
