@@ -11,7 +11,7 @@
 </template>
 
 <script>
-    import CompareUtil from '@/utils/CompareUtil'
+    import ActionBuilder from '@/utils/ActionBuilderUtil'
 
     export default {
         name: "ObjectData",
@@ -32,13 +32,15 @@
                     additionalProperties: this.additionalProperties
                 }
             },
-            isEdited : function () {
-                if(this.schemaData.type !== 'object')return true
-                return CompareUtil.isChanged(this.schemaData, this._data, this.attributesKey)
+            getActions : function () {
+                let tmp = this.schemaData
+                if(tmp !== undefined && tmp.type !== 'object')tmp = {}
+                return ActionBuilder.createActions(tmp, this._data, this.attributesKey)
             }
         },
         created(){
-            if(this.schemaData.type === 'object'){
+
+            if(this.schemaData !== undefined && this.schemaData.type === 'object'){
                 this.additionalProperties = this.schemaData.additionalProperties
             }
         }

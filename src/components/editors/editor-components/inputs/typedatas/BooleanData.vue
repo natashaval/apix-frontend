@@ -11,7 +11,7 @@
 </template>
 
 <script>
-    import CompareUtil from '@/utils/CompareUtil'
+    import ActionBuilder from '@/utils/ActionBuilderUtil'
 
     export default {
         name: "BooleanData",
@@ -32,14 +32,16 @@
                     default : this.defaultVal
                 }
             },
-            isEdited : function () {
-                if(this.schemaData.type !== 'boolean')return true
-                return CompareUtil.isChanged(this.schemaData, this._data, this.attributesKey)
+            getActions : function () {
+                let tmp = this.schemaData
+                if(tmp !== undefined && tmp.type !== 'boolean')tmp = {}
+                return ActionBuilder.createActions(tmp, this._data, this.attributesKey)
             }
 
         },
         created(){
-            if(this.schemaData.type === 'boolean'){
+
+            if(this.schemaData !== undefined && this.schemaData.type === 'boolean'){
                 this.defaultVal = (this.schemaData.default === undefined)?false:this.schemaData.default
             }
         }

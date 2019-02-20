@@ -44,7 +44,7 @@
 </template>
 
 <script>
-    import CompareUtil from '@/utils/CompareUtil'
+    import ActionBuilder from '@/utils/ActionBuilderUtil'
 
     export default {
         name: "StringData",
@@ -63,8 +63,8 @@
                 {keyBefore : 'enum', keyAfter : 'enums', default : []},
                 {key : 'minLength'},
                 {key : 'maxLength'},
-                {key : 'pattern'},
-                {keyBefore : 'default', keyAfter : 'defaultVal'}
+                {key : 'pattern', default : ''},
+                {keyBefore : 'default', keyAfter : 'defaultVal', default : ''}
             ],
 
         }),
@@ -93,10 +93,13 @@
                     default : this.defaultVal
                 }
             },
-            isEdited : function () {
-                if(this.schemaData.type !== 'string')return true
+            getActions : function () {
+                let tmp = this.schemaData
+                if(tmp !== undefined && tmp.type !== 'string'){
+                    tmp = {}
+                }
                 this.enums.pop()
-                let res = CompareUtil.isChanged(this.schemaData, this._data, this.attributesKey)
+                let res = ActionBuilder.createActions(tmp, this._data, this.attributesKey)
                 this.enums.push('')
                 return res
             },
@@ -105,7 +108,10 @@
             }
         },
         created(){
-            if(this.schemaData.type === 'string'){
+
+            // if(this.schemaData === undefined)this.schemaData = {}
+
+            if(this.schemaData !== undefined && this.schemaData.type === 'string'){
                 let sd = this.schemaData
                 if(sd.enum !== undefined){
                     this.enums = Object.assign([],sd.enum)

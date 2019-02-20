@@ -46,7 +46,7 @@
 </template>
 
 <script>
-    import CompareUtil from '@/utils/CompareUtil'
+    import ActionBuilder from '@/utils/ActionBuilderUtil'
 
     export default {
         name: "NumericData",
@@ -82,6 +82,7 @@
                 if(i === this.enumCount - 1 ){
                     if(this.enums[i] !== ''){
                         this.enumCount++
+                        console.log('kepush lagi')
                         this.enums.push('')
                     }
                 }
@@ -105,18 +106,21 @@
             _toString : function (value) {
                 return (value !== undefined)?value.toString():undefined
             },
-            isEdited : function () {
-                if(!(this.schemaData.type === 'number' || this.schemaData.type === 'integer')){
-                    return true
+            getActions : function () {
+                let tmp = this.schemaData
+                if(!(tmp.type === 'number' || tmp.type === 'integer')){
+                    tmp = {}
                 }
                 this.enums.pop()
-                let res = CompareUtil.isChanged(this.schemaData, this._data, this.attributesKey)
+                let res = ActionBuilder.createActions(tmp, this._data, this.attributesKey)
                 this.enums.push('')
                 return res
             },
         },
         created(){
-            if(this.schemaData.type === 'number' || this.schemaData.type === 'integer'){
+
+            if(this.schemaData !== undefined &&
+                (this.schemaData.type === 'number' || this.schemaData.type === 'integer') ){
                 let sd = this.schemaData
                 if(sd.enum !== undefined){
                     this.enums = Object.assign([],sd.enum)

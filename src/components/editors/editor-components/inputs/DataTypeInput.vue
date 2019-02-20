@@ -124,7 +124,7 @@
     import NumericData from "./typedatas/NumericData";
     import BooleanData from "./typedatas/BooleanData";
 
-    import CompareUtil from '@/utils/CompareUtil'
+    import ActionBuilder from '@/utils/ActionBuilderUtil'
 
 
     export default {
@@ -155,7 +155,6 @@
             propertiesId : [{id : 1}],
 
             attributesKey : [
-                {key : 'name'},
                 {key : 'type'},
                 {key : 'required'},
                 {key : 'example'},
@@ -204,73 +203,148 @@
                     this.items = this.items.slice(0,i+1)
                 }
             },
-            isEdited : function () {
-                if(this.schemaData.type !== this.type)return true
-                return CompareUtil.isChanged(this.schemaData, this._data, this.attributesKey)
-
+            getActions : function () {
+                let tmp = this.schemaData
+                return ActionBuilder.createActions(tmp, this._data, this.attributesKey)
             },
             /*
             * if ada perubahan, return {name,attributes}
             * else, return undefined
             * */
-            getChangedData : function () {
+            getChangedData : function (parentQuery) {
+                let query = {_hasActions : true, _actions : []}
+                let childIsEdited = false
 
-                let isEdited = this.isEdited() || this.$refs.curDataType.isEdited()
+                if(parentQuery._hasActions === undefined){
+                    parentQuery._hasActions = true
+                    parentQuery._actions = []
+                }
+
+                //jika object/field baru
+                if(this.schemaData === undefined || this.schemaData.type !== this.type){
+                    parentQuery._actions.push({
+                        action : 'put',
+                        key : this.name,
+                        value : this.getData().attributes
+                    })
+                    return
+                }//jika ganti nama
+                else if(this.schemaData.name !== this.name){
+                    parentQuery._actions.push({
+                        action : 'rename',
+                        key : this.schemaData.name,
+                        newKey : this.name
+                    })
+                    parentQuery[this.name] = query
+                }//jika tidak ada perubahan nama
+                //ingat undefined == null tapi undefined !== null
+                else if(this.name !== '' && this.name != undefined ){
+                    parentQuery[this.name] = query
+                }
+                else{
+                    //jika ga punya nama????
+                    parentQuery._actions = []
+                    parentQuery._hasActions = true
+                    query = parentQuery
+                }
+
+                let actions = this.getActions()
+                this.$refs.curDataType.getActions().forEach(x => actions.push(x))
+
+                query._actions = actions
+
+                if(this.type === 'object'){
+                    for(let i = 0; i < this.propertiesId.length; i++){
+                        let id = this.propertiesId[i].id
+                        //nandain apakah didalamnya ada diedit
+                        childIsEdited |= this.$refs['property-'+id][0].getChangedData(query)
+                    }
+                }
+                else if(this.type === 'array') {
+                    query.items = {}
+                    let pointer = query.items
+                    let lastEditedPointer = pointer
+                    let sdItemPointer = this.schemaData.items
+                    for(let i = 0; i < this.items.length - 1; i++){
+                        let tmp = this.$refs['array-' + i][0].getActions()
+
+                        if(tmp.length > 0 || sdItemPointer === undefined){
+                            lastEditedPointer = pointer
+                            pointer._hasActions = true
+                            pointer._actions = tmp
+                            childIsEdited = true
+                        }
+
+                        pointer.items = {}
+                        pointer = pointer.items
+                        if(sdItemPointer !== undefined){
+                            sdItemPointer = sdItemPointer.items
+                        }
+                    }
+
+                    if (this.lastItem.type === 'object') {
+                        let tmp = {}
+                        let itemIsEdited = false
+                        for (let i = 0; i < this.propertiesId.length; i++) {
+                            let id = this.propertiesId[i].id
+                            //nandain apakah didalamnya ada diedit
+                            itemIsEdited |= this.$refs['property-' + id][0].getChangedData(tmp)
+                        }
+                        if (itemIsEdited) {
+                            pointer.properties = tmp
+                            childIsEdited = true
+                        }else{
+                            delete lastEditedPointer.items
+                        }
+                    } else {
+                        let tmp = this.$refs.itemDataType[0].getActions()
+                        if (tmp.length > 0) {
+                            pointer._actions = tmp
+                            pointer._actions.push({
+                                action : 'put',
+                                key : 'type',
+                                value : this.lastItem.type
+                            })
+                            pointer._hasActions = true
+                            childIsEdited = true
+                        }else {
+                            delete lastEditedPointer.items
+                        }
+                    }
+                }
+
+
+                let isEdited = query._actions.length > 0 || childIsEdited
+                if(!isEdited){
+                    delete parentQuery[this.name]
+                }
+                return isEdited
+            },
+            getData : function () {
                 let res = this.$refs.curDataType.getAttributes()
                 res.name = this.name
                 res.description = this.description
                 res.example = this.example
-
-                let getChangedProperties = () => {
-                    let properties = {}
-                    let isEdited = false
+                if(this.type === 'object' || this.lastItem.type === 'object'){
+                    res.properties = {}
                     for(let i=0; i <  this.propertiesId.length; i++){
                         let id = this.propertiesId[i].id
-                        let data = this.$refs['property-'+id][0].getChangedData()
-                        //jika tidak ada perubahan data dalam child => continue
-                        if(data === undefined)continue
-                        isEdited = true
-                        properties[data.name] = data.attributes
+                        let data = this.$refs['property-'+id][0].getData()
+                        res.properties[data.name] = data.attributes
                     }
-                    if(isEdited){return properties}
-                    return undefined
                 }
 
-                if(this.type === 'object'){
-                    let propData = getChangedProperties()
-                    //jika childnya juga tidak ada yg berubah
-                    if(propData === undefined)return undefined
-                    isEdited = true
-                    res.properties = propData
-                }
-                else if(this.type === 'array'){
+                if(this.type === 'array'){
                     let pointer = res
                     //item terakhir bukan array
                     for(let i = 0; i < this.items.length-1; i++){
-                        if(!isEdited){
-                            isEdited |= this.$refs['array-'+i][0].isEdited()
-                        }
                         pointer.items = this.$refs['array-'+i][0].getAttributes()
                         pointer = pointer.items
                     }
-
                     pointer.items = this.$refs.itemDataType[0].getAttributes()
-
-                    if(this.lastItem.type === 'object'){
-                        let propData = getChangedProperties()
-                        if(propData !== undefined){
-                            isEdited |= true
-                            //jika child dari tipe data item array tidak berubah
-                            pointer.items.properties = propData.properties
-                        }
-                    }
-                    else if(!isEdited){
-                        isEdited |= this.$refs.itemDataType[0].isEdited()
-                    }
+                    pointer.items.properties = res.properties
+                    delete res.properties
                 }
-
-                if(!isEdited)return undefined
-
                 return {
                     name : this.name,
                     attributes : res
@@ -298,7 +372,9 @@
             },
 
             dump : function () {
-                console.log(this.getChangedData())
+                let tmp = {}
+                console.log(this.getChangedData(tmp))
+                console.log(tmp)
             }
         },
         created(){

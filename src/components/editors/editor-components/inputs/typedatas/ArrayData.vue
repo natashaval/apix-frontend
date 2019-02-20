@@ -29,7 +29,7 @@
 </template>
 
 <script>
-    import CompareUtil from '@/utils/CompareUtil'
+    import ActionBuilder from '@/utils/ActionBuilderUtil'
 
     export default {
         name: "ArrayData",
@@ -57,16 +57,18 @@
                     uniqueItems : this.uniqueItems
                 }
             },
-            isEdited : function () {
-                if(this.schemaData.type !== 'array')return true
-                return CompareUtil.isChanged(this.schemaData, this._data, this.attributesKey)
+            getActions : function () {
+                let tmp = this.schemaData
+                if(tmp !== undefined && tmp.type !== 'array')tmp = {}
+                return ActionBuilder.createActions(tmp, this._data, this.attributesKey)
             },
             _toString : function (value) {
                 return (value !== undefined)?value.toString():undefined
             }
         },
         created(){
-            if(this.schemaData.type === 'array'){
+
+            if(this.schemaData !== undefined && this.schemaData.type === 'array'){
                 let sd = this.schemaData
                 this.minItems = this._toString(sd.minItems)
                 this.maxItems = this._toString(sd.maxItems)
