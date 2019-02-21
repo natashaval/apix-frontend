@@ -31,6 +31,11 @@ export default{
                 return (tmp === undefined)?undefined : tmp.methods[operation]
             }
         },
+        getDefinitionData(state){
+            return (definition) => {
+                return (state.project.definitions === undefined) ? undefined : state.project.definitions[definition]
+            }
+        },
         getDataTypes(state){
             return state.project.definitions
         }

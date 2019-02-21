@@ -7,6 +7,7 @@ import {store} from '../stores'
 import PathEditor from "../components/editors/PathEditor";
 import OperationEditor from "../components/editors/OperationEditor";
 import ProjectRepo from "../components/projects/ProjectRepo";
+import DefinitionEditor from "../components/editors/DefinitionEditor";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -45,6 +46,11 @@ export const router = new VueRouter({
             name : 'operation-editor', path : '/projects/:projectId/sections/:sectionApi/paths/:pathApi/operations/:operationApi',
             component : OperationEditor, props : true,
             beforeEnter : initProject
+        },
+        {
+            name: 'definition-editor', path: '/projects/:projectId/definitions/:definitionApi',
+            component: DefinitionEditor, props: true,
+            beforeEnter: initProject
         },
         // List of Projects available
         {

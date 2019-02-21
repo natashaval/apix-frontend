@@ -1,13 +1,13 @@
 <template>
     <div>
-        <h4 @click="enterProject"> {{project.info.title }}</h4>
-        <h6> {{ project.host }} </h6>
-        <button @click="deleteProject">Delete</button>
+        <b-card @click="enterProject" text-variant="primary"
+                :title="project.info.title" :sub-title="project.host">
+            <button @click="deleteProject">Delete</button>
+        </b-card>
     </div>
 </template>
 
 <script>
-    import axios from 'axios'
 
     export default {
         name: "ProjectsCard",
