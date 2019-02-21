@@ -57,18 +57,21 @@
             enumCount : 1,
             minLength : undefined,
             maxLength : undefined,
-            pattern : '',
-            defaultVal : '',
+            pattern : undefined,
+            defaultVal : undefined,
             attributesKey : [
                 {keyBefore : 'enum', keyAfter : 'enums', default : []},
                 {key : 'minLength'},
                 {key : 'maxLength'},
-                {key : 'pattern', default : ''},
-                {keyBefore : 'default', keyAfter : 'defaultVal', default : ''}
+                {key : 'pattern'},
+                {keyBefore : 'default', keyAfter : 'defaultVal'}
             ],
 
         }),
         methods : {
+            getAttributesKey : function () {
+                return this.attributesKey
+            },
             onEnumTyped : function(i) {
                 if(i === this.enumCount - 1 ){
                     if(this.enums[i] !== ''){
@@ -118,7 +121,7 @@
                     this.enums.push('')
                     this.enumCount = this.enums.length
                 }
-                this.pattern = sd.pattern
+                this.pattern = this._toString(sd.pattern)
                 this.minLength = this._toString(sd.minLength)
                 this.maxLength = this._toString(sd.maxLength)
                 this.defaultVal = this._toString(sd.default)

@@ -78,11 +78,13 @@
             }
         },
         methods : {
+            getAttributesKey : function () {
+                return this.attributesKey
+            },
             onEnumTyped : function(i) {
                 if(i === this.enumCount - 1 ){
                     if(this.enums[i] !== ''){
                         this.enumCount++
-                        console.log('kepush lagi')
                         this.enums.push('')
                     }
                 }

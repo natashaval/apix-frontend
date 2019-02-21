@@ -26,6 +26,9 @@
             ]
         }),
         methods : {
+            getAttributesKey : function () {
+                return this.attributesKey
+            },
             getAttributes : function () {
                 return {
                     type : 'boolean',
