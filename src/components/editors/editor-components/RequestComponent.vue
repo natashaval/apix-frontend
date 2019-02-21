@@ -1,6 +1,6 @@
 <template>
     <div>
-        <BodyForm :bodyData="operationData.body"/>
+        <BodyForm :bodyData="operationData.requestBody"/>
     </div>
 </template>
 

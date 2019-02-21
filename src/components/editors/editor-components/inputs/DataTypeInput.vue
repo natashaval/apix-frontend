@@ -69,6 +69,7 @@
                         <BooleanData ref="curDataType" v-else-if="type === 'boolean'"
                                      :isEditing="isEditing"
                                      :schemaData="schemaData"/>
+                        <CustomData ref="curDataType" v-else :dataName="type"/>
                     </div>
                 </div>
             </div>
@@ -82,6 +83,10 @@
                             <option v-for="dataType in dataTypes"
                                     v-bind:key="dataType.val"
                                     :value="dataType.val">{{dataType.text}}</option>
+                            <hr/>
+                            <option v-for="(value,name) in customDataTypes"
+                                    v-bind:key="name"
+                                    :value="name">{{name}}</option>
                         </b-select>
                     </div>
                     <div class="col-6">
@@ -95,9 +100,10 @@
                         <NumericData ref="itemDataType" v-else-if="item.type === 'number'"
                                      :numericType="'number'" :schemaData="lastItem" :isEditing="isEditing"/>
                         <NumericData ref="itemDataType" v-else-if="item.type === 'integer'"
-                                     :numericType="'integer'" schemaData="lastItem" :isEditing="isEditing"/>
+                                     :numericType="'integer'" :schemaData="lastItem" :isEditing="isEditing"/>
                         <BooleanData ref="itemDataType" v-else-if="item.type === 'boolean'"
                                      :schemaData="lastItem" :isEditing="isEditing"/>
+                        <CustomData ref="itemDataType" v-else :dataName="lastItem.type"/>
                     </div>
                 </div>
             </div>
@@ -125,11 +131,12 @@
     import BooleanData from "./typedatas/BooleanData";
 
     import ActionBuilder from '@/utils/ActionBuilderUtil'
+    import CustomData from "./typedatas/CustomData";
 
 
     export default {
         name: "DataTypeInput",
-        components: {BooleanData, NumericData, ObjectData, StringData, ArrayData},
+        components: {CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
         props : ['parentIsEditing','schemaData'],
         data : () => ({
             //data editor
@@ -146,9 +153,12 @@
             exampleCount : 1,
 
             //data array
-            arrayDimension : 0,
-            itemType : '',
             items : [],
+            /*digunakan untuk kasus khusus
+            * karna ketika array yang multidimensi diutak atik, schemaData bisa hilang sehingga validasi tidak valid
+            * sehingga validasi/getActions dilakukan di file ini
+            */
+            schemaItems : [],
 
             //data object
             propertyId : 2,
@@ -227,7 +237,7 @@
                         key : this.name,
                         value : this.getData().attributes
                     })
-                    return
+                    return true
                 }//jika ganti nama
                 else if(this.schemaData.name !== this.name){
                     parentQuery._actions.push({
@@ -262,11 +272,17 @@
                 }
                 else if(this.type === 'array') {
                     query.items = {}
-                    let pointer = query.items
+                    let pointer = query
                     let lastEditedPointer = pointer
                     let sdItemPointer = this.schemaData.items
                     for(let i = 0; i < this.items.length - 1; i++){
-                        let tmp = this.$refs['array-' + i][0].getActions()
+                        pointer = pointer.items
+                        // let tmp = this.$refs['array-' + i][0].getActions()
+                        let tmp = ActionBuilder.createActions(
+                            this.schemaItems[i],
+                            this.$refs['array-' + i][0].getAttributes(),
+                            this.$refs['array-' + i][0].getAttributesKey()
+                        )
 
                         if(tmp.length > 0 || sdItemPointer === undefined){
                             lastEditedPointer = pointer
@@ -276,13 +292,59 @@
                         }
 
                         pointer.items = {}
-                        pointer = pointer.items
                         if(sdItemPointer !== undefined){
                             sdItemPointer = sdItemPointer.items
                         }
                     }
+                    let getChilds = () => {
+                        let childs = {}
+                        for (let i = 0; i < this.propertiesId.length; i++) {
+                            let id = this.propertiesId[i].id
+                            //nandain apakah didalamnya ada diedit
+                            let tmp = this.$refs['property-' + id][0].getData()
+                            childs[tmp.name] = tmp.attributes
+                        }
+                        return childs
+                    }
+                    //dimensi array berubah
+                    if(sdItemPointer !== undefined && sdItemPointer.type === 'array'){
+                        let objVal = this.$refs.itemDataType[0].getAttributes()
+                        if(this.lastItem.type === 'object'){
+                            objVal.properties = getChilds()
+                        }
+                        if(pointer._hasActions === undefined){
+                            pointer._hasActions = true
+                            pointer._actions = []
 
-                    if (this.lastItem.type === 'object') {
+                        }
+                        childIsEdited = true
+                        pointer._actions.push({
+                            action : 'put',
+                            put : 'items',
+                            value : objVal
+                        })
+                    }//tipe data child berubah
+                    else if(sdItemPointer.type !== this.lastItem.type){
+                        let value = undefined
+                        if(this.lastItem.type === 'object'){
+                            value = {
+                                type : 'object',
+                                properties : getChilds()
+                            }
+                        }
+                        else{
+                            value = this.$refs.itemDataType[0].getAttributes()
+                        }
+                        pointer._hasActions = true
+                        pointer._actions = [{
+                            action : 'put',
+                            key : 'item',
+                            value : value
+                        }]
+                        childIsEdited = true
+                    }//ngecek child dari last item berubah atau tidak
+                    else if (this.lastItem.type === 'object') {
+                        pointer = pointer.items
                         let tmp = {}
                         let itemIsEdited = false
                         for (let i = 0; i < this.propertiesId.length; i++) {
@@ -296,15 +358,18 @@
                         }else{
                             delete lastEditedPointer.items
                         }
-                    } else {
-                        let tmp = this.$refs.itemDataType[0].getActions()
+                    }//ngecek attribute last item berubah atau tidak
+                    else {
+                        pointer = pointer.items
+
+                        let tmp = ActionBuilder.createActions(
+                            this.schemaItems[this.schemaItems.length-1],
+                            this.$refs.itemDataType[0].getAttributes(),
+                            this.$refs.itemDataType[0].getAttributesKey()
+                        )
+
                         if (tmp.length > 0) {
                             pointer._actions = tmp
-                            pointer._actions.push({
-                                action : 'put',
-                                key : 'type',
-                                value : this.lastItem.type
-                            })
                             pointer._hasActions = true
                             childIsEdited = true
                         }else {
@@ -390,9 +455,9 @@
                 this.example = sd.example
 
                 if(this.type === 'array'){
-                    this.arrayDimension = 1
                     let initItems = (pointer) => {
-                        this.items.push(pointer)
+                        this.items.push(Object.assign({},pointer))
+                        this.schemaItems.push(pointer)
                         if(pointer.type === 'array'){
                             initItems(pointer.items)
                         }
