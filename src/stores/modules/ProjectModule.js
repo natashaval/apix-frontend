@@ -31,6 +31,11 @@ export default{
                 return (tmp === undefined)?undefined : tmp.methods[operation]
             }
         },
+        getDefinitionData(state){
+            return (definition) => {
+                return (state.project.definitions === undefined) ? undefined : state.project.definitions[definition]
+            }
+        },
         getDataTypes(state){
             return state.project.definitions
         }
@@ -42,6 +47,11 @@ export default{
 
         LIST_DATA (state, newData) {
             state.projects = newData
+        },
+
+        DELETE_DATA (state, idxData) {
+            const projectIndex = state.projects.findIndex(p => p.id === idxData);
+            state.projects.splice(projectIndex, 1)
         }
     },
     actions : {
@@ -60,6 +70,17 @@ export default{
                     commit('LIST_DATA', response.data)
                 })
             fetchProjects()
+        },
+
+        deleteProjectData({ commit }, idProject) {
+            let deleteProject = () => axios.delete('http://localhost:8080/project/' + idProject).then(
+                (response) => {
+                    commit('DELETE_DATA', idProject)
+                }
+            ).catch(function (error) {
+                console.log(error);
+            })
+            deleteProject()
         }
     }
 }

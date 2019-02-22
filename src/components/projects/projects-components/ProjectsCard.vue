@@ -1,20 +1,33 @@
 <template>
     <div>
-        <h4 @click="projectClick"> {{project.info.title }}</h4>
-        <h6> {{ project.host }} </h6>
+        <b-card @click="enterProject" text-variant="primary"
+                :title="project.info.title" :sub-title="project.host">
+            <button @click="deleteProject">Delete</button>
+        </b-card>
     </div>
 </template>
 
 <script>
+
     export default {
         name: "ProjectsCard",
         props: ['project'],
         methods: {
-            projectClick: function () {
+            enterProject: function () {
+                console.log(this.project.id);
                 this.$router.push({
                     name :'project-editor',
                     params: {projectId : this.project.id}
                 })
+            },
+            deleteProject: function () {
+                if(confirm("Delete this project?")){
+                    this.$store.dispatch('project/deleteProjectData', this.project.id);
+                    console.log("project deleted!");
+                }
+                else {
+                    console.log("cancel delete project");
+                }
             }
         }
     }

@@ -1,12 +1,19 @@
 <template>
     <div>
-        SideBar
         <ProjectBar :apiData="apiData"/>
         <ul>
             <Section v-for="(value,key) in apiData.sections"
                      v-bind:key="key"
                      :apiData="value"
                      :sectionApi="key"/>
+
+            <hr />
+
+            <b-button v-b-toggle.model class="m-1">Models</b-button>
+            <b-collapse visible id="model">
+                <ModelBar v-for="(value, key) in apiData.definitions"
+                      v-bind:key="key" :apiData="value" :definitionApi="key" />
+            </b-collapse>
         </ul>
     </div>
 
@@ -16,11 +23,12 @@
 <script>
     import Section from "./SectionBar";
     import ProjectBar from "./ProjectBar";
+    import ModelBar from "./ModelBar";
 
 
     export default {
         name: "SideBar",
-        components: {ProjectBar, Section},
+        components: {ModelBar, ProjectBar, Section},
         props : ['apiData'],
         methods : {
 
