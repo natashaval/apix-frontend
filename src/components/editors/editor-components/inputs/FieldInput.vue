@@ -1,7 +1,13 @@
 <template>
     <div>
-        <label>{{ apiTitle }}</label>
-        <b-form-input type="text" v-model="apiData"/>
+        <b-row>
+            <b-col cols="3">
+                <label>{{ apiTitle }}</label>
+            </b-col>
+            <b-col cols="9">
+                <b-form-input type="text" v-model="apiData"/>
+            </b-col>
+        </b-row>
     </div>
 </template>
 
