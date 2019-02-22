@@ -5,7 +5,7 @@
             <b-col cols="9"></b-col>
         </b-row>
         <b-row>
-        <b-col>
+        <b-col v-show="isEditing">
             <vue-editor v-model="editor"></vue-editor>
         </b-col>
         <b-col>
@@ -23,7 +23,7 @@
         components: {
             VueEditor
         },
-        props: ['apiData', 'apiTitle'],
+        props: ['apiData', 'apiTitle', 'isEditing'],
         data: function () {
             return {
                 editor: this.apiData

@@ -3,7 +3,7 @@
         <h1>project id : {{projectId}}</h1>
         <div v-if="apiData.info !== undefined">
             <h1>Project editor: {{apiData.info.title}} </h1>
-            <DescriptionComponent :apiData="apiData"></DescriptionComponent>
+            <DescriptionComponent :apiData="apiData.info"></DescriptionComponent>
 
         </div>
     </div>
