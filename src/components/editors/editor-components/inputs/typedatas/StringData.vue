@@ -25,38 +25,53 @@
             </div>
         </div>
         <div v-else class="float-right">
-            <h3>ini preview tambahan dari string</h3>
             <div class="row" v-if="enums.length !== 1">
                 <p class="col-5">enum</p>
                 <div class="col-5">
                     <p v-for="_enum in enums" v-bind:key="_enum">{{_enum}}</p>
                 </div>
             </div>
-            <div class="row" v-if="pattern !== ''">
+            <div class="row" v-if="pattern !== undefined">
                 <p>Pattern : {{pattern}}</p>
             </div>
             <div class="row">
                 <p v-if="minLength != null">Min length : {{minLength}}, </p>
                 <p v-if="maxLength != null">Max length : {{maxLength}}</p>
             </div>
-            <p v-if="defaultVal !== '' ">Default : {{defaultVal}}</p>
+            <p v-if="defaultVal !== undefined ">Default : {{defaultVal}}</p>
         </div>
     </div>
 </template>
 
 <script>
+    import ActionBuilder from '@/utils/ActionBuilderUtil'
+
     export default {
         name: "StringData",
-        props : ['isEditing'],
+        props : {
+            isEditing : Boolean,
+            schemaData : Object
+        },
         data : () => ({
             enums : [''],
             enumCount : 1,
-            minLength : null,
-            maxLength : null,
-            pattern : '',
-            defaultVal : ''
+            minLength : undefined,
+            maxLength : undefined,
+            pattern : undefined,
+            defaultVal : undefined,
+            attributesKey : [
+                {keyBefore : 'enum', keyAfter : 'enums', default : []},
+                {key : 'minLength'},
+                {key : 'maxLength'},
+                {key : 'pattern'},
+                {keyBefore : 'default', keyAfter : 'defaultVal'}
+            ],
+
         }),
         methods : {
+            getAttributesKey : function () {
+                return this.attributesKey
+            },
             onEnumTyped : function(i) {
                 if(i === this.enumCount - 1 ){
                     if(this.enums[i] !== ''){
@@ -80,6 +95,36 @@
                     maxLength : this.maxLength,
                     default : this.defaultVal
                 }
+            },
+            getActions : function () {
+                let tmp = this.schemaData
+                if(tmp !== undefined && tmp.type !== 'string'){
+                    tmp = {}
+                }
+                this.enums.pop()
+                let res = ActionBuilder.createActions(tmp, this._data, this.attributesKey)
+                this.enums.push('')
+                return res
+            },
+            _toString : function (value) {
+                return (value !== undefined)?value.toString():undefined
+            }
+        },
+        created(){
+
+            // if(this.schemaData === undefined)this.schemaData = {}
+
+            if(this.schemaData !== undefined && this.schemaData.type === 'string'){
+                let sd = this.schemaData
+                if(sd.enum !== undefined){
+                    this.enums = Object.assign([],sd.enum)
+                    this.enums.push('')
+                    this.enumCount = this.enums.length
+                }
+                this.pattern = this._toString(sd.pattern)
+                this.minLength = this._toString(sd.minLength)
+                this.maxLength = this._toString(sd.maxLength)
+                this.defaultVal = this._toString(sd.default)
             }
         }
     }

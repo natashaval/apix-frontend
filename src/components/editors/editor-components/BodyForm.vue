@@ -2,13 +2,16 @@
     <!--nanti dilanjutkan-->
     <div>
         <!--<b-form-select v-model="selected" :options="options"/>-->
+        <DataTypeInput :schemaData="bodyData.schema"/>
     </div>
 </template>
 
 <script>
+    import DataTypeInput from "./inputs/DataTypeInput";
     export default {
         name: "bodyForm",
-        props : ['apiData'],
+        components: {DataTypeInput},
+        props : ['bodyData'],
         data() {
             return {
                 isEditMode : false,
