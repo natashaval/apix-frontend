@@ -10,7 +10,7 @@
 
     export default {
         name: "OperationEditor",
-        components: {DataTypeInput},
+        components: {RequestComponent},
         props : ['projectId','sectionApi','pathApi','operationApi'],
         computed : {
             apiData : function(){

@@ -1,24 +1,51 @@
 <template>
     <div>
-        <div class="form-inline float-right">
+        <div v-if="isEditing" class="form-inline float-right">
             <label class="col-4">default :</label>
-            <b-input class="col-8" v-model="defaultVal"></b-input>
+            <b-checkbox class="col-8" v-model="defaultVal"/>{{defaultVal}}
+        </div>
+        <div v-else>
+            <p>default : {{defaultVal}}</p>
         </div>
     </div>
 </template>
 
 <script>
+    import ActionBuilder from '@/utils/ActionBuilderUtil'
+
     export default {
         name: "BooleanData",
+        props : {
+            isEditing : Boolean,
+            schemaData : Object
+        },
         data : () => ({
-            defaultVal : ''
+            defaultVal : false,
+            attributesKey : [
+                {keyBefore : 'default', keyAfter : 'defaultVal'}
+            ]
         }),
         methods : {
+            getAttributesKey : function () {
+                return this.attributesKey
+            },
             getAttributes : function () {
                 return {
                     type : 'boolean',
                     default : this.defaultVal
                 }
+            },
+            getActions : function () {
+                let tmp = this.schemaData
+                if(tmp !== undefined && tmp.type !== 'boolean')tmp = {}
+                return ActionBuilder.createActions(tmp, this._data, this.attributesKey)
+            }
+
+        },
+        created(){
+
+            if(this.schemaData !== undefined && this.schemaData.type === 'boolean'){
+                this.defaultVal = (this.schemaData.default === undefined)?false:this.schemaData.default
             }
         }
     }
