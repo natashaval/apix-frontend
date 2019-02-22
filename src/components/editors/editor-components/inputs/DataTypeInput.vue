@@ -435,59 +435,69 @@
                     }
                 }
             },
-
             dump : function () {
                 let tmp = {}
                 console.log(this.getChangedData(tmp))
                 console.log(tmp)
+            },
+            loadSchemaData : function () {
+                if(this.parentIsEditing !== undefined){
+                    this.isEditing = this.parentIsEditing
+                }
+                if(this.schemaData !== undefined){
+                    let sd = this.schemaData
+                    this.name = sd.name
+                    this.type = sd.type
+                    this.description = sd.description
+                    this.required = sd.required
+                    this.example = sd.example
+
+                    if(this.type === 'array'){
+                        this.items = []
+                        this.schemaItems = []
+                        let initItems = (pointer) => {
+                            this.items.push(Object.assign({},pointer))
+                            this.schemaItems.push(pointer)
+                            if(pointer.type === 'array'){
+                                initItems(pointer.items)
+                            }
+                        }
+
+                        initItems(this.schemaData.items)
+
+                    }
+
+                    //punya properties/child
+                    if(sd.properties !== undefined){
+                        //buang default field
+                        // this.propertiesId.pop()
+                        this.propertiesId = []
+                        let pr = sd.properties
+                        for(let key in pr){
+                            let tmp = pr[key]
+                            tmp.name = key
+                            this.propertiesId.push({
+                                id : this.propertyId++,
+                                schemaData : pr[key]
+                            })
+                        }
+                    }
+                }
+
+
+
+                if(this.type === undefined){
+                    this.type = 'string'
+                }
+            },        },
+        watch : {
+            schemaData : function () {
+                console.log('changed')
+                this.loadSchemaData()
             }
         },
         created(){
-            if(this.parentIsEditing !== undefined){
-                this.isEditing = this.parentIsEditing
-            }
-            if(this.schemaData !== undefined){
-                let sd = this.schemaData
-                this.name = sd.name
-                this.type = sd.type
-                this.description = sd.description
-                this.required = sd.required
-                this.example = sd.example
-
-                if(this.type === 'array'){
-                    let initItems = (pointer) => {
-                        this.items.push(Object.assign({},pointer))
-                        this.schemaItems.push(pointer)
-                        if(pointer.type === 'array'){
-                            initItems(pointer.items)
-                        }
-                    }
-
-                    initItems(this.schemaData.items)
-
-                }
-
-                //punya properties/child
-                if(sd.properties !== undefined){
-                    //buang default field
-                    this.propertiesId.pop()
-                    let pr = sd.properties
-                    for(let key in pr){
-                        let tmp = pr[key]
-                        tmp.name = key
-                        this.propertiesId.push({
-                            id : this.propertyId++,
-                            schemaData : pr[key]
-                        })
-                    }
-                }
-            }
-
-
-
-            if(this.type === undefined){
-                this.type = 'string'
-            }
+            this.loadSchemaData()
 
         }
     }
