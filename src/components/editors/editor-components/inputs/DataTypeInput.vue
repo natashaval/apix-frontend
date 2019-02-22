@@ -217,10 +217,6 @@
                 let tmp = this.schemaData
                 return ActionBuilder.createActions(tmp, this._data, this.attributesKey)
             },
-            /*
-            * if ada perubahan, return {name,attributes}
-            * else, return undefined
-            * */
             getChangedData : function (parentQuery) {
                 let query = {_hasActions : true, _actions : []}
                 let childIsEdited = false
@@ -385,6 +381,10 @@
                 }
                 return isEdited
             },
+            /*
+            * if ada perubahan, return {name,attributes}
+            * else, return undefined
+            * */
             getData : function () {
                 let res = this.$refs.curDataType.getAttributes()
                 res.name = this.name

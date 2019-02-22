@@ -38,6 +38,10 @@ export default{
     mutations: {
         ASSIGN_DATA(state,newData){
             state.project = newData
+        },
+
+        LIST_DATA (state, newData) {
+            state.projects = newData
         }
     },
     actions : {
@@ -48,6 +52,14 @@ export default{
                 }
             )
             fetchData()
+        },
+        
+        fetchAllProjectsData({ commit }) {
+            let fetchProjects = () => axios.get('http://localhost:8080/project/all/info')
+                .then((response) => {
+                    commit('LIST_DATA', response.data)
+                })
+            fetchProjects()
         }
     }
 }

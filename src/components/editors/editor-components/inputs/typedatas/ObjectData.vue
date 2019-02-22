@@ -4,9 +4,6 @@
             <label>Additional properties</label>
             <b-checkbox value="true" v-model="additionalProperties"></b-checkbox>
         </div>
-        <div v-else>
-            <p>Additional Properties : {{additionalProperties}}</p>
-        </div>
     </div>
 </template>
 

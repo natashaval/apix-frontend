@@ -1,5 +1,6 @@
 <template>
     <div>
+        SideBar
         <ProjectBar :apiData="apiData"/>
         <ul>
             <Section v-for="(value,key) in apiData.sections"

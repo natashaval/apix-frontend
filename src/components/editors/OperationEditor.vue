@@ -1,19 +1,20 @@
 <template>
-    <div>
+    <div v-if="apiData !== undefined">
         <h1>method : {{operationApi}}</h1>
-        <RequestComponent v-if="operationData !== undefined" :operationData="operationData"/>
+        <DataTypeInput :apiData="apiData"/>
     </div>
 </template>
 
 <script>
-    import RequestComponent from "./editor-components/RequestComponent";
+    import DataTypeInput from "./editor-components/inputs/DataTypeInput";
+
     export default {
         name: "OperationEditor",
         components: {RequestComponent},
         props : ['projectId','sectionApi','pathApi','operationApi'],
         computed : {
-            operationData : function(){
-                return this.$store.getters['project/getOperationData'](this.sectionApi,this.pathApi,this.operationApi)
+            apiData : function(){
+                return this.$store.getters['project/getPathData'](this.sectionApi,this.pathApi,this.operationApi)
             }
         }
     }
