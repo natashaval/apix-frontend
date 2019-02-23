@@ -8,7 +8,7 @@
                         <label v-if="isHasName" class="col-4">Name :</label>
                         <b-input v-if="isHasName" class="col-8" v-model="name"></b-input>
                         <label class="col-4">Type :</label>
-                        <b-select class="col-8"  v-model="type" @change="selectType">
+                        <b-select class="col-8" v-model="selectedType" @change="selectType">
                             <option v-for="dataType in dataTypes"
                                     v-bind:key="dataType.val"
                                     :value="dataType.val">{{dataType.text}}</option>
@@ -23,7 +23,11 @@
                     <div v-else>
                         <h3>ini preview basic-kiri</h3>
                         <p>{{name}}</p>
-                        <p>{{type}} <b>{{(required?"Required":"Optional")}}</b></p>
+                        <p v-if="type !== '' && type !== undefined">{{type}}</p>
+                        <router-link v-else
+                                :to="'/projects/'+projectId+'/definitions/'+refName">
+                            {{refName}}
+                        </router-link><b>{{(required?"Required":"Optional")}}</b>
                     </div>
                 </div>
                 <!--kolom kanan-->
@@ -69,7 +73,6 @@
                         <BooleanData ref="curDataType" v-else-if="type === 'boolean'"
                                      :isEditing="isEditing"
                                      :schemaData="schemaData"/>
-                        <CustomData ref="curDataType" v-else :dataName="type"/>
                     </div>
                 </div>
             </div>
@@ -77,6 +80,7 @@
             <!--tambahan view jika tipe datanya array-->
             <div class="form-row blue-frame" v-if="type === 'array'">
                 <div class="row w-100" v-for="(item,i) in items" v-bind:key="i">
+                    <!--editing mode-->
                     <div class="col-6" v-if="isEditing">
                         <label class="col-4">Of :</label>
                         <b-select class="col-8" @change="selectItemType($event,i)" v-model="item.type">
@@ -90,7 +94,10 @@
                         </b-select>
                     </div>
                     <div class="col-6">
-                        {{item.type}}
+                        Of :
+                        <b v-if="item.ref === undefined">{{item.type}}</b>
+                        <router-link v-else
+                                :to="'/projects/'+projectId+'/definitions/'+item.type">{{item.type}}</router-link>
                         <ArrayData :ref="'array-'+i" v-if="item.type === 'array'"
                                    :schemaData="item" :isEditing="isEditing"/>
                         <StringData ref="itemDataType" v-else-if="item.type === 'string'"
@@ -103,7 +110,6 @@
                                      :numericType="'integer'" :schemaData="lastItem" :isEditing="isEditing"/>
                         <BooleanData ref="itemDataType" v-else-if="item.type === 'boolean'"
                                      :schemaData="lastItem" :isEditing="isEditing"/>
-                        <CustomData ref="itemDataType" v-else :dataName="lastItem.type"/>
                     </div>
                 </div>
             </div>
@@ -131,13 +137,11 @@
     import BooleanData from "./typedatas/BooleanData";
 
     import ActionBuilder from '@/utils/ActionBuilderUtil'
-    import CustomData from "./typedatas/CustomData";
-
 
     export default {
         name: "DataTypeInput",
-        components: {CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
-        props : ['parentIsEditing','schemaData'],
+        components: {BooleanData, NumericData, ObjectData, StringData, ArrayData},
+        props : ['parentIsEditing','schemaData','projectId'],
         data : () => ({
             //data editor
             isEditing : false,
@@ -147,11 +151,13 @@
             name : '',
             isHasName : true,
             description : '',
-            type : 'string',
+            type : undefined,
+            selectedType : '',//untuk tampilan saja,hasil watch dari @type dan @ref
             required : false,
             example : '',
             exampleCount : 1,
-
+            ref : undefined,
+            itemRef : undefined,
             //data array
             items : [],
             /*digunakan untuk kasus khusus
@@ -168,23 +174,28 @@
                 {key : 'type'},
                 {key : 'required'},
                 {key : 'example'},
-                {key : 'description'}
-            ]
+                {key : 'description'},
+                {keyAfter : 'ref', keyBefore : '$ref', default : ''}
+            ],
 
+            dataTypes : [
+                {text : 'Object', val : 'object'},
+                {text : 'Array', val : 'array'},
+                {text : 'String', val : 'string'},
+                {text : 'Number', val : 'number'},
+                {text : 'Integer', val : 'integer'},
+                {text : 'Boolean', val : 'boolean'},
+            ],
         }),
         computed : {
+            refName : function () {
+                if(this.ref === undefined){
+                    return undefined
+                }
+                return this.ref.split('/')[2]
+            },
             moreDisplay: function () {
                 return (this.isMoreDisplay)?'block':'none'
-            },
-            dataTypes : function () {
-                return [
-                    {text : 'Object', val : 'object'},
-                    {text : 'Array', val : 'array'},
-                    {text : 'String', val : 'string'},
-                    {text : 'Number', val : 'number'},
-                    {text : 'Integer', val : 'integer'},
-                    {text : 'Boolean', val : 'boolean'},
-                ]
             },
             customDataTypes : function () {
                 return this.$store.getters['project/getDataTypes']
@@ -194,16 +205,31 @@
             }
         },
         methods : {
+            isDefaultDataType : function (type) {
+                return this.dataTypes.find(item => type === item.val) !== undefined
+            },
             clickMoreDisplay : function(){
                 this.isMoreDisplay = ! this.isMoreDisplay
             },
             selectType : function (value) {
+                this.selectedType = value
                 if(value === 'array'){
+                    this.type = 'array'
                     this.items = []
                     this.items.push({type : 'string'})
                 }
+                else if(this.isDefaultDataType(value)){
+                    this.type = value
+                }
+                else{
+                    this.ref = '#/definitions/'+value
+                    this.type = undefined
+                }
             },
             selectItemType : function (value,i) {
+                if(!this.isDefaultDataType(value)){
+                    this.items[i].ref = '#/definitions/'+value
+                }
                 if(value === 'array' && i === this.items.length -1 ){
                     this.items.push({
                         type : 'string'
@@ -212,6 +238,7 @@
                 else{
                     this.items = this.items.slice(0,i+1)
                 }
+
             },
             getActions : function () {
                 let tmp = this.schemaData
@@ -227,7 +254,7 @@
                 }
 
                 //jika object/field baru
-                if(this.schemaData === undefined || this.schemaData.type !== this.type){
+                if(this.schemaData === undefined || (this.schemaData.type !== this.type && this.ref === undefined)){
                     parentQuery._actions.push({
                         action : 'put',
                         key : this.name,
@@ -255,7 +282,9 @@
                 }
 
                 let actions = this.getActions()
-                this.$refs.curDataType.getActions().forEach(x => actions.push(x))
+                if(this.$refs.curDataType !== undefined){
+                    this.$refs.curDataType.getActions().forEach(x => actions.push(x))
+                }
 
                 query._actions = actions
 
@@ -302,7 +331,7 @@
                         }
                         return childs
                     }
-                    //dimensi array berubah
+                    //dimensi array berubah menjadi lebih pendek
                     if(sdItemPointer !== undefined && sdItemPointer.type === 'array'){
                         let objVal = this.$refs.itemDataType[0].getAttributes()
                         if(this.lastItem.type === 'object'){
@@ -320,7 +349,7 @@
                             value : objVal
                         })
                     }//tipe data child berubah
-                    else if(sdItemPointer.type !== this.lastItem.type){
+                    else if(sdItemPointer !== undefined && sdItemPointer.type !== this.lastItem.type){
                         let value = undefined
                         if(this.lastItem.type === 'object'){
                             value = {
@@ -338,7 +367,8 @@
                             value : value
                         }]
                         childIsEdited = true
-                    }//ngecek child dari last item berubah atau tidak
+                    }
+                    //ngecek child dari last item berubah atau tidak
                     else if (this.lastItem.type === 'object') {
                         pointer = pointer.items
                         let tmp = {}
@@ -354,7 +384,20 @@
                         }else{
                             delete lastEditedPointer.items
                         }
-                    }//ngecek attribute last item berubah atau tidak
+                    }
+                    else if(this.lastItem.ref !== undefined){
+                        if(pointer._hasActions === undefined){
+                            pointer._hasActions = true
+                            pointer._actions = []
+
+                        }
+                        pointer._actions.push({
+                            action : 'put',
+                            key : 'item',
+                            value : {$ref : this.lastItem.ref}
+                        })
+                    }
+                    //ngecek attribute last item berubah atau tidak
                     else {
                         pointer = pointer.items
 
@@ -440,6 +483,10 @@
                 console.log(this.getChangedData(tmp))
                 console.log(tmp)
             },
+            /*
+            * input : #/definitions/mydatatype
+            * output : mydatatype
+            * */
             loadSchemaData : function () {
                 if(this.parentIsEditing !== undefined){
                     this.isEditing = this.parentIsEditing
@@ -451,12 +498,21 @@
                     this.description = sd.description
                     this.required = sd.required
                     this.example = sd.example
+                    if(sd['$ref'] !== undefined){
+                        this.ref = sd['$ref']
+                        this.selectedType = this.refName
+                    }
 
                     if(this.type === 'array'){
                         this.items = []
                         this.schemaItems = []
                         let initItems = (pointer) => {
-                            this.items.push(Object.assign({},pointer))
+                            let copy = Object.assign({},pointer)
+                            if(copy['$ref'] !== undefined){
+                                copy.ref = copy['$ref']
+                                copy.type = copy.ref.split('/')[2]
+                            }
+                            this.items.push(copy)
                             this.schemaItems.push(pointer)
                             if(pointer.type === 'array'){
                                 initItems(pointer.items)
@@ -484,15 +540,14 @@
                     }
                 }
 
-
-
-                if(this.type === undefined){
+                if(this.type === undefined && this.ref === undefined){
                     this.type = 'string'
+                    this.selectType = 'string'
                 }
-            },        },
+            },
+        },
         watch : {
             schemaData : function () {
-                console.log('changed')
                 this.loadSchemaData()
             }
         },

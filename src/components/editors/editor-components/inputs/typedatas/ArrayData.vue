@@ -38,8 +38,8 @@
             schemaData : Object
         },
         data : () => ({
-            minItems : 0,
-            maxItems : 0,
+            minItems : undefined,
+            maxItems : undefined,
             uniqueItems : false,
 
             attributesKey : [
