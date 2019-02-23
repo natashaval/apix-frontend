@@ -1,7 +1,6 @@
 <template>
     <div id="app" class="container-fluid">
         <b-row>
-            Component
             <component v-bind:is="layout"></component>
         </b-row>
 
