@@ -26,9 +26,23 @@
         props: ['apiData', 'apiTitle', 'isEditing'],
         data: function () {
             return {
-                editor: this.apiData
+                editor: undefined
+            }
+        },
+        methods: {
+            loadData: function () {
+                this.editor = this.apiData
+            }
+        },
+        created() {
+            this.loadData();
+        },
+        watch: {
+            apiData: function(){
+                this.loadData()
             }
         }
+
     }
 </script>
 
