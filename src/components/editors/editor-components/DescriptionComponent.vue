@@ -4,7 +4,7 @@
         <button @click="changeEditing">Edit: {{isEditing}}</button>
         <InputEditor :apiData="apiData.info.title" :apiTitle="`title`" :isEditing="isEditing"></InputEditor>
         <InputEditor :apiData="apiData.info.version" :apiTitle="`version`" :isEditing="isEditing"></InputEditor>
-        <TextDocInput id="info-description" :apiData="apiData.info.description" :apiTitle="`Description`" :isEditing="isEditing"/>
+        <TextDocInput id="info-description" :apiData="apiData.info.description" :apiTitle="`Description`" :isEditing="isEditing" :ref="description"/>
         <InputEditor v-for="(value,key) in apiData.info.contact" v-bind:key="`info-${key}`" :apiData="value" :apiTitle="`Contact ${key}`" :isEditing="isEditing"/>
         <InputEditor v-for="(value,key) in apiData.info.license" v-bind:key="`info-${key}`" :apiData="value" :apiTitle="`License ${key}`" :isEditing="isEditing"/>
         <TextDocInput id="info-tos" :apiData="apiData.info.termsOfService" :apiTitle="`Terms of Service`" :isEditing="isEditing"/>
