@@ -1,6 +1,7 @@
 <template>
     <div>
-        <BodyForm :bodyData="operationData.requestBody"/>
+        <BodyForm :bodyData="operationData.requestBody"
+                  :projectId="projectId"/>
     </div>
 </template>
 
@@ -9,7 +10,7 @@
     export default {
         name: "RequestComponent",
         components: {BodyForm},
-        props : ['operationData']
+        props : ['operationData','projectId']
     }
 </script>
 

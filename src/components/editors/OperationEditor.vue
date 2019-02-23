@@ -1,7 +1,9 @@
 <template>
     <div>
         <h1>method : {{operationApi}}</h1>
-        <RequestComponent v-if="operationData !== undefined" :operationData="operationData"/>
+        <RequestComponent v-if="operationData !== undefined"
+                          :operationData="operationData"
+                          :projectId="projectId"/>
     </div>
 </template>
 
