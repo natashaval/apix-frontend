@@ -56,7 +56,7 @@ export default{
     },
     actions : {
         fetchProjectData({ commit }, idProject) {
-            let fetchData = () => axios.get('http://localhost:8080/project/'+idProject).then(
+            let fetchData = () => axios.get('http://localhost:8080/projects/'+idProject).then(
                 (response) => {
                     commit('ASSIGN_DATA', response.data)
                 }
@@ -65,7 +65,7 @@ export default{
         },
         
         fetchAllProjectsData({ commit }) {
-            let fetchProjects = () => axios.get('http://localhost:8080/project/all/info')
+            let fetchProjects = () => axios.get('http://localhost:8080/projects/all/info')
                 .then((response) => {
                     commit('LIST_DATA', response.data)
                 })
@@ -73,7 +73,7 @@ export default{
         },
 
         deleteProjectData({ commit }, idProject) {
-            let deleteProject = () => axios.delete('http://localhost:8080/project/' + idProject).then(
+            let deleteProject = () => axios.delete('http://localhost:8080/projects/' + idProject).then(
                 (response) => {
                     commit('DELETE_DATA', idProject)
                 }
