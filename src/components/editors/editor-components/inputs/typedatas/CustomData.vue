@@ -11,7 +11,7 @@
         data : () => ({
             refBefore : undefined,
             attributesKey : [
-                {key : '$ref'}
+                {key : 'ref'}
             ]
         }),
         methods : {
@@ -20,20 +20,20 @@
             },
             getAttributes : function() {
                 return {
-                    $ref: this.currentRef
+                    ref: this.currentRef
                 }
             },
             getActions : function () {
                 return ActionBuilderUtil.createActions(
-                    {$ref : this.refBefore},
-                    {$ref : this.currentRef},
+                    {ref : this.refBefore},
+                    {ref : this.currentRef},
                     this.attributesKey
                 )
             }
         },
         created() {
             if(this.schemaData !== undefined){
-                this.refBefore = this.schemaData.$ref
+                this.refBefore = this.schemaData.ref
             }
         }
     }

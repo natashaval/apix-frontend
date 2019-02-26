@@ -235,7 +235,7 @@
                 {key : 'required'},
                 {key : 'example'},
                 {key : 'description'},
-                {keyAfter : 'ref', keyBefore : '$ref'}
+                {key : 'ref'}
             ],
 
             dataTypes : [
@@ -458,7 +458,7 @@
                         pointer._actions.push({
                             action : 'put',
                             key : 'items',
-                            value : {$ref : this.lastItem.ref}
+                            value : {ref : this.lastItem.ref}
                         })
                     }
                     //ngecek attribute last item berubah atau tidak
@@ -583,8 +583,8 @@
                     this.description = sd.description
                     this.required = sd.required
                     this.example = sd.example
-                    if(sd['$ref'] !== undefined){
-                        this.ref = sd['$ref']
+                    if(sd['ref'] !== undefined){
+                        this.ref = sd['ref']
                         this.selectedType = this.refName
                     }
 
@@ -593,8 +593,8 @@
                         this.schemaItems = []
                         let initItems = (pointer) => {
                             let copy = Object.assign({},pointer)
-                            if(copy['$ref'] !== undefined){
-                                copy.ref = copy['$ref']
+                            if(copy['ref'] !== undefined){
+                                copy.ref = copy['ref']
                                 copy.type = copy.ref.split('/')[2]
                             }
                             this.items.push(copy)
