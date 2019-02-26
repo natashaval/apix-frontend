@@ -62,19 +62,25 @@
             minLength : undefined,
             maxLength : undefined,
             pattern : undefined,
-            defaultVal : undefined,
-            attributesKey : [
+            defaultVal : undefined,//tidak pakai 'default' karna reserved keyword, sehingga tidak bisa dibind
+            attributesKey : [//digunakan di internal
                 {keyBefore : 'enum', keyAfter : 'enums', default : []},
                 {key : 'minLength'},
                 {key : 'maxLength'},
                 {key : 'pattern'},
                 {keyBefore : 'default', keyAfter : 'defaultVal'}
             ],
-
+            publicAttributesKey: [//digunakan public
+                {key : 'enum'},
+                {key : 'minLength'},
+                {key : 'maxLength'},
+                {key : 'pattern'},
+                {key : 'default'}
+            ]
         }),
         methods : {
             getAttributesKey : function () {
-                return this.attributesKey
+                return this.publicAttributesKey
             },
             onEnumTyped : function(i) {
                 if(i === this.enumCount - 1 ){
@@ -93,7 +99,7 @@
             getAttributes : function(){
                 return {
                     type : 'string',
-                    enums : this.enums.slice(0,-1),
+                    enum : this.enums.slice(0,-1),
                     pattern : this.pattern,
                     minLength : this.minLength,
                     maxLength : this.maxLength,

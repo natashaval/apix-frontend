@@ -44,7 +44,7 @@
             maxItems : undefined,
             uniqueItems : false,
 
-            attributesKey : [
+            attributesKey : [//public dan internal sama, karna tidak ada attribute yang dicustom namanya
                 {key : 'minItems'},
                 {key : 'maxItems'},
                 {key : 'uniqueItems',default : false}

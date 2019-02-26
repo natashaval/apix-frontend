@@ -66,13 +66,20 @@
             format : '',
             minimum : undefined,
             maximum : undefined,
-            defaultVal : undefined,
-            attributesKey : [
+            defaultVal : undefined,//tidak pakai 'default' karna reserved keyword, sehingga tidak bisa dibind
+            attributesKey : [//digunakan di internal
                 {keyBefore : 'enum', keyAfter : 'enums', default : []},
                 {key : 'format'},
                 {key : 'minimum'},
                 {key : 'maximum'},
                 {keyBefore : 'default', keyAfter : 'defaultVal'}
+            ],
+            attributesKeyPublic: [//digunakan di external
+                {key : 'enum'},
+                {key : 'format'},
+                {key : 'minimum'},
+                {key : 'maximum'},
+                {key : 'default'}
             ]
         }),
         computed : {
@@ -84,7 +91,7 @@
         },
         methods : {
             getAttributesKey : function () {
-                return this.attributesKey
+                return this.attributesKeyPublic
             },
             onEnumTyped : function(i) {
                 if(i === this.enumCount - 1 ){
@@ -103,7 +110,7 @@
             getAttributes : function(){
                 return {
                     type : this.numericType.toLowerCase(),
-                    enums : this.enums.slice(0,-1),
+                    enum : this.enums.slice(0,-1),
                     format : this.format,
                     minimum : this.minimum,
                     maximum : this.maximum,

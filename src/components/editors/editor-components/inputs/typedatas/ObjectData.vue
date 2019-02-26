@@ -18,7 +18,7 @@
         },
         data : () => ({
             additionalProperties : true,
-            attributesKey : [
+            attributesKey : [//public dan internal
                 {key : 'additionalProperties'}
             ],
         }),

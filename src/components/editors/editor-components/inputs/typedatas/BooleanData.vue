@@ -23,11 +23,14 @@
             defaultVal : false,
             attributesKey : [
                 {keyBefore : 'default', keyAfter : 'defaultVal'}
+            ],
+            attributesKeyPublic : [
+                {key : 'default'}
             ]
         }),
         methods : {
             getAttributesKey : function () {
-                return this.attributesKey
+                return this.attributesKeyPublic
             },
             getAttributes : function () {
                 return {
