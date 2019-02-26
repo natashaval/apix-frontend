@@ -11,6 +11,7 @@
 <script>
     import RequestComponent from "./editor-components/RequestComponent";
     import TreeBuilder from "@/utils/DeepTreeBuilderUtil";
+    import * as axios from "axios";
     export default {
         name: "OperationEditor",
         components: {RequestComponent},
@@ -35,12 +36,19 @@
         methods : {
             submit : function () {
                 let tree = TreeBuilder.buildDeepTree(this.treeKeys)
-                tree.root.id = this.projectId
                 let pointer = tree.leaf
                 pointer._signature = this.operationData._signature
 
                 this.$refs.request.getChangedData(tree.leaf,pointer.requestBody = {})
-                console.log(tree)
+
+                axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
+                    (response) => {
+                        console.log(response)
+                    }
+                ).catch(function (error) {
+                    console.log(error);
+                })
+
 
             },
             loadData : function () {
