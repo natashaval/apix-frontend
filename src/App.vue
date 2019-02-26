@@ -72,5 +72,10 @@
         border: 1px solid red;
     }
 
+    .dot-border{
+        border: rgba(42, 18, 59, 0.28) 1px dotted;
+    }
+
+
 </style>
 
