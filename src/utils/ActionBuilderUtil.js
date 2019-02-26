@@ -48,7 +48,7 @@ export default {
                 // console.log('masyukk')
                 if(!this.isEqual(after, keys.default)){
                     actions.push({
-                        actions : 'put',
+                        action : 'put',
                         key : (keys.key === undefined)?keys.keyBefore:keys.key,
                         value : this._getCopy(after)
                     })
@@ -56,7 +56,7 @@ export default {
             }
             else if(!this.isEqual(before,after)){
                 actions.push({
-                    actions : 'put',
+                    action : 'put',
                     key : (keys.key === undefined)?keys.keyBefore:keys.key,
                     value : this._getCopy(after)
                 })

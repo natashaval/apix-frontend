@@ -93,8 +93,12 @@
                         case 'formData':
                             this.contentType = 'multipart/form-data'
                     }
+                    this.description = bd.description
                 }
             }
+        },
+        created() {
+            this.loadData()
         }
     }
 </script>
