@@ -1,12 +1,12 @@
 <template>
-    <div class="json-form ">
+    <div class="dot-border">
         <div class="row justify-content-end ">
             <div class="col-1 ">
                 <b-button class="round-button"
                           style="margin: 10px"
                           v-if="type === 'object'"
                           @click="showChild = (showChild === 'down')?'':'down'"
-                    v-b-toggle="componentId">
+                    v-b-toggle="childCollapseId">
                     <i class="fa fa-angle-right rotate"
                        v-bind:class="showChild"></i>
                 </b-button>
@@ -18,8 +18,8 @@
                     <!--kolom kiri-->
                     <div class="col-6">
                         <div v-if="isEditing" class="form-inline">
-                            <label v-if="isHasName" class="col-4">Name :</label>
-                            <b-input v-if="isHasName" class="col-8" v-model="name"></b-input>
+                            <label v-if="hasName" class="col-4">Name :</label>
+                            <b-input v-if="hasName" class="col-8" v-model="name"></b-input>
                             <label class="col-4">Type :</label>
                             <b-select class="col-8" v-model="selectedType" @change="selectType">
                                 <option v-for="dataType in dataTypes"
@@ -91,6 +91,7 @@
                             <BooleanData ref="curDataType" v-else-if="type === 'boolean'"
                                          :isEditing="isEditing"
                                          :schemaData="schemaData"/>
+                            <CustomData ref="curDataType" v-else :scemaData="schemaData" :currentRef="ref"/>
                         </div>
                     </div>
                     <div class="w-100"></div>
@@ -135,13 +136,14 @@
                                              :numericType="'integer'" :schemaData="lastItem" :isEditing="isEditing"/>
                                 <BooleanData ref="itemDataType" v-else-if="item.type === 'boolean'"
                                              :schemaData="lastItem" :isEditing="isEditing"/>
+                                <CustomData ref="itemDataType" v-else :schemaData="lastItem" :currentRef="lastItem.ref"/>
                             </div>
                         </div>
                     </div>
                 </div>
 
 
-                <!--<button @click="dump">check!</button>-->
+                <button @click="dump">Dump!</button>
                 <!--<button @click="isEditing = !isEditing">edit : {{isEditing}}</button>-->
 
             </div>
@@ -149,20 +151,22 @@
                 <b-button @click="isEditing = !isEditing" class="float-right round-button">
                     <i class="fa fa-pencil-alt"></i>
                 </b-button>
-                <b-button class="float-right round-button" style="margin-top:5px;">
+                <b-button v-if="!isRoot" @click="selfDelete" class="float-right round-button" style="margin-top:5px;">
                     <i class="fa fa-trash"></i>
                 </b-button>
             </div>
         </div>
-        <b-collapse :id="componentId" visible>
+        <b-collapse :id="childCollapseId" visible>
             <div v-if="type === 'object' || lastItem.type === 'object'">
                 <!--child object-->
-                <div v-for="(val,i) in propertiesId" v-bind:key="val.id" class="row justify-content-end">
+                <div v-for="(val,i) in propertiesData" v-bind:key="val.id" class="row justify-content-end">
                     <div class="row-3" style="margin-top: -16px;margin-bottom: 16px">
                         <hr class="vline row-3"/>
                     </div>
-                    <DataTypeInput :ref="'property-'+val.id" :parentIsEditing="isEditing"
-                                   :schemaData="val.schemaData" class="col-11"/>
+                    <DataTypeInput :ref="'property-'+val.id" :parentIsEditing="val.isEditing"
+                                   :schemaData="val.schemaData" :componentId="i"
+                                   :fSelfDelete="deleteChild"
+                                   v-on:delete="deleteChild" class="col-11"/>
                     <!--<button @click="deleteProperty(i)">delete property</button>-->
                 </div>
                 <button @click="addNewProperty">Add more property</button>
@@ -180,21 +184,29 @@
     import BooleanData from "./typedatas/BooleanData";
 
     import ActionBuilder from '@/utils/ActionBuilderUtil'
+    import CustomData from "./typedatas/CustomData";
 
     export default {
         name: "DataTypeInput",
-        components: {BooleanData, NumericData, ObjectData, StringData, ArrayData},
-        props : ['parentIsEditing','schemaData','projectId'],
+        components: {CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
+        props : [
+            'fSelfDelete',//delete function from parent
+            'parentIsEditing',//default value dari @isEditing
+            'schemaData',//data dari parent, jika form baru maka null
+            'componentId',//id atau index yang diberi oleh parent berdasarkan array childs parent
+            'isRoot'//jika root maka tidak punya nama
+        ],
         data : () => ({
+            projectId : undefined,
             //data editor
             isEditing : false,
             isMoreDisplay : false,
-            componentId : Math.random().toString(),
+            childCollapseId : Math.random().toString(),
             showChild : 'down',
 
             //data general
             name : '',
-            isHasName : true,
+            hasName : true,
             description : '',
             type : undefined,
             selectedType : '',//untuk tampilan saja,hasil watch dari @type dan @ref
@@ -202,25 +214,28 @@
             example : '',
             exampleCount : 1,
             ref : undefined,
-            itemRef : undefined,
             //data array
             items : [],
             /*digunakan untuk kasus khusus
-            * karna ketika array yang multidimensi diutak atik, schemaData bisa hilang sehingga validasi tidak valid
+            * karna ketika array yang multidimensi diutak atik / array @items, schemaData bisa hilang sehingga validasi tidak valid
             * sehingga validasi/getActions dilakukan di file ini
+            * array @schemaItems tidak diutak-atik isinya karna digunakan untuk comparison before dan after
             */
             schemaItems : [],
 
             //data object
             propertyId : 2,
-            propertiesId : [{id : 1}],
+            propertiesData : [{id : 1}],
+
+            //menyimpan property yang didelete, tidak menyimpan property yang baru dibuat lalu dihapus
+            deletedPropertyQuery : [],
 
             attributesKey : [
                 {key : 'type'},
                 {key : 'required'},
                 {key : 'example'},
                 {key : 'description'},
-                {keyAfter : 'ref', keyBefore : '$ref', default : ''}
+                {keyAfter : 'ref', keyBefore : '$ref'}
             ],
 
             dataTypes : [
@@ -326,16 +341,18 @@
                     query = parentQuery
                 }
 
+
                 let actions = this.getActions()
                 if(this.$refs.curDataType !== undefined){
                     this.$refs.curDataType.getActions().forEach(x => actions.push(x))
                 }
+                this.deletedPropertyQuery.forEach(x => actions.push(x))
 
                 query._actions = actions
 
                 if(this.type === 'object'){
-                    for(let i = 0; i < this.propertiesId.length; i++){
-                        let id = this.propertiesId[i].id
+                    for(let i = 0; i < this.propertiesData.length; i++){
+                        let id = this.propertiesData[i].id
                         //nandain apakah didalamnya ada diedit
                         childIsEdited |= this.$refs['property-'+id][0].getChangedData(query)
                     }
@@ -368,8 +385,8 @@
                     }
                     let getChilds = () => {
                         let childs = {}
-                        for (let i = 0; i < this.propertiesId.length; i++) {
-                            let id = this.propertiesId[i].id
+                        for (let i = 0; i < this.propertiesData.length; i++) {
+                            let id = this.propertiesData[i].id
                             //nandain apakah didalamnya ada diedit
                             let tmp = this.$refs['property-' + id][0].getData()
                             childs[tmp.name] = tmp.attributes
@@ -393,6 +410,7 @@
                             put : 'items',
                             value : objVal
                         })
+                        delete pointer.items
                     }//tipe data child berubah
                     else if(sdItemPointer !== undefined && sdItemPointer.type !== this.lastItem.type){
                         let value = undefined
@@ -408,18 +426,19 @@
                         pointer._hasActions = true
                         pointer._actions = [{
                             action : 'put',
-                            key : 'item',
+                            key : 'items',
                             value : value
                         }]
                         childIsEdited = true
+                        delete pointer.items
                     }
                     //ngecek child dari last item berubah atau tidak
                     else if (this.lastItem.type === 'object') {
                         pointer = pointer.items
                         let tmp = {}
                         let itemIsEdited = false
-                        for (let i = 0; i < this.propertiesId.length; i++) {
-                            let id = this.propertiesId[i].id
+                        for (let i = 0; i < this.propertiesData.length; i++) {
+                            let id = this.propertiesData[i].id
                             //nandain apakah didalamnya ada diedit
                             itemIsEdited |= this.$refs['property-' + id][0].getChangedData(tmp)
                         }
@@ -438,14 +457,13 @@
                         }
                         pointer._actions.push({
                             action : 'put',
-                            key : 'item',
+                            key : 'items',
                             value : {$ref : this.lastItem.ref}
                         })
                     }
                     //ngecek attribute last item berubah atau tidak
                     else {
                         pointer = pointer.items
-
                         let tmp = ActionBuilder.createActions(
                             this.schemaItems[this.schemaItems.length-1],
                             this.$refs.itemDataType[0].getAttributes(),
@@ -467,6 +485,12 @@
                 if(!isEdited){
                     delete parentQuery[this.name]
                 }
+                else{
+                    if(query._actions.length === 0){
+                        delete query._hasActions
+                        delete query._actions
+                    }
+                }
                 return isEdited
             },
             /*
@@ -480,8 +504,8 @@
                 res.example = this.example
                 if(this.type === 'object' || this.lastItem.type === 'object'){
                     res.properties = {}
-                    for(let i=0; i <  this.propertiesId.length; i++){
-                        let id = this.propertiesId[i].id
+                    for(let i=0; i <  this.propertiesData.length; i++){
+                        let id = this.propertiesData[i].id
                         let data = this.$refs['property-'+id][0].getData()
                         res.properties[data.name] = data.attributes
                     }
@@ -504,10 +528,21 @@
                 }
             },
             addNewProperty : function() {
-                this.propertiesId.push({id : this.propertyId++})
+                this.propertiesData.push({id : this.propertyId++,isEditing : true})
             },
-            deleteProperty(i) {
-                this.propertiesId.splice(i,1)
+            selfDelete() {
+                //panggil deleteChild() dari parent
+                this.fSelfDelete(this.componentId)
+            },
+            deleteChild : function (childIndex) {
+                //jika bukan property baru, maka bikin query delete
+                if(this.propertiesData[childIndex].schemaData !== undefined){
+                    this.deletedPropertyQuery.push({
+                        action : 'delete',
+                        key : this.propertiesData[childIndex].schemaData.name
+                    })
+                }
+                this.propertiesData.splice(childIndex,1)
             },
             onExampleTyped : function(i) {
                 if(i === this.exampleCount - 1 ){
@@ -525,7 +560,7 @@
             },
             dump : function () {
                 let tmp = {}
-                console.log(this.getChangedData(tmp))
+                this.getChangedData(tmp)
                 console.log(tmp)
             },
             /*
@@ -533,6 +568,10 @@
             * output : mydatatype
             * */
             loadSchemaData : function () {
+                this.projectId = this.$router.currentRoute.params.projectId
+
+                this.deletedPropertyQuery = []
+
                 if(this.parentIsEditing !== undefined){
                     this.isEditing = this.parentIsEditing
                 }
@@ -572,15 +611,16 @@
                     //punya properties/child
                     if(sd.properties !== undefined){
                         //buang default field
-                        // this.propertiesId.pop()
-                        this.propertiesId = []
+                        // this.propertiesData.pop()
+                        this.propertiesData = []
                         let pr = sd.properties
                         for(let key in pr){
                             let tmp = pr[key]
                             tmp.name = key
-                            this.propertiesId.push({
+                            this.propertiesData.push({
                                 id : this.propertyId++,
-                                schemaData : pr[key]
+                                schemaData : pr[key],
+                                isEditing : false
                             })
                         }
                     }
@@ -589,6 +629,10 @@
                 if(this.type === undefined && this.ref === undefined){
                     this.type = 'string'
                     this.selectedType = 'string'
+                }
+
+                if(this.isRoot === true){
+                    this.hasName = false
                 }
             },
         },
@@ -611,10 +655,6 @@
 
     .more-attribute{
         float: right;color: #4493e2;cursor: pointer;
-    }
-
-    .json-form{
-        border: rgba(42, 18, 59, 0.28) 1px dotted;
     }
 
     .round-button{

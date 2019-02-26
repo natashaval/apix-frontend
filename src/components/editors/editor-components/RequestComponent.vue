@@ -1,29 +1,53 @@
 <template>
     <div v-if="bodyData !== undefined" class="green-frame container" >
-        <!--query param-->
         <div v-if="bodyData.headers !== undefined">
             <h1>ini headers</h1>
-            <DataTypeInput v-for="(value,name) in bodyData.headers" v-bind:key="name" :schemaData="value"/>
+            <PropertyForm ref="headers" :schemaData="bodyData.headers"/>
         </div>
-        <div v-if="bodyData.queryParams !== undefined">
+        <div>
             <h1>ini query param</h1>
-            <DataTypeInput v-for="(value,name) in bodyData.queryParams" v-bind:key="name" :schemaData="value"/>
+            <PropertyForm ref="queryParams" :schemaData="bodyData.queryParams"/>
         </div>
 
-        <BodyForm :bodyData="operationData.requestBody"
-                  :projectId="projectId" style="padding-left: 10%"/>
+        <BodyForm v-if="hasBody" ref="body" :bodyData="operationData.requestBody" style="padding-left: 10%"/>
     </div>
 </template>
 
 <script>
     import BodyForm from "./forms/BodyForm";
+    import PropertyForm from "./forms/PropertyForm";
+
     export default {
         name: "RequestComponent",
-        components: {BodyForm},
-        props : ['operationData','projectId'],
+        components: {PropertyForm, BodyForm},
+        props : [
+            'operationData'
+        ],
         computed : {
+            operationApi : function () {
+                return this.$route.params.operationApi
+            },
+            hasBody : function () {
+                switch (this.operationApi) {
+                    case "post":
+                    case "put":
+                    case "patch":
+                        return true
+                }
+                return false
+            },
             bodyData : function () {
                 return this.operationData.requestBody
+            }
+        },
+        methods : {
+            getChangedData : function (operationPointer,requestBodyPointer) {
+                let request = requestBodyPointer
+                this.$refs.headers.getChangedData(request.headers = {})
+                this.$refs.queryParams.getChangedData(request.queryParams = {})
+                if(this.$refs.body !== undefined){
+                    this.$refs.body.getChangedData(operationPointer,request.schema = {})
+                }
             }
         }
     }
