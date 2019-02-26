@@ -7,7 +7,10 @@ export default {
             }
             return true
         }
-        return obj1 == obj2
+        let obj1Empty = obj1 === undefined || obj1 === null || obj1 === ''
+        let obj2Empty = obj2 === undefined || obj2 === null || obj2 === ''
+
+        return (obj1 == obj2) || (obj1Empty && obj2Empty)
     },
     _getCopy(obj){
       if(obj instanceof Array){
@@ -44,7 +47,6 @@ export default {
             if(before === undefined){
                 // console.log('masyukk')
                 if(!this.isEqual(after, keys.default)){
-                    // console.log(after+' vs '+keys.default)
                     actions.push({
                         actions : 'put',
                         key : (keys.key === undefined)?keys.keyBefore:keys.key,
