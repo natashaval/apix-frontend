@@ -18,7 +18,7 @@
                 </div>
                 <div class="form-inline col-6 row">
                     <label class="col-6">Maximum :</label>
-                    <b-input class="col-6" v-model="maximum"></b-input>
+                    <b-input type="number" class="col-6" v-model="maximum"></b-input>
                 </div>
             </div>
             <div class="form-inline float-right">
@@ -28,17 +28,22 @@
         </div>
         <div v-else class="float-right">
             <div class="row" v-if="enums.length !== 1">
-                <p class="col-5">enum</p>
+                <p class="col-5">Enum</p>
                 <div class="col-5">
                     <p v-for="_enum in enums" v-bind:key="_enum">{{_enum}}</p>
                 </div>
             </div>
-            <div class="row" v-if="format !== ''">
-                <p>format : {{format}}</p>
+            <div class="row" v-if="format !== '' && format !== undefined ">
+                <p>Format : {{format}}</p>
             </div>
-            <div class="row">
-                <p v-if="minimum != null">Minimum : {{minimum}}, </p>
-                <p v-if="maximum != null">Maximum : {{maximum}}</p>
+            <div v-if="minimum !== '' && minimum !== undefined" class="row">
+                <p>Minimum : {{minimum}}</p>
+            </div>
+            <div v-if="maximum !== '' && maximum !== undefined" class="row">
+                <p>Maximum : {{maximum}}</p>
+            </div>
+            <div v-if="defaultVal !== '' && defaultVal !== undefined" class="row">
+                <p>Default : {{defaultVal}}</p>
             </div>
         </div>
     </div>

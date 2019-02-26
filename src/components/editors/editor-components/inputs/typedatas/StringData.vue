@@ -11,34 +11,38 @@
             </div>
             <div class="form-inline row float-right">
                 <div class="form-inline col-6 row">
-                    <label class="col-6">Min length :</label>
+                    <label class="col-6">Min length:</label>
                     <b-input type="number" class="col-6" v-model="minLength"></b-input>
                 </div>
                 <div class="form-inline col-6 row">
-                    <label class="col-6">Max length :</label>
+                    <label class="col-6">Max length:</label>
                     <b-input class="col-6" v-model="maxLength"></b-input>
                 </div>
             </div>
             <div class="form-inline float-right">
-                <label class="col-4">default :</label>
+                <label class="col-4">Default :</label>
                 <b-input class="col-8" v-model="defaultVal"></b-input>
             </div>
         </div>
         <div v-else class="float-right">
             <div class="row" v-if="enums.length !== 1">
-                <p class="col-5">enum</p>
-                <div class="col-5">
+                <p class="col">Enum</p>
+                <div class="col">
                     <p v-for="_enum in enums" v-bind:key="_enum">{{_enum}}</p>
                 </div>
             </div>
             <div class="row" v-if="pattern !== undefined">
                 <p>Pattern : {{pattern}}</p>
             </div>
-            <div class="row">
-                <p v-if="minLength != null">Min length : {{minLength}}, </p>
-                <p v-if="maxLength != null">Max length : {{maxLength}}</p>
+            <div class="row" v-if="minLength !== '' && minLength !== undefined">
+                <p>Min length : {{minLength}}, </p>
             </div>
-            <p v-if="defaultVal !== undefined ">Default : {{defaultVal}}</p>
+            <div v-if="maxLength !== '' && maxLength !== undefined" class="row">
+                <p>Max length : {{maxLength}}</p>
+            </div>
+            <div class="row" v-if="defaultVal !== '' && defaultVal !== undefined">
+                <p>Default : {{defaultVal}}</p>
+            </div>
         </div>
     </div>
 </template>

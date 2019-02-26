@@ -1,130 +1,173 @@
 <template>
-    <div>
-        <div class="form-group">
-            <div class="form-row red-frame flex-md-wrap">
-                <!--kolom kiri-->
-                <div class="col-6">
-                    <div v-if="isEditing" class="form-inline">
-                        <label v-if="isHasName" class="col-4">Name :</label>
-                        <b-input v-if="isHasName" class="col-8" v-model="name"></b-input>
-                        <label class="col-4">Type :</label>
-                        <b-select class="col-8" v-model="selectedType" @change="selectType">
-                            <option v-for="dataType in dataTypes"
-                                    v-bind:key="dataType.val"
-                                    :value="dataType.val">{{dataType.text}}</option>
-                            <hr/>
-                            <option v-for="(value,name) in customDataTypes"
-                                    v-bind:key="name"
-                                    :value="name">{{name}}</option>
-                        </b-select>
-                        <label>Required : </label>
-                        <b-checkbox v-model="required"/>
-                    </div>
-                    <div v-else>
-                        <h3>ini preview basic-kiri</h3>
-                        <p>{{name}}</p>
-                        <p v-if="type !== '' && type !== undefined">{{type}}</p>
-                        <router-link v-else
-                                :to="'/projects/'+projectId+'/definitions/'+refName">
-                            {{refName}}
-                        </router-link><b>{{(required?"Required":"Optional")}}</b>
-                    </div>
-                </div>
-                <!--kolom kanan-->
-                <div class="col-6 blue-frame">
-                    <div v-bind:style="{display: (isEditing)?'block':'none'}">
-                        <div class="form-inline">
-                            <label class="col-4">Description :</label>
-                            <b-input class="col-8" v-model="description"></b-input>
-                        </div>
-                        <div class="form-inline float-right">
-                            <label class="col-4">Example :</label>
-                            <b-input class="col-8" v-model="example"></b-input>
-                        </div>
-                        <div class="form-inline float-right w-100">
-                            <a style="float: right;color: #4493e2;cursor: pointer;"
-                               class="more-attribute btn-link" @click="clickMoreDisplay">more attributes</a>
-                        </div>
-                        <br/>
-                    </div>
-
-                    <div v-if="!isEditing">
-                        <h3>Ini preview basic-kanan</h3>
-                        <p v-if="description !== ''">Description : {{description}}</p>
-                        <p v-if="example !== ''">Example : {{example}}</p>
-                    </div>
-                    <div v-bind:style="{display: (isEditing)?moreDisplay:'block'}">
-                        <!--more attributes of selected datatype-->
-                        <StringData ref="curDataType" v-if="type === 'string'"
-                                    :isEditing="isEditing" :schemaData="schemaData"/>
-                        <ArrayData ref="curDataType" v-else-if="type === 'array'"
-                                   :isEditing="isEditing" :schemaData="schemaData"/>
-                        <ObjectData ref="curDataType" v-else-if="type === 'object'"
-                                    :isEditing="isEditing" :schemaData="schemaData"/>
-
-                        <NumericData ref="curDataType" v-else-if="type === 'number'"
-                                     :numericType="'number'" :isEditing="isEditing"
-                                     :schemaData="schemaData"/>
-
-                        <NumericData ref="curDataType" v-else-if="type === 'integer'"
-                                     :numericType="'integer'" :isEditing="isEditing"
-                                     :schemaData="schemaData"/>
-
-                        <BooleanData ref="curDataType" v-else-if="type === 'boolean'"
-                                     :isEditing="isEditing"
-                                     :schemaData="schemaData"/>
-                    </div>
-                </div>
+    <div class="json-form ">
+        <div class="row justify-content-end ">
+            <div class="col-1 ">
+                <b-button class="round-button"
+                          style="margin: 10px"
+                          v-if="type === 'object'"
+                          @click="showChild = (showChild === 'down')?'':'down'"
+                    v-b-toggle="componentId">
+                    <i class="fa fa-angle-right rotate"
+                       v-bind:class="showChild"></i>
+                </b-button>
+                <div class="w-100"></div>
+                <!--<hr class="vline"/>-->
             </div>
-
-            <!--tambahan view jika tipe datanya array-->
-            <div class="form-row blue-frame" v-if="type === 'array'">
-                <div class="row w-100" v-for="(item,i) in items" v-bind:key="i">
-                    <!--editing mode-->
-                    <div class="col-6" v-if="isEditing">
-                        <label class="col-4">Of :</label>
-                        <b-select class="col-8" @change="selectItemType($event,i)" v-model="item.type">
-                            <option v-for="dataType in dataTypes"
-                                    v-bind:key="dataType.val"
-                                    :value="dataType.val">{{dataType.text}}</option>
-                            <hr/>
-                            <option v-for="(value,name) in customDataTypes"
-                                    v-bind:key="name"
-                                    :value="name">{{name}}</option>
-                        </b-select>
-                    </div>
+            <div class="col-10 justify-content-end">
+                <div class="container row">
+                    <!--kolom kiri-->
                     <div class="col-6">
-                        Of :
-                        <b v-if="item.ref === undefined">{{item.type}}</b>
-                        <router-link v-else
-                                :to="'/projects/'+projectId+'/definitions/'+item.type">{{item.type}}</router-link>
-                        <ArrayData :ref="'array-'+i" v-if="item.type === 'array'"
-                                   :schemaData="item" :isEditing="isEditing"/>
-                        <StringData ref="itemDataType" v-else-if="item.type === 'string'"
-                                    :schemaData="item" :isEditing="isEditing"/>
-                        <ObjectData ref="itemDataType" v-else-if="item.type === 'object'"
-                                    :schemaData="lastItem" :isEditing="isEditing"/>
-                        <NumericData ref="itemDataType" v-else-if="item.type === 'number'"
-                                     :numericType="'number'" :schemaData="lastItem" :isEditing="isEditing"/>
-                        <NumericData ref="itemDataType" v-else-if="item.type === 'integer'"
-                                     :numericType="'integer'" :schemaData="lastItem" :isEditing="isEditing"/>
-                        <BooleanData ref="itemDataType" v-else-if="item.type === 'boolean'"
-                                     :schemaData="lastItem" :isEditing="isEditing"/>
+                        <div v-if="isEditing" class="form-inline">
+                            <label v-if="isHasName" class="col-4">Name :</label>
+                            <b-input v-if="isHasName" class="col-8" v-model="name"></b-input>
+                            <label class="col-4">Type :</label>
+                            <b-select class="col-8" v-model="selectedType" @change="selectType">
+                                <option v-for="dataType in dataTypes"
+                                        v-bind:key="dataType.val"
+                                        :value="dataType.val">{{dataType.text}}</option>
+                                <hr/>
+                                <option v-for="(value,name) in customDataTypes"
+                                        v-bind:key="name"
+                                        :value="name">{{name}}</option>
+                            </b-select>
+                            <label>Required : </label>
+                            <b-checkbox v-model="required"/>
+                        </div>
+                        <div v-else class="row">
+                            <p>{{name}}</p>
+                            <div class="w-100"></div>
+                            <p v-if="type !== '' && type !== undefined">{{type}}</p>
+                            <router-link v-else
+                                         :to="'/projects/'+projectId+'/definitions/'+refName">
+                                {{refName}}
+                            </router-link>
+                            <div class="col-1"></div>
+                            <b>{{(required?"Required":"Optional")}}</b>
+                        </div>
+                    </div>
+                    <!--kolom kanan-->
+                    <div class="col-6">
+                        <div v-if="isEditing">
+                            <div class="row">
+                                <label class="col-4">Description :</label>
+                                <b-input class="col-8" v-model="description"></b-input>
+                            </div>
+                            <div class="row">
+                                <label class="col-4">Example :</label>
+                                <b-input class="col-8" v-model="example"></b-input>
+                            </div>
+                            <div class="form-inline float-right w-100">
+                                <a style="float: right;color: #4493e2;cursor: pointer;"
+                                   class="more-attribute btn-link" @click="clickMoreDisplay">more attributes</a>
+                            </div>
+                            <br/>
+                        </div>
+                        <div v-else class="container">
+                            <div class="row" style="text-align: right;display: block;">
+                                <p v-if="description !== undefined">Description : {{description}}</p>
+                            </div>
+                            <div class="row" style="text-align: right;display: block;">
+                                <p v-if="example !== undefined">Example : {{example}}</p>
+                            </div>
+                        </div>
+                        <div v-bind:style="{display: (isEditing)?moreDisplay:'block'}">
+                            <!--more attributes of selected datatype-->
+                            <div class="w-100"></div>
+                            <StringData ref="curDataType" v-if="type === 'string'"
+                                        :isEditing="isEditing" :schemaData="schemaData"/>
+                            <ArrayData ref="curDataType" v-else-if="type === 'array'"
+                                       :isEditing="isEditing" :schemaData="schemaData"/>
+                            <ObjectData ref="curDataType" v-else-if="type === 'object'"
+                                        :isEditing="isEditing" :schemaData="schemaData"/>
+
+                            <NumericData ref="curDataType" v-else-if="type === 'number'"
+                                         :numericType="'number'" :isEditing="isEditing"
+                                         :schemaData="schemaData"/>
+
+                            <NumericData ref="curDataType" v-else-if="type === 'integer'"
+                                         :numericType="'integer'" :isEditing="isEditing"
+                                         :schemaData="schemaData"/>
+
+                            <BooleanData ref="curDataType" v-else-if="type === 'boolean'"
+                                         :isEditing="isEditing"
+                                         :schemaData="schemaData"/>
+                        </div>
+                    </div>
+                    <div class="w-100"></div>
+                    <!--<div class="col-6">-->
+                        <!---->
+                    <!--</div>-->
+                    <!--tambahan view jika tipe datanya array-->
+                    <div class="col-12 w-100" v-if="type === 'array'">
+                        <div class="row w-100" v-for="(item,i) in items" v-bind:key="i">
+                            <!--editing mode-->
+                            <div class="col-6" v-if="isEditing">
+                                <label class="col-4">Of :</label>
+                                <b-select class="col-8" @change="selectItemType($event,i)" v-model="item.type">
+                                    <option v-for="dataType in dataTypes"
+                                            v-bind:key="dataType.val"
+                                            :value="dataType.val">{{dataType.text}}</option>
+                                    <hr/>
+                                    <option v-for="(value,name) in customDataTypes"
+                                            v-bind:key="name"
+                                            :value="name">{{name}}</option>
+                                </b-select>
+                            </div>
+                            <div v-else class="col-6">
+                                <div v-if="!isEditing" class="row">
+                                    <p>Of :
+                                        <b v-if="item.ref === undefined && !isEditing">{{item.type}}</b>
+                                        <router-link v-else-if="!isEditing"
+                                                     :to="'/projects/'+projectId+'/definitions/'+item.type">{{item.type}}</router-link>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-6" style="display:block;">
+                                <ArrayData :ref="'array-'+i" v-if="item.type === 'array'"
+                                           :schemaData="item" :isEditing="isEditing"/>
+                                <StringData ref="itemDataType" v-else-if="item.type === 'string'"
+                                            :schemaData="item" :isEditing="isEditing"/>
+                                <ObjectData ref="itemDataType" v-else-if="item.type === 'object'"
+                                            :schemaData="lastItem" :isEditing="isEditing"/>
+                                <NumericData ref="itemDataType" v-else-if="item.type === 'number'"
+                                             :numericType="'number'" :schemaData="lastItem" :isEditing="isEditing"/>
+                                <NumericData ref="itemDataType" v-else-if="item.type === 'integer'"
+                                             :numericType="'integer'" :schemaData="lastItem" :isEditing="isEditing"/>
+                                <BooleanData ref="itemDataType" v-else-if="item.type === 'boolean'"
+                                             :schemaData="lastItem" :isEditing="isEditing"/>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div v-if="type === 'object' || lastItem.type === 'object'" style="padding-left: 5%">
+
+                <!--<button @click="dump">check!</button>-->
+                <!--<button @click="isEditing = !isEditing">edit : {{isEditing}}</button>-->
+
+            </div>
+            <div class="col-1 " style="padding: 10px 25px;">
+                <b-button @click="isEditing = !isEditing" class="float-right round-button">
+                    <i class="fa fa-pencil-alt"></i>
+                </b-button>
+                <b-button class="float-right round-button" style="margin-top:5px;">
+                    <i class="fa fa-trash"></i>
+                </b-button>
+            </div>
+        </div>
+        <b-collapse :id="componentId" visible>
+            <div v-if="type === 'object' || lastItem.type === 'object'">
                 <!--child object-->
-                <div v-for="(val,i) in propertiesId" v-bind:key="val.id">
-                    <DataTypeInput :ref="'property-'+val.id" :parentIsEditing="isEditing" :schemaData="val.schemaData"/>
-                    <button @click="deleteProperty(i)">delete property</button>
+                <div v-for="(val,i) in propertiesId" v-bind:key="val.id" class="row justify-content-end">
+                    <div class="row-3" style="margin-top: -16px;margin-bottom: 16px">
+                        <hr class="vline row-3"/>
+                    </div>
+                    <DataTypeInput :ref="'property-'+val.id" :parentIsEditing="isEditing"
+                                   :schemaData="val.schemaData" class="col-11"/>
+                    <!--<button @click="deleteProperty(i)">delete property</button>-->
                 </div>
                 <button @click="addNewProperty">Add more property</button>
             </div>
-            <button @click="dump">check!</button>
-            <button @click="isEditing = !isEditing">edit : {{isEditing}}</button>
-        </div>
+        </b-collapse>
     </div>
 
 </template>
@@ -146,6 +189,8 @@
             //data editor
             isEditing : false,
             isMoreDisplay : false,
+            componentId : Math.random().toString(),
+            showChild : 'down',
 
             //data general
             name : '',
@@ -495,6 +540,7 @@
                     let sd = this.schemaData
                     this.name = sd.name
                     this.type = sd.type
+                    this.selectedType = sd.type
                     this.description = sd.description
                     this.required = sd.required
                     this.example = sd.example
@@ -542,7 +588,7 @@
 
                 if(this.type === undefined && this.ref === undefined){
                     this.type = 'string'
-                    this.selectType = 'string'
+                    this.selectedType = 'string'
                 }
             },
         },
@@ -566,4 +612,37 @@
     .more-attribute{
         float: right;color: #4493e2;cursor: pointer;
     }
+
+    .json-form{
+        border: rgba(42, 18, 59, 0.28) 1px dotted;
+    }
+
+    .round-button{
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        background: rgba(187, 184, 172, 0.49);
+        display: inline-block;
+        box-shadow: 0px 0px 2px #888;
+        padding: 0.5em 0.6em;
+    }
+
+    .vline{
+        border-left: 6px solid rgba(226, 116, 0, 0.41);
+        height: 100%;
+    }
+
+
+    .rotate {
+        -moz-transition: all .5s linear;
+        -webkit-transition: all .5s linear;
+        transition: all .2s linear;
+    }
+
+    .rotate.down{
+        -moz-transform:rotate(90deg);
+        -webkit-transform:rotate(90deg);
+        transform:rotate(90deg);
+    }
+
 </style>

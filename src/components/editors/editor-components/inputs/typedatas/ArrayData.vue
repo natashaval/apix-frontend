@@ -3,11 +3,11 @@
         <div v-if="isEditing">
             <div class="form-inline row float-right">
                 <div class="form-inline col-6 row">
-                    <label class="col-6">Min items :</label>
+                    <label class="col-6">Min items:</label>
                     <b-input type="number" class="col-6" v-model="minItems"></b-input>
                 </div>
                 <div class="form-inline col-6 row">
-                    <label class="col-6">Max items :</label>
+                    <label class="col-6">Max items:</label>
                     <b-input type="number" class="col-6" v-model="maxItems"></b-input>
                 </div>
             </div>
@@ -16,9 +16,11 @@
                 <b-checkbox v-model="uniqueItems"></b-checkbox>
             </div>
         </div>
-        <div v-else>
+        <div v-else class="float-right">
             <div class="row">
-                <p v-if="minItems !== undefined">Min items : {{minItems}}, </p>
+                <p v-if="minItems !== undefined">Min items : {{minItems}}</p>
+            </div>
+            <div class="row">
                 <p v-if="maxItems !== undefined">Max items : {{maxItems}}</p>
             </div>
             <div class="row">
