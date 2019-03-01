@@ -40,7 +40,8 @@
                 {key : 'description'},
                 {key : 'in'},
                 {keyBefore : 'name', keyAfter: 'in'}
-            ]
+            ],
+            commitChangeCallback : []
         }),
         watch : {
             contentType : function () {
@@ -56,12 +57,14 @@
         },
         methods : {
             getChangedData : function (operationPointer,pointer) {
+                let isEdited = false
                 let requestBody = operationPointer.requestBody
 
                 let actions = ActionBuilderUtil.createActions(
                     this.bodyData,this._data,this.attributesKey
                 )
                 if(actions.length !== 0){
+                    isEdited = true
                     requestBody._actions = actions
                     requestBody._hasActions = true
                     if(this.in !== this.bodyData.in){
@@ -76,11 +79,25 @@
                         })
                     }
                 }
-                this.$refs.root.getChangedData(pointer)
+
+                let callback = this.$refs.root.getChangedData(pointer)
+
+                if(callback !== undefined){
+                    isEdited = true
+                    this.commitChangeCallback.push(callback)
+                }
+
                 if(pointer._actions !== undefined && pointer._actions.length === 0){
                     delete pointer._actions
                     delete pointer._hasActions
                 }
+
+                return (isEdited)?this.commitChange : undefined
+            },
+            commitChange : function () {
+                console.log('commit body form')
+                this.commitChangeCallback.forEach(fn => fn())
+
             },
             loadData : function () {
                 if(this.bodyData !== undefined){

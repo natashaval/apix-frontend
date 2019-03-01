@@ -227,9 +227,10 @@
             propertyId : 2,
             propertiesData : [{id : 1}],
 
-            //menyimpan property yang didelete, tidak menyimpan property yang baru dibuat lalu dihapus
-            deletedPropertyQuery : [],
+            commitChangeCallback : [],
 
+            //menyimpan propertyname yang didelete, tidak menyimpan property yang baru dibuat lalu dihapus
+            deletedProperty : [],
             attributesKey : [
                 {key : 'type'},
                 {key : 'required'},
@@ -304,7 +305,12 @@
                 let tmp = this.schemaData
                 return ActionBuilder.createActions(tmp, this._data, this.attributesKey)
             },
+            commitChange : function () {
+                console.log('commit changed datatype input => '+this.name)
+                this.commitChangeCallback.forEach(fn => fn())
+            },
             getChangedData : function (parentQuery) {
+                this.commitChangeCallback = []
                 let query = {_hasActions : true, _actions : []}
                 let childIsEdited = false
 
@@ -320,7 +326,7 @@
                         key : this.name,
                         value : this.getData().attributes
                     })
-                    return true
+                    return undefined
                 }//jika ganti nama
                 else if(this.schemaData.name !== this.name){
                     parentQuery._actions.push({
@@ -346,7 +352,7 @@
                 if(this.$refs.curDataType !== undefined){
                     this.$refs.curDataType.getActions().forEach(x => actions.push(x))
                 }
-                this.deletedPropertyQuery.forEach(x => actions.push(x))
+                this.deletedProperty.forEach(x => actions.push({action : 'delete',key : x}))
 
                 query._actions = actions
 
@@ -354,7 +360,11 @@
                     for(let i = 0; i < this.propertiesData.length; i++){
                         let id = this.propertiesData[i].id
                         //nandain apakah didalamnya ada diedit
-                        childIsEdited |= this.$refs['property-'+id][0].getChangedData(query)
+                        let callback = this.$refs['property-'+id][0].getChangedData(query)
+                        if(callback !== undefined){
+                            childIsEdited = true
+                            this.commitChangeCallback.push(callback)
+                        }
                     }
                 }
                 else if(this.type === 'array') {
@@ -440,7 +450,10 @@
                         for (let i = 0; i < this.propertiesData.length; i++) {
                             let id = this.propertiesData[i].id
                             //nandain apakah didalamnya ada diedit
-                            itemIsEdited |= this.$refs['property-' + id][0].getChangedData(tmp)
+                            let callback = this.$refs['property-' + id][0].getChangedData(tmp)
+                            if(callback !== undefined){
+                                itemIsEdited = true
+                            }
                         }
                         if (itemIsEdited) {
                             pointer.properties = tmp
@@ -491,7 +504,7 @@
                         delete query._actions
                     }
                 }
-                return isEdited
+                return (isEdited)?this.commitChange : undefined
             },
             /*
             * if ada perubahan, return {name,attributes}
@@ -537,10 +550,9 @@
             deleteChild : function (childIndex) {
                 //jika bukan property baru, maka bikin query delete
                 if(this.propertiesData[childIndex].schemaData !== undefined){
-                    this.deletedPropertyQuery.push({
-                        action : 'delete',
-                        key : this.propertiesData[childIndex].schemaData.name
-                    })
+                    this.deletedProperty.push(
+                        this.propertiesData[childIndex].schemaData.name
+                    )
                 }
                 this.propertiesData.splice(childIndex,1)
             },
@@ -570,7 +582,7 @@
             loadSchemaData : function () {
                 this.projectId = this.$router.currentRoute.params.projectId
 
-                this.deletedPropertyQuery = []
+                this.deletedProperty = []
 
                 if(this.parentIsEditing !== undefined){
                     this.isEditing = this.parentIsEditing

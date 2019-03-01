@@ -20,6 +20,9 @@
     export default {
         name: "RequestComponent",
         components: {PropertyForm, BodyForm},
+        data : () => ({
+            commitChangeCallback : []
+        }),
         props : [
             'operationData'
         ],
@@ -42,12 +45,33 @@
         },
         methods : {
             getChangedData : function (operationPointer,requestBodyPointer) {
+                let isEdited = false
                 let request = requestBodyPointer
-                this.$refs.headers.getChangedData(request.headers = {})
-                this.$refs.queryParams.getChangedData(request.queryParams = {})
-                if(this.$refs.body !== undefined){
-                    this.$refs.body.getChangedData(operationPointer,request.schema = {})
+                let callback = this.$refs.headers.getChangedData(request.headers = {})
+                if(callback !== undefined){
+                    isEdited = true
+                    this.commitChangeCallback.push(callback)
                 }
+
+                callback = this.$refs.queryParams.getChangedData(request.queryParams = {})
+                if(callback !== undefined){
+                    isEdited = true
+                    this.commitChangeCallback.push(callback)
+                }
+
+                if(this.$refs.body !== undefined){
+                    callback = this.$refs.body.getChangedData(operationPointer,request.schema = {})
+                    if(callback !== undefined){
+                        isEdited = true
+                        this.commitChangeCallback.push(callback)
+                    }
+                }
+
+                return (isEdited)?this.commitChange : undefined
+            },
+            commitChange : function () {
+                console.log('commit changed property form')
+                this.commitChangeCallback.forEach(fn => fn())
             }
         }
     }

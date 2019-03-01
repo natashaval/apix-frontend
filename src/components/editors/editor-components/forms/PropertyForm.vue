@@ -22,7 +22,8 @@
             propertiesData : [],
             propertyId : 0,
             //menyimpan property yang didelete, tidak menyimpan property yang baru dibuat lalu dihapus
-            deletedPropertyQuery : [],
+            deletedProperty : [],
+            commitChangeCallback : []
 
         }),
         computed : {
@@ -48,33 +49,45 @@
                     }
                 }
             },
+            commitChange : function () {
+                console.log('commit changed property form')
+                this.commitChangeCallback.forEach(fn => fn())
+            },
             deleteChild : function (childIndex) {
                 //jika bukan property baru, maka bikin query delete
                 if(this.propertiesData[childIndex].schemaData !== undefined){
-                    this.deletedPropertyQuery.push({
-                        action : 'delete',
-                        key : this.propertiesData[childIndex].schemaData.name
-                    })
+                    this.deletedProperty.push(
+                        this.propertiesData[childIndex].schemaData.name
+                    )
                 }
                 this.propertiesData.splice(childIndex,1)
             },
             getChangedData : function (query) {
+                this.commitChangeCallback = []
+                let isEdited = false
                 for(let i = 0; i < this.propertiesData.length; i++){
                     let id = this.propertiesData[i].id
-                    this.$refs['property-'+id][0].getChangedData(query)
+                    let callback = this.$refs['property-'+id][0].getChangedData(query)
+                    if( callback !== undefined ){
+                        isEdited = true
+                        this.commitChangeCallback.push(callback)
+                    }
                 }
 
-                if(this.deletedPropertyQuery.length > 0){
+                if(this.deletedProperty.length > 0){
+                    isEdited = true
                     if(query._actions === undefined){
                         query._actions = []
                     }
-                    this.deletedPropertyQuery.forEach(x => query._actions.push(x))
+                    this.deletedProperty.forEach(fieldName => query._actions.push({action : 'delete', key : fieldName}))
                 }
 
                 if(query._actions !== undefined && query._actions.length === 0){
                     delete query._hasActions
                     delete query._actions
                 }
+
+                return (isEdited)?this.commitChange : undefined
             }
         },
         created() {

@@ -39,15 +39,18 @@
                 let pointer = tree.leaf
                 pointer._signature = this.operationData._signature
 
-                this.$refs.request.getChangedData(tree.leaf,pointer.requestBody = {})
+                let callback = this.$refs.request.getChangedData(tree.leaf,pointer.requestBody = {})
+                if(callback !== undefined){
+                    callback()
+                }
 
-                axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
-                    (response) => {
-                        console.log(response)
-                    }
-                ).catch(function (error) {
-                    console.log(error);
-                })
+                // axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
+                //     (response) => {
+                //         console.log(response)
+                //     }
+                // ).catch(function (error) {
+                //     console.log(error);
+                // })
 
 
             },
