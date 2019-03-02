@@ -6,15 +6,19 @@
 
 <script>
     export default {
-        name: "MethodBar",
+        name: "OperationBar",
         props : [
-            'operationApi','apiData'
+            'apiData','operationApi','pathApi','sectionApi'
         ],
         methods : {
             methodClick : function () {
                 this.$router.push({
                     name :'operation-editor',
-                    params: {operationApi : this.operationApi}
+                    params: {
+                        sectionApi : this.sectionApi,
+                        pathApi : this.pathApi,
+                        operationApi : this.operationApi
+                    }
                 })
             }
         }

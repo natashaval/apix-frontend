@@ -3,7 +3,7 @@
         <li v-b-toggle="'section-'+sectionApi" @click="sectionClick"><i class="fa fa-angle-right"></i>{{sectionApi}}</li>
         <b-collapse :id="'section-'+sectionApi" class="mt-2">
             <ul>
-                <PathBar v-for="(value,key) in apiData.paths" v-bind:key="key" :apiData="value" :pathApi="key"/>
+                <PathBar v-for="(value,key) in apiData.paths" v-bind:key="key" :apiData="value" :sectionApi="sectionApi" :pathApi="key"/>
             </ul>
         </b-collapse>
     </div>

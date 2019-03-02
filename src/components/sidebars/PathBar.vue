@@ -2,22 +2,24 @@
     <div>
         <li @click="pathClick" v-b-toggle="'link-'+pathApi">{{pathApi}}</li>
         <b-collapse :id="'link-'+pathApi" class="mt-2">
-            <MethodBar v-for="(value,key) in apiData.methods" v-bind:key="key" :apiData="value" :operationApi="key"/>
+            <OperationBar v-for="(value,key) in apiData.methods" v-bind:key="key" :apiData="value"
+                          :sectionApi="sectionApi" :pathApi="pathApi"
+                          :operationApi="key"/>
         </b-collapse>
     </div>
 </template>
 
 <script>
-    import MethodBar from "./MethodBar";
+    import OperationBar from "./OperationBar";
     export default {
         name: "PathBar",
-        components: {MethodBar},
-        props : ['pathApi','apiData'],
+        components: {OperationBar},
+        props : ['apiData','pathApi','sectionApi'],
         methods : {
             pathClick : function(){
                 this.$router.push({
                     name :'path-editor',
-                    params: {pathApi : this.pathApi}
+                    params: {sectionApi : this.sectionApi, pathApi : this.pathApi}
                 })
             }
         }
