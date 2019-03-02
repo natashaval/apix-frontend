@@ -1,6 +1,6 @@
 <template>
-    <div class="dot-border">
-        <div class="row justify-content-end ">
+    <div :class="(borderAble)?'dot-border':''">
+        <div class="row justify-content-end" style="margin-left: -10%">
             <div class="col-1 ">
                 <b-button class="round-button"
                           style="margin: 10px"
@@ -17,10 +17,10 @@
                 <div class="container row">
                     <!--kolom kiri-->
                     <div class="col-6">
-                        <div v-if="isEditing" class="form-inline">
-                            <label v-if="hasName" class="col-4">Name :</label>
-                            <b-input v-if="hasName" class="col-8" v-model="name"></b-input>
-                            <label class="col-4">Type :</label>
+                        <div v-if="showEdit" class="form-inline">
+                            <label v-if="nameAble" class="col-4">Name :</label>
+                            <b-input v-if="nameAble" class="col-8" v-model="name"></b-input>
+                            <label class="col-4">{{(isSubArray)?'Of :':'Type :'}}</label>
                             <b-select class="col-8" v-model="selectedType" @change="selectType">
                                 <option v-for="dataType in dataTypes"
                                         v-bind:key="dataType.val"
@@ -34,6 +34,7 @@
                             <b-checkbox v-model="required"/>
                         </div>
                         <div v-else class="row">
+                            <p v-if="isSubArray">Of: </p>
                             <p>{{name}}</p>
                             <div class="w-100"></div>
                             <p v-if="type !== '' && type !== undefined">{{type}}</p>
@@ -47,7 +48,7 @@
                     </div>
                     <!--kolom kanan-->
                     <div class="col-6">
-                        <div v-if="isEditing">
+                        <div v-if="showEdit">
                             <div class="row">
                                 <label class="col-4">Description :</label>
                                 <b-input class="col-8" v-model="description"></b-input>
@@ -70,98 +71,58 @@
                                 <p v-if="example !== undefined">Example : {{example}}</p>
                             </div>
                         </div>
-                        <div v-bind:style="{display: (isEditing)?moreDisplay:'block'}">
+                        <div v-bind:style="{display: (showEdit)?moreDisplay:'block'}">
                             <!--more attributes of selected datatype-->
                             <div class="w-100"></div>
                             <StringData ref="curDataType" v-if="type === 'string'"
-                                        :isEditing="isEditing" :schemaData="schemaData"/>
+                                        :isEditing="showEdit" :schemaData="schemaData"/>
                             <ArrayData ref="curDataType" v-else-if="type === 'array'"
-                                       :isEditing="isEditing" :schemaData="schemaData"/>
+                                       :isEditing="showEdit" :schemaData="schemaData"/>
                             <ObjectData ref="curDataType" v-else-if="type === 'object'"
-                                        :isEditing="isEditing" :schemaData="schemaData"/>
+                                        :isEditing="showEdit" :schemaData="schemaData"/>
 
                             <NumericData ref="curDataType" v-else-if="type === 'number'"
-                                         :numericType="'number'" :isEditing="isEditing"
+                                         :numericType="'number'" :isEditing="showEdit"
                                          :schemaData="schemaData"/>
 
                             <NumericData ref="curDataType" v-else-if="type === 'integer'"
-                                         :numericType="'integer'" :isEditing="isEditing"
+                                         :numericType="'integer'" :isEditing="showEdit"
                                          :schemaData="schemaData"/>
 
                             <BooleanData ref="curDataType" v-else-if="type === 'boolean'"
-                                         :isEditing="isEditing"
+                                         :isEditing="showEdit"
                                          :schemaData="schemaData"/>
                             <CustomData ref="curDataType" v-else :scemaData="schemaData" :currentRef="ref"/>
-                        </div>
-                    </div>
-                    <div class="w-100"></div>
-                    <!--<div class="col-6">-->
-                        <!---->
-                    <!--</div>-->
-                    <!--tambahan view jika tipe datanya array-->
-                    <div class="col-12 w-100" v-if="type === 'array'">
-                        <div class="row w-100" v-for="(item,i) in items" v-bind:key="i">
-                            <!--editing mode-->
-                            <div class="col-6" v-if="isEditing">
-                                <label class="col-4">Of :</label>
-                                <b-select class="col-8" @change="selectItemType($event,i)" v-model="item.type">
-                                    <option v-for="dataType in dataTypes"
-                                            v-bind:key="dataType.val"
-                                            :value="dataType.val">{{dataType.text}}</option>
-                                    <hr/>
-                                    <option v-for="(value,name) in customDataTypes"
-                                            v-bind:key="name"
-                                            :value="name">{{name}}</option>
-                                </b-select>
-                            </div>
-                            <div v-else class="col-6">
-                                <div v-if="!isEditing" class="row">
-                                    <p>Of :
-                                        <b v-if="item.ref === undefined && !isEditing">{{item.type}}</b>
-                                        <router-link v-else-if="!isEditing"
-                                                     :to="'/projects/'+projectId+'/definitions/'+item.type">{{item.type}}</router-link>
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="col-6" style="display:block;">
-                                <ArrayData :ref="'array-'+i" v-if="item.type === 'array'"
-                                           :schemaData="item" :isEditing="isEditing"/>
-                                <StringData ref="itemDataType" v-else-if="item.type === 'string'"
-                                            :schemaData="item" :isEditing="isEditing"/>
-                                <ObjectData ref="itemDataType" v-else-if="item.type === 'object'"
-                                            :schemaData="lastItem" :isEditing="isEditing"/>
-                                <NumericData ref="itemDataType" v-else-if="item.type === 'number'"
-                                             :numericType="'number'" :schemaData="lastItem" :isEditing="isEditing"/>
-                                <NumericData ref="itemDataType" v-else-if="item.type === 'integer'"
-                                             :numericType="'integer'" :schemaData="lastItem" :isEditing="isEditing"/>
-                                <BooleanData ref="itemDataType" v-else-if="item.type === 'boolean'"
-                                             :schemaData="lastItem" :isEditing="isEditing"/>
-                                <CustomData ref="itemDataType" v-else :schemaData="lastItem" :currentRef="lastItem.ref"/>
-                            </div>
                         </div>
                     </div>
                 </div>
 
 
                 <button @click="dump">Dump!</button>
-                <!--<button @click="isEditing = !isEditing">edit : {{isEditing}}</button>-->
 
             </div>
             <div class="col-1 " style="padding: 10px 25px;">
-                <b-button @click="isEditing = !isEditing" class="float-right round-button">
+                <b-button v-if="editAble" @click="isEditing = !isEditing" class="float-right round-button">
                     <i class="fa fa-pencil-alt"></i>
                 </b-button>
-                <b-button v-if="!isRoot" @click="selfDelete" class="float-right round-button" style="margin-top:5px;">
+                <b-button v-if="deleteAble" @click="selfDelete" class="float-right round-button" style="margin-top:5px;">
                     <i class="fa fa-trash"></i>
                 </b-button>
             </div>
         </div>
+        <!--tambahan view jika tipe datanya array-->
+        <div class="w-100" v-if="type === 'array'">
+            <DataTypeInput ref="arrayItem" :schemaData="schemaData.items" :borderAble="false"
+                           :nameAble="false" :deleteAble="false" :editAble="false"
+                           :isSubArray="true" :parentIsEditing="showEdit"/>
+        </div>
+
         <b-collapse :id="childCollapseId" visible>
-            <div v-if="type === 'object' || lastItem.type === 'object'">
+            <div v-if="type === 'object'">
                 <!--child object-->
                 <div v-for="(val,i) in propertiesData" v-bind:key="val.id" class="row justify-content-end">
-                    <div class="row-3" style="margin-top: -16px;margin-bottom: 16px">
-                        <hr class="vline row-3"/>
+                    <div style="margin-top: -16px;margin-bottom: 16px">
+                        <hr class="vline"/>
                     </div>
                     <DataTypeInput :ref="'property-'+val.id" :parentIsEditing="val.isEditing"
                                    :schemaData="val.schemaData" :componentId="i"
@@ -189,13 +150,41 @@
     export default {
         name: "DataTypeInput",
         components: {CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
-        props : [
-            'fSelfDelete',//delete function from parent
-            'parentIsEditing',//default value dari @isEditing
-            'schemaData',//data dari parent, jika form baru maka null
-            'componentId',//id atau index yang diberi oleh parent berdasarkan array childs parent
-            'isRoot'//jika root maka tidak punya nama
-        ],
+        props : {
+            fSelfDelete : {
+                type : Function
+            },//delete function from parent
+            parentIsEditing : {
+                type : Boolean
+            },//default value dari @isEditing
+            schemaData : {
+                type : Object
+            },//data dari parent, jika form baru maka null
+            componentId : {
+                type : Number
+            },//id atau index yang diberi oleh parent berdasarkan array childs parent
+            nameAble : {
+                type : Boolean,
+                default : true
+            },//punya nama (default : true)
+            borderAble : {
+                type : Boolean,
+                default : true
+            },//punya border (default : true)
+            deleteAble : {
+                type : Boolean,
+                default : true
+            },//punya tombol delete (default : true),
+            editAble : {
+                type : Boolean,
+                default : true
+            },//edit cuma bisa di trigger dari parentnya karna tidak ada tombol edit
+            isSubArray : {
+                type : Boolean,
+                default : false
+            }
+
+        },
         data : () => ({
             projectId : undefined,
             //data editor
@@ -206,26 +195,17 @@
 
             //data general
             name : '',
-            hasName : true,
             description : '',
             type : undefined,
-            selectedType : '',//untuk tampilan saja,hasil watch dari @type dan @ref
+            selectedType : '',//untuk tampilan saja,karna untuk 'ref' value dan text di select option tidak sama
             required : false,
             example : '',
             exampleCount : 1,
             ref : undefined,
-            //data array
-            items : [],
-            /*digunakan untuk kasus khusus
-            * karna ketika array yang multidimensi diutak atik / array @items, schemaData bisa hilang sehingga validasi tidak valid
-            * sehingga validasi/getActions dilakukan di file ini
-            * array @schemaItems tidak diutak-atik isinya karna digunakan untuk comparison before dan after
-            */
-            schemaItems : [],
 
             //data object
             propertyId : 2,
-            propertiesData : [{id : 1}],
+            propertiesData : [{id : 1,isEditing : true}],
 
             commitChangeCallback : [],
 
@@ -261,8 +241,11 @@
             customDataTypes : function () {
                 return this.$store.getters['project/getDataTypes']
             },
-            lastItem : function () {
-                return (this.items.length === 0)?{}:this.items[this.items.length - 1]
+            showEdit : function () {
+                if(this.isSubArray){
+                    return this.parentIsEditing
+                }
+                return this.isEditing
             }
         },
         methods : {
@@ -276,8 +259,8 @@
                 this.selectedType = value
                 if(value === 'array'){
                     this.type = 'array'
-                    this.items = []
-                    this.items.push({type : 'string'})
+                    // this.items = []
+                    // this.items.push({type : 'string'})
                 }
                 else if(this.isDefaultDataType(value)){
                     this.type = value
@@ -289,7 +272,7 @@
             },
             selectItemType : function (value,i) {
                 if(!this.isDefaultDataType(value)){
-                    this.items[i].ref = '#/definitions/'+value
+                    // this.items[i].ref = '#/definitions/'+value
                 }
                 if(value === 'array' && i === this.items.length -1 ){
                     this.items.push({
@@ -305,10 +288,15 @@
                 let tmp = this.schemaData
                 return ActionBuilder.createActions(tmp, this._data, this.attributesKey)
             },
+            //mengcopy hasil edit ke state vuex project
             commitChange : function () {
                 console.log('commit changed datatype input => '+this.name)
                 this.commitChangeCallback.forEach(fn => fn())
             },
+            /* parameter : @parentQuery(pointer object dari parent, semua query akan langsung di assign ke pointer,
+            * tidak melalui return value)
+            * return : fungsi callback(digunakan untuk commit change) jika data dirinya atau childnya teredit
+            * */
             getChangedData : function (parentQuery) {
                 this.commitChangeCallback = []
                 let query = {_hasActions : true, _actions : []}
@@ -319,29 +307,38 @@
                     parentQuery._actions = []
                 }
 
-                //jika object/field baru
-                if(this.schemaData === undefined || (this.schemaData.type !== this.type && this.ref === undefined)){
+
+                if(this.schemaData === undefined){//jika object/field baru atau ganti tipe data
                     parentQuery._actions.push({
                         action : 'put',
                         key : this.name,
                         value : this.getData().attributes
                     })
                     return undefined
-                }//jika ganti nama
-                else if(this.schemaData.name !== this.name){
+                }
+                else if(this.schemaData.type !== this.type){//jika ganti tipe data
+                    console.log('yes '+this.isSubArray)
+                    parentQuery._actions.push({
+                        action : 'put',
+                        key : (this.isSubArray)?'items':this.name,
+                        value : this.getData().attributes
+                    })
+                }
+                else if(this.schemaData.name !== this.name){//jika ganti nama
                     parentQuery._actions.push({
                         action : 'rename',
                         key : this.schemaData.name,
                         newKey : this.name
                     })
                     parentQuery[this.name] = query
-                }//jika tidak ada perubahan nama
-                //ingat undefined == null tapi undefined !== null
-                else if(this.name !== '' && this.name != undefined ){
+                }//ingat undefined == null tapi undefined !== null
+                else if(this.name !== '' && this.name != undefined ){//jika tidak ada perubahan nama
                     parentQuery[this.name] = query
                 }
-                else{
-                    //jika ga punya nama????
+                else if(this.isSubArray){
+                    parentQuery['items'] = query
+                }
+                else{//jika ga punya nama / jika root
                     parentQuery._actions = []
                     parentQuery._hasActions = true
                     query = parentQuery
@@ -368,131 +365,15 @@
                     }
                 }
                 else if(this.type === 'array') {
-                    query.items = {}
-                    let pointer = query
-                    let lastEditedPointer = pointer
-                    let sdItemPointer = this.schemaData.items
-                    for(let i = 0; i < this.items.length - 1; i++){
-                        pointer = pointer.items
-                        // let tmp = this.$refs['array-' + i][0].getActions()
-                        let tmp = ActionBuilder.createActions(
-                            this.schemaItems[i],
-                            this.$refs['array-' + i][0].getAttributes(),
-                            this.$refs['array-' + i][0].getAttributesKey()
-                        )
-
-                        if(tmp.length > 0 || sdItemPointer === undefined){
-                            lastEditedPointer = pointer
-                            pointer._hasActions = true
-                            pointer._actions = tmp
-                            childIsEdited = true
-                        }
-
-                        pointer.items = {}
-                        if(sdItemPointer !== undefined){
-                            sdItemPointer = sdItemPointer.items
-                        }
-                    }
-                    let getChilds = () => {
-                        let childs = {}
-                        for (let i = 0; i < this.propertiesData.length; i++) {
-                            let id = this.propertiesData[i].id
-                            //nandain apakah didalamnya ada diedit
-                            let tmp = this.$refs['property-' + id][0].getData()
-                            childs[tmp.name] = tmp.attributes
-                        }
-                        return childs
-                    }
-                    //dimensi array berubah menjadi lebih pendek
-                    if(sdItemPointer !== undefined && sdItemPointer.type === 'array'){
-                        let objVal = this.$refs.itemDataType[0].getAttributes()
-                        if(this.lastItem.type === 'object'){
-                            objVal.properties = getChilds()
-                        }
-                        if(pointer._hasActions === undefined){
-                            pointer._hasActions = true
-                            pointer._actions = []
-
-                        }
+                    let callback = this.$refs['arrayItem'].getChangedData(query)
+                    if(callback !== undefined){
                         childIsEdited = true
-                        pointer._actions.push({
-                            action : 'put',
-                            put : 'items',
-                            value : objVal
-                        })
-                        delete pointer.items
-                    }//tipe data child berubah
-                    else if(sdItemPointer !== undefined && sdItemPointer.type !== this.lastItem.type){
-                        let value = undefined
-                        if(this.lastItem.type === 'object'){
-                            value = {
-                                type : 'object',
-                                properties : getChilds()
-                            }
-                        }
-                        else{
-                            value = this.$refs.itemDataType[0].getAttributes()
-                        }
-                        pointer._hasActions = true
-                        pointer._actions = [{
-                            action : 'put',
-                            key : 'items',
-                            value : value
-                        }]
-                        childIsEdited = true
-                        delete pointer.items
+                        this.commitChangeCallback.push(callback)
                     }
-                    //ngecek child dari last item berubah atau tidak
-                    else if (this.lastItem.type === 'object') {
-                        pointer = pointer.items
-                        let tmp = {}
-                        let itemIsEdited = false
-                        for (let i = 0; i < this.propertiesData.length; i++) {
-                            let id = this.propertiesData[i].id
-                            //nandain apakah didalamnya ada diedit
-                            let callback = this.$refs['property-' + id][0].getChangedData(tmp)
-                            if(callback !== undefined){
-                                itemIsEdited = true
-                            }
-                        }
-                        if (itemIsEdited) {
-                            pointer.properties = tmp
-                            childIsEdited = true
-                        }else{
-                            delete lastEditedPointer.items
-                        }
-                    }
-                    else if(this.lastItem.ref !== undefined){
-                        if(pointer._hasActions === undefined){
-                            pointer._hasActions = true
-                            pointer._actions = []
-
-                        }
-                        pointer._actions.push({
-                            action : 'put',
-                            key : 'items',
-                            value : {ref : this.lastItem.ref}
-                        })
-                    }
-                    //ngecek attribute last item berubah atau tidak
-                    else {
-                        pointer = pointer.items
-                        let tmp = ActionBuilder.createActions(
-                            this.schemaItems[this.schemaItems.length-1],
-                            this.$refs.itemDataType[0].getAttributes(),
-                            this.$refs.itemDataType[0].getAttributesKey()
-                        )
-
-                        if (tmp.length > 0) {
-                            pointer._actions = tmp
-                            pointer._hasActions = true
-                            childIsEdited = true
-                        }else {
-                            delete lastEditedPointer.items
-                        }
+                    else{
+                        delete query.items
                     }
                 }
-
 
                 let isEdited = query._actions.length > 0 || childIsEdited
                 if(!isEdited){
@@ -515,7 +396,7 @@
                 res.name = this.name
                 res.description = this.description
                 res.example = this.example
-                if(this.type === 'object' || this.lastItem.type === 'object'){
+                if(this.type === 'object'){
                     res.properties = {}
                     for(let i=0; i <  this.propertiesData.length; i++){
                         let id = this.propertiesData[i].id
@@ -523,17 +404,8 @@
                         res.properties[data.name] = data.attributes
                     }
                 }
-
-                if(this.type === 'array'){
-                    let pointer = res
-                    //item terakhir bukan array
-                    for(let i = 0; i < this.items.length-1; i++){
-                        pointer.items = this.$refs['array-'+i][0].getAttributes()
-                        pointer = pointer.items
-                    }
-                    pointer.items = this.$refs.itemDataType[0].getAttributes()
-                    pointer.items.properties = res.properties
-                    delete res.properties
+                else if(this.type === 'array'){
+                    res.items = this.$refs['arrayItem'][0].getData().attributes
                 }
                 return {
                     name : this.name,
@@ -600,30 +472,8 @@
                         this.selectedType = this.refName
                     }
 
-                    if(this.type === 'array'){
-                        this.items = []
-                        this.schemaItems = []
-                        let initItems = (pointer) => {
-                            let copy = Object.assign({},pointer)
-                            if(copy['ref'] !== undefined){
-                                copy.ref = copy['ref']
-                                copy.type = copy.ref.split('/')[2]
-                            }
-                            this.items.push(copy)
-                            this.schemaItems.push(pointer)
-                            if(pointer.type === 'array'){
-                                initItems(pointer.items)
-                            }
-                        }
-
-                        initItems(this.schemaData.items)
-
-                    }
-
                     //punya properties/child
                     if(sd.properties !== undefined){
-                        //buang default field
-                        // this.propertiesData.pop()
                         this.propertiesData = []
                         let pr = sd.properties
                         for(let key in pr){
@@ -643,9 +493,6 @@
                     this.selectedType = 'string'
                 }
 
-                if(this.isRoot === true){
-                    this.hasName = false
-                }
             },
         },
         watch : {
