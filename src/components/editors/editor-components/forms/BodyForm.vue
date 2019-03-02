@@ -12,7 +12,7 @@
                     <vue-editor style="height: 100px;" v-model="description"></vue-editor>
                 </div>
             </div>
-            <DataTypeInput ref="root" :schemaData="bodyData.schema" :isRoot="true"
+            <DataTypeInput ref="root" :schemaData="bodyData.schema" :nameAble="false" :deleteAble="false"
                             style="margin-top: 130px"/>
         </div>
     </div>
@@ -22,6 +22,7 @@
     import DataTypeInput from "../inputs/DataTypeInput";
     import { VueEditor } from 'vue2-editor'
     import ActionBuilderUtil from "@/utils/ActionBuilderUtil";
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
 
     export default {
         name: "bodyForm",
@@ -41,7 +42,8 @@
                 {key : 'in'},
                 {keyBefore : 'name', keyAfter: 'in'}
             ],
-            commitChangeCallback : []
+            commitChangeCallback : [],
+            actionsQuery : []
         }),
         watch : {
             contentType : function () {
@@ -53,10 +55,13 @@
                         this.in = 'formData'
                         break
                 }
+            },
+            bodyData : function () {
+                this.loadData()
             }
         },
         methods : {
-            getChangedData : function (operationPointer,pointer) {
+            getChangedData : function (operationPointer,requestBodyPointer) {
                 let isEdited = false
                 let requestBody = operationPointer.requestBody
 
@@ -80,22 +85,27 @@
                     }
                 }
 
-                let callback = this.$refs.root.getChangedData(pointer)
+                let callback = this.$refs.root.getChangedData(requestBodyPointer.schema = {})
 
                 if(callback !== undefined){
                     isEdited = true
                     this.commitChangeCallback.push(callback)
                 }
 
-                if(pointer._actions !== undefined && pointer._actions.length === 0){
-                    delete pointer._actions
-                    delete pointer._hasActions
+                if(requestBodyPointer._actions !== undefined){
+                    if(requestBodyPointer._actions.length === 0){
+                        delete requestBodyPointer._actions
+                        delete requestBodyPointer._hasActions
+                    }
+                    else{
+                        this.actionsQuery = requestBodyPointer._actions
+                    }
                 }
 
                 return (isEdited)?this.commitChange : undefined
             },
             commitChange : function () {
-                console.log('commit body form')
+                ActionExecutorUtil.executeActions(this.bodyData, this.actionsQuery)
                 this.commitChangeCallback.forEach(fn => fn())
 
             },

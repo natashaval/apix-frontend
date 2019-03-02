@@ -146,40 +146,41 @@
 
     import ActionBuilder from '@/utils/ActionBuilderUtil'
     import CustomData from "./typedatas/CustomData";
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
 
     export default {
         name: "DataTypeInput",
         components: {CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
         props : {
-            fSelfDelete : {
+            fSelfDelete : {//delete function from parent
                 type : Function
-            },//delete function from parent
-            parentIsEditing : {
+            },
+            parentIsEditing : {//default value dari @isEditing
                 type : Boolean
-            },//default value dari @isEditing
-            schemaData : {
+            },
+            schemaData : {//data dari parent, jika form baru maka null
                 type : Object
-            },//data dari parent, jika form baru maka null
-            componentId : {
+            },
+            componentId : {//id atau index yang diberi oleh parent berdasarkan array childs parent
                 type : Number
-            },//id atau index yang diberi oleh parent berdasarkan array childs parent
-            nameAble : {
+            },
+            nameAble : {//punya nama (default : true)
                 type : Boolean,
                 default : true
-            },//punya nama (default : true)
-            borderAble : {
+            },
+            borderAble : {//punya border (default : true)
                 type : Boolean,
                 default : true
-            },//punya border (default : true)
-            deleteAble : {
+            },
+            deleteAble : {//punya tombol delete (default : true)
                 type : Boolean,
                 default : true
-            },//punya tombol delete (default : true),
-            editAble : {
+            },
+            editAble : {//jika false maka edit hanya bisa di trigger dari parentnya karna tidak ada tombol edit
                 type : Boolean,
                 default : true
-            },//edit cuma bisa di trigger dari parentnya karna tidak ada tombol edit
-            isSubArray : {
+            },
+            isSubArray : {//jika merupakan subarray dari parentnya / parentnya adalah array
                 type : Boolean,
                 default : false
             }
@@ -208,6 +209,8 @@
             propertiesData : [{id : 1,isEditing : true}],
 
             commitChangeCallback : [],
+            actionsQuery : [],
+            propertiesActionQuery : [],//query yang ada di properties dari object
 
             //menyimpan propertyname yang didelete, tidak menyimpan property yang baru dibuat lalu dihapus
             deletedProperty : [],
@@ -290,7 +293,14 @@
             },
             //mengcopy hasil edit ke state vuex project
             commitChange : function () {
-                console.log('commit changed datatype input => '+this.name)
+                ActionExecutorUtil.executeActions(this.schemaData, this.actionsQuery)
+                if(this.type === 'object' ){
+                    //execute actions yang ada di properties
+                    ActionExecutorUtil.executeActions(
+                        this.schemaData.properties,
+                        this.propertiesActionQuery
+                    )
+                }
                 this.commitChangeCallback.forEach(fn => fn())
             },
             /* parameter : @parentQuery(pointer object dari parent, semua query akan langsung di assign ke pointer,
@@ -317,7 +327,6 @@
                     return undefined
                 }
                 else if(this.schemaData.type !== this.type){//jika ganti tipe data
-                    console.log('yes '+this.isSubArray)
                     parentQuery._actions.push({
                         action : 'put',
                         key : (this.isSubArray)?'items':this.name,
@@ -349,19 +358,38 @@
                 if(this.$refs.curDataType !== undefined){
                     this.$refs.curDataType.getActions().forEach(x => actions.push(x))
                 }
-                this.deletedProperty.forEach(x => actions.push({action : 'delete',key : x}))
+
+
 
                 query._actions = actions
 
                 if(this.type === 'object'){
+                    query.properties = {
+                        _actions : this.propertiesActionQuery = [],
+                        _hasActions : true
+                    }
+
+                    this.deletedProperty.forEach(x => query.properties._actions.push({action : 'delete',key : x}))
                     for(let i = 0; i < this.propertiesData.length; i++){
                         let id = this.propertiesData[i].id
                         //nandain apakah didalamnya ada diedit
-                        let callback = this.$refs['property-'+id][0].getChangedData(query)
+                        let callback = this.$refs['property-'+id][0].getChangedData(query.properties)
                         if(callback !== undefined){
                             childIsEdited = true
                             this.commitChangeCallback.push(callback)
                         }
+                    }
+
+                    if(query.properties._actions.length === 0){
+                        delete query.properties._actions
+                        delete query.properties._hasActions
+                    }
+                    else{
+                        childIsEdited = true
+                    }
+
+                    if(!childIsEdited){
+                        delete query.properties
                     }
                 }
                 else if(this.type === 'array') {
@@ -384,7 +412,12 @@
                         delete query._hasActions
                         delete query._actions
                     }
+                    else{
+                        this.actionsQuery = query._actions
+                        isEdited = true
+                    }
                 }
+
                 return (isEdited)?this.commitChange : undefined
             },
             /*

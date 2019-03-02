@@ -16,12 +16,14 @@
 <script>
     import BodyForm from "./forms/BodyForm";
     import PropertyForm from "./forms/PropertyForm";
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
 
     export default {
         name: "RequestComponent",
         components: {PropertyForm, BodyForm},
         data : () => ({
-            commitChangeCallback : []
+            commitChangeCallback : [],
+            actionsQuery : []
         }),
         props : [
             'operationData'
@@ -60,17 +62,19 @@
                 }
 
                 if(this.$refs.body !== undefined){
-                    callback = this.$refs.body.getChangedData(operationPointer,request.schema = {})
+                    callback = this.$refs.body.getChangedData(operationPointer, request)
                     if(callback !== undefined){
                         isEdited = true
                         this.commitChangeCallback.push(callback)
                     }
                 }
-
+                if(request._actions !== undefined){
+                    this.actionsQuery = request._actions
+                }
                 return (isEdited)?this.commitChange : undefined
             },
             commitChange : function () {
-                console.log('commit changed property form')
+                ActionExecutorUtil.executeActions(this.operationData, this.actionsQuery)
                 this.commitChangeCallback.forEach(fn => fn())
             }
         }

@@ -44,13 +44,17 @@
                     callback()
                 }
 
-                // axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
-                //     (response) => {
-                //         console.log(response)
-                //     }
-                // ).catch(function (error) {
-                //     console.log(error);
-                // })
+                axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
+                    (response) => {
+                        console.log(response)
+                        if(response.status === 200){
+                            callback()
+                            this.operationData._signature = response.data.new_signature
+                        }
+                    }
+                ).catch(function (error) {
+                    console.log(error);
+                })
 
 
             },

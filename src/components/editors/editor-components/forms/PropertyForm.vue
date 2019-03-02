@@ -14,6 +14,7 @@
 
 <script>
     import DataTypeInput from "../inputs/DataTypeInput";
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     export default {
         name: "PropertyForm",
         props : ['schemaData'],
@@ -23,12 +24,18 @@
             propertyId : 0,
             //menyimpan property yang didelete, tidak menyimpan property yang baru dibuat lalu dihapus
             deletedProperty : [],
-            commitChangeCallback : []
+            commitChangeCallback : [],
+            actionsQuery : []
 
         }),
         computed : {
             projectId : function () {
                 return this.$route.params.projectId
+            }
+        },
+        watch : {
+            schemaData : function () {
+                this.loadData()
             }
         },
         methods : {
@@ -50,7 +57,7 @@
                 }
             },
             commitChange : function () {
-                console.log('commit changed property form')
+                ActionExecutorUtil.executeActions(this.schemaData, this.actionsQuery)
                 this.commitChangeCallback.forEach(fn => fn())
             },
             deleteChild : function (childIndex) {
@@ -82,9 +89,15 @@
                     this.deletedProperty.forEach(fieldName => query._actions.push({action : 'delete', key : fieldName}))
                 }
 
-                if(query._actions !== undefined && query._actions.length === 0){
-                    delete query._hasActions
-                    delete query._actions
+                if(query._actions !== undefined){
+                    if(query._actions.length === 0){
+                        delete query._hasActions
+                        delete query._actions
+                    }
+                    else{
+                        isEdited = true
+                        this.actionsQuery = query._actions
+                    }
                 }
 
                 return (isEdited)?this.commitChange : undefined
