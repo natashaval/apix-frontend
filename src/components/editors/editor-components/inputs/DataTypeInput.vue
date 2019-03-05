@@ -341,7 +341,7 @@
                 else if(this.schemaData.type !== this.type){//jika ganti tipe data
                     parentQuery._actions.push({
                         action : 'put',
-                        key : (this.isSubArray)?'items':this.name,
+                        key : (this.isSubArray)?'items':(this.nameAble)?this.name:'schema',
                         value : this.getData().attributes
                     })
                 }
@@ -359,10 +359,13 @@
                 else if(this.isSubArray){
                     parentQuery['items'] = query
                 }
-                else{//jika ga punya nama / jika root
+                else if(!this.nameAble){//jika root
                     parentQuery._actions = []
                     parentQuery._hasActions = true
-                    query = parentQuery
+                    parentQuery.schema = query
+                }
+                else{
+                    'error'
                 }
 
 

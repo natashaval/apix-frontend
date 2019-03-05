@@ -93,7 +93,7 @@
                     }
                 }
 
-                let callback = this.$refs.root.buildQuery(requestBodyPointer.schema = {})
+                let callback = this.$refs.root.buildQuery(requestBodyPointer)
 
                 if(callback !== undefined){
                     isEdited = true

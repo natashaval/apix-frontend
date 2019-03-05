@@ -52,16 +52,13 @@
                 pointer._signature = this.operationData._signature
 
                 let callback = this.$refs.request.buildQuery(tree.leaf,pointer.requestBody = {})
-                if(callback !== undefined){
-                    callback()
-                }
 
                 axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
                     (response) => {
-                        console.log(response)
                         if(response.status === 200){
                             callback()
                             this.operationData._signature = response.data.new_signature
+                            this.reloadData()
                         }
                     }
                 ).catch(function (error) {
