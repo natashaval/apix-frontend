@@ -6,7 +6,7 @@ export default {
             let val = actions[i].value
             switch (actions[i].action) {
                 case 'put' :
-                    delete target[key]
+                    if(target[key] !== undefined)delete target[key]
                     target[key] = val
                     break
                 case 'rename' :
@@ -15,6 +15,7 @@ export default {
                     break
                 case 'delete' :
                     delete target[key]
+                    break
             }
         }
     }
