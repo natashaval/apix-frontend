@@ -75,24 +75,32 @@
                             <!--more attributes of selected datatype-->
                             <div class="w-100"></div>
                             <StringData ref="curDataType" v-if="type === 'string'"
+                                        :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                                         :isEditing="showEdit" :schemaData="schemaData"/>
                             <ArrayData ref="curDataType" v-else-if="type === 'array'"
+                                       :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                                        :isEditing="showEdit" :schemaData="schemaData"/>
                             <ObjectData ref="curDataType" v-else-if="type === 'object'"
+                                        :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                                         :isEditing="showEdit" :schemaData="schemaData"/>
 
                             <NumericData ref="curDataType" v-else-if="type === 'number'"
+                                         :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                                          :numericType="'number'" :isEditing="showEdit"
                                          :schemaData="schemaData"/>
 
                             <NumericData ref="curDataType" v-else-if="type === 'integer'"
+                                         :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                                          :numericType="'integer'" :isEditing="showEdit"
                                          :schemaData="schemaData"/>
 
                             <BooleanData ref="curDataType" v-else-if="type === 'boolean'"
+                                         :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                                          :isEditing="showEdit"
                                          :schemaData="schemaData"/>
-                            <CustomData ref="curDataType" v-else :scemaData="schemaData" :currentRef="ref"/>
+                            <CustomData ref="curDataType" v-else
+                                        :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                                        :scemaData="schemaData" :currentRef="ref"/>
                         </div>
                     </div>
                 </div>
@@ -112,8 +120,10 @@
         </div>
         <!--tambahan view jika tipe datanya array-->
         <div class="w-100" v-if="type === 'array'">
-            <DataTypeInput ref="arrayItem" :schemaData="schemaData.items" :borderAble="false"
+            <DataTypeInput ref="arrayItem" :schemaData="(schemaData !== undefined)?schemaData.items:undefined"
+                           :borderAble="false"
                            :nameAble="false" :deleteAble="false" :editAble="false"
+                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                            :isSubArray="true" :parentIsEditing="showEdit"/>
         </div>
 
@@ -127,6 +137,7 @@
                     <DataTypeInput :ref="'property-'+val.id" :parentIsEditing="val.isEditing"
                                    :schemaData="val.schemaData" :componentId="i"
                                    :fSelfDelete="deleteChild"
+                                   :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                                    v-on:delete="deleteChild" class="col-11"/>
                     <!--<button @click="deleteProperty(i)">delete property</button>-->
                 </div>
@@ -147,10 +158,12 @@
     import ActionBuilder from '@/utils/ActionBuilderUtil'
     import CustomData from "./typedatas/CustomData";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
+    import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
 
     export default {
         name: "DataTypeInput",
         components: {CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
+        mixins : [ChangeObserverMixin],
         props : {
             fSelfDelete : {//delete function from parent
                 type : Function
@@ -183,7 +196,7 @@
             isSubArray : {//jika merupakan subarray dari parentnya / parentnya adalah array
                 type : Boolean,
                 default : false
-            }
+            },
 
         },
         data : () => ({
@@ -218,8 +231,7 @@
                 {key : 'type'},
                 {key : 'required'},
                 {key : 'example'},
-                {key : 'description'},
-                {key : 'ref'}
+                {key : 'description'}
             ],
 
             dataTypes : [
@@ -229,7 +241,7 @@
                 {text : 'Number', val : 'number'},
                 {text : 'Integer', val : 'integer'},
                 {text : 'Boolean', val : 'boolean'},
-            ],
+            ]
         }),
         computed : {
             refName : function () {
@@ -307,7 +319,7 @@
             * tidak melalui return value)
             * return : fungsi callback(digunakan untuk commit change) jika data dirinya atau childnya teredit
             * */
-            getChangedData : function (parentQuery) {
+            buildQuery : function (parentQuery) {
                 this.commitChangeCallback = []
                 let query = {_hasActions : true, _actions : []}
                 let childIsEdited = false
@@ -373,7 +385,7 @@
                     for(let i = 0; i < this.propertiesData.length; i++){
                         let id = this.propertiesData[i].id
                         //nandain apakah didalamnya ada diedit
-                        let callback = this.$refs['property-'+id][0].getChangedData(query.properties)
+                        let callback = this.$refs['property-'+id][0].buildQuery(query.properties)
                         if(callback !== undefined){
                             childIsEdited = true
                             this.commitChangeCallback.push(callback)
@@ -393,7 +405,7 @@
                     }
                 }
                 else if(this.type === 'array') {
-                    let callback = this.$refs['arrayItem'].getChangedData(query)
+                    let callback = this.$refs['arrayItem'].buildQuery(query)
                     if(callback !== undefined){
                         childIsEdited = true
                         this.commitChangeCallback.push(callback)
@@ -477,17 +489,19 @@
             },
             dump : function () {
                 let tmp = {}
-                this.getChangedData(tmp)
+                this.buildQuery(tmp)
                 console.log(tmp)
             },
             /*
             * input : #/definitions/mydatatype
             * output : mydatatype
             * */
-            loadSchemaData : function () {
+            loadData : function () {
+                this.$_changeObserverMixin_unObserve()
                 this.projectId = this.$router.currentRoute.params.projectId
 
                 this.deletedProperty = []
+                this.propertiesData = []
 
                 if(this.parentIsEditing !== undefined){
                     this.isEditing = this.parentIsEditing
@@ -500,8 +514,8 @@
                     this.description = sd.description
                     this.required = sd.required
                     this.example = sd.example
-                    if(sd['ref'] !== undefined){
-                        this.ref = sd['ref']
+                    if(sd['$ref'] !== undefined){
+                        this.ref = sd['$ref']
                         this.selectedType = this.refName
                     }
 
@@ -526,16 +540,23 @@
                     this.selectedType = 'string'
                 }
 
+                //init observer dari mixin
+                let watchList = ['propertiesData.length','selectedType']
+                // watchList.push(this.attributesKey)
+                this.attributesKey.forEach(attr => watchList.push(attr.key))
+                this.$_changeObserverMixin_initObserver(watchList)
             },
+            reloadData : function () {
+                this.loadData()
+            }
         },
         watch : {
             schemaData : function () {
-                this.loadSchemaData()
+                this.loadData()
             }
         },
-        created(){
-            this.loadSchemaData()
-
+        mounted() {
+            this.loadData()
         }
     }
 </script>

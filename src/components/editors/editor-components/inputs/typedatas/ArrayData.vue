@@ -32,9 +32,11 @@
 
 <script>
     import ActionBuilder from '@/utils/ActionBuilderUtil'
+    import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
 
     export default {
         name: "ArrayData",
+        mixins : [ChangeObserverMixin],
         props : {
             isEditing : Boolean,
             schemaData : Object
@@ -79,6 +81,8 @@
                 this.maxItems = this._toString(sd.maxItems)
                 this.uniqueItems = (sd.uniqueItems === undefined)?false:sd.uniqueItems
             }
+
+            this.$_changeObserverMixin_initObserver( this.attributesKey.map(attr => attr.key) )
         }
     }
 </script>

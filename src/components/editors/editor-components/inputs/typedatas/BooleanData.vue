@@ -12,9 +12,11 @@
 
 <script>
     import ActionBuilder from '@/utils/ActionBuilderUtil'
+    import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
 
     export default {
         name: "BooleanData",
+        mixins : [ChangeObserverMixin],
         props : {
             isEditing : Boolean,
             schemaData : Object
@@ -50,6 +52,8 @@
             if(this.schemaData !== undefined && this.schemaData.type === 'boolean'){
                 this.defaultVal = (this.schemaData.default === undefined)?false:this.schemaData.default
             }
+
+            this.$_changeObserverMixin_initObserver(['defaulVal'])
         }
     }
 </script>

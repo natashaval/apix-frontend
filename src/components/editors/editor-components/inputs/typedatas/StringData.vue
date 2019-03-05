@@ -49,9 +49,11 @@
 
 <script>
     import ActionBuilder from '@/utils/ActionBuilderUtil'
+    import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
 
     export default {
         name: "StringData",
+        mixins : [ChangeObserverMixin],
         props : {
             isEditing : Boolean,
             schemaData : Object
@@ -122,8 +124,6 @@
         },
         created(){
 
-            // if(this.schemaData === undefined)this.schemaData = {}
-
             if(this.schemaData !== undefined && this.schemaData.type === 'string'){
                 let sd = this.schemaData
                 if(sd.enum !== undefined){
@@ -136,6 +136,14 @@
                 this.maxLength = this._toString(sd.maxLength)
                 this.defaultVal = this._toString(sd.default)
             }
+
+            this.$_changeObserverMixin_initObserver(
+                this.attributesKey.map(attr => {
+                    if(attr.key !== undefined)return attr.key
+                    return attr.keyAfter
+                })
+            )
+
         }
     }
 </script>

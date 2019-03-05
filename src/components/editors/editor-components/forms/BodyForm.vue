@@ -12,7 +12,9 @@
                     <vue-editor style="height: 100px;" v-model="description"></vue-editor>
                 </div>
             </div>
-            <DataTypeInput ref="root" :schemaData="bodyData.schema" :nameAble="false" :deleteAble="false"
+            <DataTypeInput ref="root" :schemaData="bodyData.schema" :nameAble="false"
+                           :deleteAble="false"
+                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                             style="margin-top: 130px"/>
         </div>
     </div>
@@ -23,11 +25,17 @@
     import { VueEditor } from 'vue2-editor'
     import ActionBuilderUtil from "@/utils/ActionBuilderUtil";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
+    import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
 
     export default {
         name: "bodyForm",
         components: {DataTypeInput,VueEditor},
-        props : ['bodyData'],
+        mixins : [ChangeObserverMixin],
+        props : {
+            bodyData : {
+                type : Object
+            }
+        },
         data : () => ({
             description : '',
             isEditMode : false,
@@ -61,7 +69,7 @@
             }
         },
         methods : {
-            getChangedData : function (operationPointer,requestBodyPointer) {
+            buildQuery : function (operationPointer,requestBodyPointer) {
                 let isEdited = false
                 let requestBody = operationPointer.requestBody
 
@@ -85,7 +93,7 @@
                     }
                 }
 
-                let callback = this.$refs.root.getChangedData(requestBodyPointer.schema = {})
+                let callback = this.$refs.root.buildQuery(requestBodyPointer.schema = {})
 
                 if(callback !== undefined){
                     isEdited = true
@@ -110,6 +118,7 @@
 
             },
             loadData : function () {
+                this.$_changeObserverMixin_unObserve()
                 if(this.bodyData !== undefined){
                     let bd = this.bodyData
                     this.in = bd.in
@@ -120,11 +129,16 @@
                         case 'formData':
                             this.contentType = 'multipart/form-data'
                     }
-                    this.description = bd.description
+                    this.description = (bd.description === undefined)?'':bd.description
                 }
+                this.$_changeObserverMixin_initObserver(['in','description'])
+            },
+            reloadData : function () {
+                this.loadData()
+                this.$refs.root.reloadData()
             }
         },
-        created() {
+        mounted() {
             this.loadData()
         }
     }

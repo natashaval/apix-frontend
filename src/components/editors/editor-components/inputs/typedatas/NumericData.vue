@@ -52,9 +52,11 @@
 
 <script>
     import ActionBuilder from '@/utils/ActionBuilderUtil'
+    import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
 
     export default {
         name: "NumericData",
+        mixins : [ChangeObserverMixin],
         props : {
             numericType : String,
             isEditing : Boolean,
@@ -146,6 +148,13 @@
                 this.maximum = this._toString(sd.maximum)
                 this.defaultVal = this._toString(sd.default)
             }
+            this.$_changeObserverMixin_initObserver(
+                this.attributesKey.map(attr => {
+                    if(attr.key !== undefined)return attr.key
+                    return attr.keyAfter
+                })
+            )
+
         }
     }
 </script>

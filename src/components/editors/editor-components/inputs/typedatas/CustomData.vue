@@ -4,14 +4,16 @@
 
 <script>
     import ActionBuilderUtil from "@/utils/ActionBuilderUtil";
+    import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
 
     export default {
         name: "CustomData",
         props : ['schemaData','currentRef'],
+        mixins : [ChangeObserverMixin],
         data : () => ({
             refBefore : undefined,
             attributesKey : [
-                {key : 'ref'}
+                {keyBefore : '$ref',keyAfter : 'ref'}
             ]
         }),
         methods : {
@@ -25,7 +27,7 @@
             },
             getActions : function () {
                 return ActionBuilderUtil.createActions(
-                    {ref : this.refBefore},
+                    {$ref : this.refBefore},
                     {ref : this.currentRef},
                     this.attributesKey
                 )
@@ -33,8 +35,9 @@
         },
         created() {
             if(this.schemaData !== undefined){
-                this.refBefore = this.schemaData.ref
+                this.refBefore = this.schemaData.$ref
             }
+            this.$_changeObserverMixin_initObserver()
         }
     }
 </script>

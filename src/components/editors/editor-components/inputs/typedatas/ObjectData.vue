@@ -9,9 +9,11 @@
 
 <script>
     import ActionBuilder from '@/utils/ActionBuilderUtil'
+    import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
 
     export default {
         name: "ObjectData",
+        mixins : [ChangeObserverMixin],
         props : {
             isEditing : Boolean,
             schemaData : Object
@@ -43,6 +45,8 @@
             if(this.schemaData !== undefined && this.schemaData.type === 'object'){
                 this.additionalProperties = this.schemaData.additionalProperties
             }
+            this.$_changeObserverMixin_initObserver(this.attributesKey.map(attr => attr.key))
+
         }
     }
 </script>

@@ -6,17 +6,20 @@
                            :projectId="projectId"
                            :schemaData="property.schemaData"
                            :ref="'property-'+property.id"
+                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                            :componentId="idx" :fSelfDelete="deleteChild"/>
         </div>
-        <button @click="getChangedData">Dump!</button>
+        <button @click="buildQuery">Dump!</button>
     </div>
 </template>
 
 <script>
     import DataTypeInput from "../inputs/DataTypeInput";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
+    import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
     export default {
         name: "PropertyForm",
+        mixins : [ChangeObserverMixin],
         props : ['schemaData'],
         components: {DataTypeInput},
         data : () => ({
@@ -43,6 +46,8 @@
                 this.propertiesData.push({id : this.propertyId++,isEditing : true})
             },
             loadData : function () {
+                this.$_changeObserverMixin_unObserve()
+                this.propertiesData = []
                 if (this.schemaData !== undefined) {
                     let sd = this.schemaData
                     for (let key in sd) {
@@ -55,6 +60,10 @@
                         })
                     }
                 }
+                this.$_changeObserverMixin_initObserver(['propertiesData.length'])
+            },
+            reloadData : function () {
+                this.loadData()
             },
             commitChange : function () {
                 ActionExecutorUtil.executeActions(this.schemaData, this.actionsQuery)
@@ -69,12 +78,12 @@
                 }
                 this.propertiesData.splice(childIndex,1)
             },
-            getChangedData : function (query) {
+            buildQuery : function (query) {
                 this.commitChangeCallback = []
                 let isEdited = false
                 for(let i = 0; i < this.propertiesData.length; i++){
                     let id = this.propertiesData[i].id
-                    let callback = this.$refs['property-'+id][0].getChangedData(query)
+                    let callback = this.$refs['property-'+id][0].buildQuery(query)
                     if( callback !== undefined ){
                         isEdited = true
                         this.commitChangeCallback.push(callback)
@@ -103,7 +112,7 @@
                 return (isEdited)?this.commitChange : undefined
             }
         },
-        created() {
+        mounted() {
             this.loadData()
         }
     }
