@@ -2,12 +2,12 @@
     <div>
         <button @click="addProperty">Add</button>
         <div v-for="(property,idx) in propertiesData" v-bind:key="property.id">
-            <DataTypeInput :parentIsEditing="property.isEditing"
-                           :projectId="projectId"
-                           :schemaData="property.schemaData"
+            <DataTypeInput :parent-is-editing="property.isEditing"
+                           :project-id="projectId"
+                           :schema-data="property.schemaData"
                            :ref="'property-'+property.id"
                            :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
-                           :componentId="idx" :fSelfDelete="deleteChild"/>
+                           :component-id="idx" :f-self-delete="deleteChild"/>
         </div>
         <button @click="buildQuery">Dump!</button>
     </div>

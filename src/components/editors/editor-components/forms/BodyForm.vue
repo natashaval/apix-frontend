@@ -12,8 +12,8 @@
                     <vue-editor style="height: 100px;" v-model="description"></vue-editor>
                 </div>
             </div>
-            <DataTypeInput ref="root" :schemaData="bodyData.schema" :nameAble="false"
-                           :deleteAble="false"
+            <DataTypeInput ref="root" :schema-data="bodyData.schema" :name-able="false"
+                           :delete-able="false"
                            :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                             style="margin-top: 130px"/>
         </div>

@@ -76,31 +76,31 @@
                             <div class="w-100"></div>
                             <StringData ref="curDataType" v-if="type === 'string'"
                                         :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
-                                        :isEditing="showEdit" :schemaData="schemaData"/>
+                                        :is-editing="showEdit" :schema-data="schemaData"/>
                             <ArrayData ref="curDataType" v-else-if="type === 'array'"
                                        :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
-                                       :isEditing="showEdit" :schemaData="schemaData"/>
+                                       :is-editing="showEdit" :schema-data="schemaData"/>
                             <ObjectData ref="curDataType" v-else-if="type === 'object'"
                                         :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
-                                        :isEditing="showEdit" :schemaData="schemaData"/>
+                                        :is-editing="showEdit" :schema-data="schemaData"/>
 
                             <NumericData ref="curDataType" v-else-if="type === 'number'"
                                          :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
-                                         :numericType="'number'" :isEditing="showEdit"
-                                         :schemaData="schemaData"/>
+                                         :numeric-type="'number'" :is-editing="showEdit"
+                                         :schema-data="schemaData"/>
 
                             <NumericData ref="curDataType" v-else-if="type === 'integer'"
                                          :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
-                                         :numericType="'integer'" :isEditing="showEdit"
-                                         :schemaData="schemaData"/>
+                                         :numeric-type="'integer'" :is-editing="showEdit"
+                                         :schema-data="schemaData"/>
 
                             <BooleanData ref="curDataType" v-else-if="type === 'boolean'"
                                          :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
-                                         :isEditing="showEdit"
-                                         :schemaData="schemaData"/>
+                                         :is-editing="showEdit"
+                                         :schema-data="schemaData"/>
                             <CustomData ref="curDataType" v-else
                                         :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
-                                        :scemaData="schemaData" :currentRef="ref"/>
+                                        :schema-data="schemaData" :current-ref="ref"/>
                         </div>
                     </div>
                 </div>
@@ -120,11 +120,11 @@
         </div>
         <!--tambahan view jika tipe datanya array-->
         <div class="w-100" v-if="type === 'array'">
-            <DataTypeInput ref="arrayItem" :schemaData="(schemaData !== undefined)?schemaData.items:undefined"
-                           :borderAble="false"
-                           :nameAble="false" :deleteAble="false" :editAble="false"
+            <DataTypeInput ref="arrayItem" :schema-data="(schemaData !== undefined)?schemaData.items:undefined"
+                           :border-able="false"
+                           :name-able="false" :delete-able="false" :edit-able="false"
                            :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
-                           :isSubArray="true" :parentIsEditing="showEdit"/>
+                           :is-sub-array="true" :parent-is-editing="showEdit"/>
         </div>
 
         <b-collapse :id="childCollapseId" visible>
@@ -134,9 +134,9 @@
                     <div style="margin-top: -16px;margin-bottom: 16px">
                         <hr class="vline"/>
                     </div>
-                    <DataTypeInput :ref="'property-'+val.id" :parentIsEditing="val.isEditing"
-                                   :schemaData="val.schemaData" :componentId="i"
-                                   :fSelfDelete="deleteChild"
+                    <DataTypeInput :ref="'property-'+val.id" :parent-is-editing="val.isEditing"
+                                   :schema-data="val.schemaData" :component-id="i"
+                                   :f-self-delete="deleteChild"
                                    :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                                    v-on:delete="deleteChild" class="col-11"/>
                     <!--<button @click="deleteProperty(i)">delete property</button>-->

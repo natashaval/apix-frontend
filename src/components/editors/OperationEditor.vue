@@ -11,7 +11,7 @@
         <RequestComponent v-if="operationData !== undefined"
                           ref="request"
                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
-                          :operationData="operationData"/>
+                          :operation-data="operationData"/>
     </div>
 </template>
 

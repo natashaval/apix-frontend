@@ -2,16 +2,16 @@
     <div v-if="bodyData !== undefined" class="green-frame container" >
         <div v-if="bodyData.headers !== undefined">
             <h1>ini headers</h1>
-            <PropertyForm ref="headers" :schemaData="bodyData.headers"
+            <PropertyForm ref="headers" :schema-data="bodyData.headers"
                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"/>
         </div>
         <div>
             <h1>ini query param</h1>
-            <PropertyForm ref="queryParams" :schemaData="bodyData.queryParams"
+            <PropertyForm ref="queryParams" :schema-data="bodyData.queryParams"
                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"/>
         </div>
 
-        <BodyForm v-if="hasBody" ref="body" :bodyData="operationData.requestBody"
+        <BodyForm v-if="hasBody" ref="body" :body-data="operationData.requestBody"
                   :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged" style="padding-left: 10%"/>
     </div>
 </template>
