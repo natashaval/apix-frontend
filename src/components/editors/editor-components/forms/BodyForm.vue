@@ -1,10 +1,13 @@
 <template>
     <div>
         <!--body-->
-        <div v-if="bodyData.schema !== undefined" class="dot-border">
+        <div class="dot-border">
             <h1>Body</h1>
-            <b-form-select v-model="contentType" :options="options"/>
-            <div class="row">
+            <b-button @click="isEditing = !isEditing" class="float-right round-button">
+                <i class="fa fa-pencil-alt"></i>
+            </b-button>
+            <div class="row" v-if="isEditing">
+                <b-form-select v-model="contentType" :options="options"/>
                 <div style="margin-left: 15px">
                     <label>Description:</label>
                 </div>
@@ -12,7 +15,12 @@
                     <vue-editor style="height: 100px;" v-model="description"></vue-editor>
                 </div>
             </div>
-            <DataTypeInput ref="root" :schema-data="bodyData.schema" :name-able="false"
+            <div v-else>
+                <div>Content Type : {{contentType}}</div>
+                <div v-html="description"></div>
+            </div>
+            <DataTypeInput ref="root"
+                           :schema-data="(bodyData !== undefined)?bodyData.schema:undefined" :name-able="false"
                            :delete-able="false"
                            :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                             style="margin-top: 130px"/>
@@ -34,13 +42,17 @@
         props : {
             bodyData : {
                 type : Object
-            }
+            },
+            parentIsEditing : {//default value dari @isEditing
+                type : Boolean
+            },
         },
         data : () => ({
             description : '',
             isEditMode : false,
             contentType : 'application/json',
             in : 'body',
+            isEditing : false,
             options : [
                 {value : 'application/json', text : 'application/json'},
                 {value : 'multipart/form-data', text : 'multipart/form-data'}
@@ -53,61 +65,42 @@
             commitChangeCallback : [],
             actionsQuery : []
         }),
-        watch : {
-            contentType : function () {
-                switch (this.contentType) {
-                    case 'application/json':
-                        this.in = 'body'
-                        break
-                    case 'multipart/form-data':
-                        this.in = 'formData'
-                        break
+        methods : {
+            getData : function () {
+                return {
+                    description : this.description,
+                    in : this.in,
+                    name : this.name,
+                    schema : this.$refs.root.getData()
                 }
             },
-            bodyData : function () {
-                this.loadData()
-            }
-        },
-        methods : {
-            buildQuery : function (operationPointer,requestBodyPointer) {
-                let isEdited = false
-                let requestBody = operationPointer.requestBody
+            buildQuery : function (requestBodyPointer) {
 
-                let actions = ActionBuilderUtil.createActions(
+                let isEdited = false
+
+                requestBodyPointer._actions = ActionBuilderUtil.createActions(
                     this.bodyData,this._data,this.attributesKey
                 )
-                if(actions.length !== 0){
-                    isEdited = true
-                    requestBody._actions = actions
-                    requestBody._hasActions = true
-                    if(this.in !== this.bodyData.in){
-                        if(operationPointer._hasActions === undefined){
-                            operationPointer._hasActions = true
-                            operationPointer._actions = []
-                        }
-
-                        operationPointer._actions.push({
-                            key : 'consumes',
-                            value : [this.contentType]
-                        })
-                    }
-                }
+                requestBodyPointer._hasActions = true
 
                 let callback = this.$refs.root.buildQuery(requestBodyPointer)
 
-                if(callback !== undefined){
+                if(callback === undefined){
+                    delete requestBodyPointer.schema
+                }
+                else{
                     isEdited = true
                     this.commitChangeCallback.push(callback)
                 }
 
-                if(requestBodyPointer._actions !== undefined){
-                    if(requestBodyPointer._actions.length === 0){
-                        delete requestBodyPointer._actions
-                        delete requestBodyPointer._hasActions
-                    }
-                    else{
-                        this.actionsQuery = requestBodyPointer._actions
-                    }
+                if(requestBodyPointer._actions.length > 0){
+                    isEdited = true
+                    this.actionsQuery = requestBodyPointer._actions
+                    requestBodyPointer._hasActions = true
+                }
+                else{
+                    delete requestBodyPointer._actions
+                    delete requestBodyPointer._hasActions
                 }
 
                 return (isEdited)?this.commitChange : undefined
@@ -115,7 +108,6 @@
             commitChange : function () {
                 ActionExecutorUtil.executeActions(this.bodyData, this.actionsQuery)
                 this.commitChangeCallback.forEach(fn => fn())
-
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
@@ -131,11 +123,29 @@
                     }
                     this.description = (bd.description === undefined)?'':bd.description
                 }
+                if(this.parentIsEditing !== undefined){
+                    this.isEditing = this.parentIsEditing
+                }
                 this.$_changeObserverMixin_initObserver(['in','description'])
             },
             reloadData : function () {
                 this.loadData()
                 this.$refs.root.reloadData()
+            }
+        },
+        watch : {
+            contentType : function () {
+                switch (this.contentType) {
+                    case 'application/json':
+                        this.in = 'body'
+                        break
+                    case 'multipart/form-data':
+                        this.in = 'formData'
+                        break
+                }
+            },
+            bodyData : function () {
+                this.loadData()
             }
         },
         mounted() {

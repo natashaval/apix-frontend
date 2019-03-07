@@ -20,7 +20,11 @@
     export default {
         name: "PropertyForm",
         mixins : [ChangeObserverMixin],
-        props : ['schemaData'],
+        props : {
+            schemasData : {
+                type : Object
+            }
+        },
         components: {DataTypeInput},
         data : () => ({
             propertiesData : [],
@@ -37,19 +41,28 @@
             }
         },
         watch : {
-            schemaData : function () {
+            schemasData : function () {
                 this.loadData()
             }
         },
         methods : {
+            getData : function () {
+                let res = {}
+                for(let i = 0; i < this.propertiesData.length; i++){
+                    let id = this.propertiesData[i].id
+                    let child = this.$refs['property-'+id][0].getData()
+                    res[child.name] = child.attributes
+                }
+                return res
+            },
             addProperty : function () {
                 this.propertiesData.push({id : this.propertyId++,isEditing : true})
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
                 this.propertiesData = []
-                if (this.schemaData !== undefined) {
-                    let sd = this.schemaData
+                if (this.schemasData !== undefined) {
+                    let sd = this.schemasData
                     for (let key in sd) {
                         let tmp = sd[key]
                         tmp.name = key
@@ -66,7 +79,7 @@
                 this.loadData()
             },
             commitChange : function () {
-                ActionExecutorUtil.executeActions(this.schemaData, this.actionsQuery)
+                ActionExecutorUtil.executeActions(this.schemasData, this.actionsQuery)
                 this.commitChangeCallback.forEach(fn => fn())
             },
             deleteChild : function (childIndex) {

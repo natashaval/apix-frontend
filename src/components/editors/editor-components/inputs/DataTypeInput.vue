@@ -323,17 +323,23 @@
                 this.commitChangeCallback = []
                 let query = {_hasActions : true, _actions : []}
                 let childIsEdited = false
-
                 if(parentQuery._hasActions === undefined){
                     parentQuery._hasActions = true
                     parentQuery._actions = []
                 }
 
+                let name = this.name
+                if(this.isSubArray){
+                    name = 'items'
+                }
+                else if(!this.nameAble){
+                    name = 'schema'
+                }
 
-                if(this.schemaData === undefined){//jika object/field baru atau ganti tipe data
+                if(this.schemaData === undefined){//jika object/field baru
                     parentQuery._actions.push({
                         action : 'put',
-                        key : this.name,
+                        key : name,
                         value : this.getData().attributes
                     })
                     return undefined
@@ -341,9 +347,10 @@
                 else if(this.schemaData.type !== this.type){//jika ganti tipe data
                     parentQuery._actions.push({
                         action : 'put',
-                        key : (this.isSubArray)?'items':(this.nameAble)?this.name:'schema',
+                        key : name,
                         value : this.getData().attributes
                     })
+                    return undefined
                 }
                 else if(this.schemaData.name !== this.name){//jika ganti nama
                     parentQuery._actions.push({
@@ -353,19 +360,11 @@
                     })
                     parentQuery[this.name] = query
                 }//ingat undefined == null tapi undefined !== null
-                else if(this.name !== '' && this.name != undefined ){//jika tidak ada perubahan nama
-                    parentQuery[this.name] = query
-                }
-                else if(this.isSubArray){
-                    parentQuery['items'] = query
-                }
-                else if(!this.nameAble){//jika root
-                    parentQuery._actions = []
-                    parentQuery._hasActions = true
-                    parentQuery.schema = query
+                else if(name !== '' && name != undefined ){//jika tidak ada perubahan nama
+                    parentQuery[name] = query
                 }
                 else{
-                    'error'
+                    throw 'Name can\'t be empty!'
                 }
 
 
@@ -373,8 +372,6 @@
                 if(this.$refs.curDataType !== undefined){
                     this.$refs.curDataType.getActions().forEach(x => actions.push(x))
                 }
-
-
 
                 query._actions = actions
 
@@ -453,7 +450,7 @@
                     }
                 }
                 else if(this.type === 'array'){
-                    res.items = this.$refs['arrayItem'][0].getData().attributes
+                    res.items = this.$refs['arrayItem'].getData().attributes
                 }
                 return {
                     name : this.name,
@@ -517,8 +514,8 @@
                     this.description = sd.description
                     this.required = sd.required
                     this.example = sd.example
-                    if(sd['$ref'] !== undefined){
-                        this.ref = sd['$ref']
+                    if(sd['ref'] !== undefined){
+                        this.ref = sd['ref']
                         this.selectedType = this.refName
                     }
 
@@ -544,7 +541,7 @@
                 }
 
                 //init observer dari mixin
-                let watchList = ['propertiesData.length','selectedType']
+                let watchList = ['propertiesData.length','selectedType','name']
                 // watchList.push(this.attributesKey)
                 this.attributesKey.forEach(attr => watchList.push(attr.key))
                 this.$_changeObserverMixin_initObserver(watchList)
@@ -571,16 +568,6 @@
 
     .more-attribute{
         float: right;color: #4493e2;cursor: pointer;
-    }
-
-    .round-button{
-        border-radius: 50%;
-        width: 35px;
-        height: 35px;
-        background: rgba(187, 184, 172, 0.49);
-        display: inline-block;
-        box-shadow: 0px 0px 2px #888;
-        padding: 0.5em 0.6em;
     }
 
     .vline{

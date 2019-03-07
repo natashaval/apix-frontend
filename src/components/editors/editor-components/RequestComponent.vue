@@ -2,12 +2,12 @@
     <div v-if="bodyData !== undefined" class="green-frame container" >
         <div v-if="bodyData.headers !== undefined">
             <h1>ini headers</h1>
-            <PropertyForm ref="headers" :schema-data="bodyData.headers"
+            <PropertyForm ref="headers" :schemas-data="bodyData.headers"
                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"/>
         </div>
         <div>
             <h1>ini query param</h1>
-            <PropertyForm ref="queryParams" :schema-data="bodyData.queryParams"
+            <PropertyForm ref="queryParams" :schemas-data="bodyData.queryParams"
                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"/>
         </div>
 
@@ -58,22 +58,41 @@
                 let isEdited = false
                 let request = requestBodyPointer
                 let callback = this.$refs.headers.buildQuery(request.headers = {})
-                if(callback !== undefined){
+                if(callback === undefined){
+                    delete request.headers
+                }
+                else{
                     isEdited = true
                     this.commitChangeCallback.push(callback)
                 }
 
                 callback = this.$refs.queryParams.buildQuery(request.queryParams = {})
-                if(callback !== undefined){
+                if(callback === undefined){
+                    delete request.queryParams
+                }
+                else{
                     isEdited = true
                     this.commitChangeCallback.push(callback)
                 }
 
                 if(this.$refs.body !== undefined){
-                    callback = this.$refs.body.buildQuery(operationPointer, request)
+                    callback = this.$refs.body.buildQuery(request)
                     if(callback !== undefined){
                         isEdited = true
                         this.commitChangeCallback.push(callback)
+                    }
+
+                    //content type berubah
+                    if(this.bodyData.in !== this.$refs.body._data.in){
+                        if(operationPointer._hasActions === undefined){
+                            operationPointer._hasActions = true
+                            operationPointer._actions = []
+                        }
+
+                        operationPointer._actions.push({
+                            key : 'consumes',
+                            value : [this.contentType]
+                        })
                     }
                 }
                 if(request._actions !== undefined){
@@ -89,7 +108,7 @@
                 this.$_changeObserverMixin_unObserve()
                 this.$refs.headers.reloadData()
                 this.$refs.queryParams.reloadData()
-                this.$refs.body.reloadData()
+                if(this.hasBody) this.$refs.body.reloadData()
                 this.$_changeObserverMixin_initObserver()
             },
         },
