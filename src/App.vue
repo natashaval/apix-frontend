@@ -76,6 +76,16 @@
         border: rgba(42, 18, 59, 0.28) 1px dotted;
     }
 
+    .round-button{
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        background: rgba(187, 184, 172, 0.49);
+        display: inline-block;
+        box-shadow: 0px 0px 2px #888;
+        padding: 0.5em 0.6em;
+    }
+
 
 </style>
 
