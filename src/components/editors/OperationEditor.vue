@@ -12,6 +12,10 @@
                           ref="request"
                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
                           :operation-data="operationData"/>
+        <ResponseComponent v-if="operationData !== undefined"
+                           ref="response"
+                           :responses-data="operationData.responses"
+                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"/>
     </div>
 </template>
 
@@ -20,10 +24,11 @@
     import TreeBuilder from "@/utils/DeepTreeBuilderUtil";
     import * as axios from "axios";
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
+    import ResponseComponent from "./editor-components/ResponseComponent";
 
     export default {
         name: "OperationEditor",
-        components: {RequestComponent},
+        components: {ResponseComponent, RequestComponent},
         mixins : [ChangeObserverMixin],
         data : () => ({
             projectId : undefined,
@@ -47,24 +52,46 @@
         },
         methods : {
             submit : function () {
-                let tree = TreeBuilder.buildDeepTree(this.treeKeys)
-                let pointer = tree.leaf
-                pointer._signature = this.operationData._signature
+                try{
+                    let tree = TreeBuilder.buildDeepTree(this.treeKeys)
+                    let pointer = tree.leaf
+                    pointer._signature = this.operationData._signature
 
-                let callback = this.$refs.request.buildQuery(tree.leaf,pointer.requestBody = {})
+                    let callbacks = []
 
-                axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
-                    (response) => {
-                        if(response.status === 200){
-                            callback()
-                            this.operationData._signature = response.data.new_signature
-                            this.reloadData()
-                        }
+                    let callback = this.$refs.request.buildQuery(tree.leaf,pointer.requestBody = {})
+                    if(callback === undefined){
+                        delete pointer.requestBody
                     }
-                ).catch(function (error) {
-                    console.log(error);
-                })
-                this.isEdited = false
+                    else{
+                        callbacks.push(callback)
+                    }
+
+                    callback = this.$refs.response.buildQuery(pointer.responses = {})
+                    if(callback === undefined){
+                        delete pointer.responses
+                    }
+                    else{
+                        callbacks.push(callback)
+                    }
+
+                    console.log(tree)
+                    axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
+                        (response) => {
+                            if(response.status === 200){
+                                callbacks.forEach(fn => fn())
+                                this.operationData._signature = response.data.new_signature
+                                this.reloadData()
+                            }
+                        }
+                    ).catch(function (error) {
+                        console.log(error);
+                    })
+                    this.isEdited = false
+                }
+                catch (e) {
+                    console.log(e)
+                }
             },
             cancel : function () {
                 this.reloadData()
@@ -81,6 +108,7 @@
             reloadData : function () {
                 this.loadData()
                 this.$refs.request.reloadData()
+                this.$refs.response.reloadData()
             },
             //override
             $_changeObserverMixin_onDataChanged : function () {
