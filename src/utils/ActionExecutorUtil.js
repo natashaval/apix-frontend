@@ -1,3 +1,5 @@
+import Vue from "vue";
+
 export default {
     executeActions(target,actions){
         let len = actions.length
@@ -6,15 +8,15 @@ export default {
             let val = actions[i].value
             switch (actions[i].action) {
                 case 'put' :
-                    if(target[key] !== undefined)delete target[key]
-                    target[key] = val
+                    if(target[key] !== undefined)Vue.delete(target,key)
+                    Vue.set(target,key,val)
                     break
                 case 'rename' :
-                    target[actions[i].newKey] = target[key]
-                    delete target[key]
+                    Vue.set(target,actions[i].newKey, Object.assign({}, target[key]))
+                    Vue.delete(target,key)
                     break
                 case 'delete' :
-                    delete target[key]
+                    Vue.delete(target,key)
                     break
             }
         }
