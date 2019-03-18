@@ -48,6 +48,11 @@ export const router = new VueRouter({
             beforeEnter : initProject
         },
         {
+            name : 'operation-create', path : '/projects/:projectId/sections/:sectionApi/paths/:pathApi/new-operation',
+            component : OperationEditor, props : true,
+            beforeEnter : initProject
+        },
+        {
             name: 'definition-editor', path: '/projects/:projectId/definitions/:definitionApi',
             component: DefinitionEditor, props: true,
             beforeEnter: initProject
