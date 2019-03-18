@@ -65,42 +65,45 @@
             commitChangeCallback : [],
             actionsQuery : []
         }),
+        computed : {
+
+        },
         methods : {
             getData : function () {
                 return {
                     description : this.description,
                     in : this.in,
                     name : this.name,
-                    schema : this.$refs.root.getData()
+                    schema : this.$refs.root.getData().attributes
                 }
             },
-            buildQuery : function (requestBodyPointer) {
+            buildQuery : function (requestPointer) {
 
                 let isEdited = false
 
-                requestBodyPointer._actions = ActionBuilderUtil.createActions(
+                requestPointer._actions = ActionBuilderUtil.createActions(
                     this.bodyData,this._data,this.attributesKey
                 )
-                requestBodyPointer._hasActions = true
+                requestPointer._hasActions = true
 
-                let callback = this.$refs.root.buildQuery(requestBodyPointer)
+                let callback = this.$refs.root.buildQuery(requestPointer)
 
                 if(callback === undefined){
-                    delete requestBodyPointer.schema
+                    delete requestPointer.schema
                 }
                 else{
                     isEdited = true
                     this.commitChangeCallback.push(callback)
                 }
 
-                if(requestBodyPointer._actions.length > 0){
+                if(requestPointer._actions.length > 0){
                     isEdited = true
-                    this.actionsQuery = requestBodyPointer._actions
-                    requestBodyPointer._hasActions = true
+                    this.actionsQuery = requestPointer._actions
+                    requestPointer._hasActions = true
                 }
                 else{
-                    delete requestBodyPointer._actions
-                    delete requestBodyPointer._hasActions
+                    delete requestPointer._actions
+                    delete requestPointer._hasActions
                 }
 
                 return (isEdited)?this.commitChange : undefined

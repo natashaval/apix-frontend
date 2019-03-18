@@ -136,11 +136,11 @@
                 }
             },
             getData : function () {
-                let res = {
-                    description : this.description
-                }
+                let res = {}
+                if(this.hasBody)res = this.$refs.body.getData()
+                res.description = this.description
+
                 if(this.hasHeaders)res.headers = this.$refs.headers.getData()
-                if(this.body)res.body = this.$refs.body.getData()
                 return res
             },
             buildQuery : function (responsesPointer) {

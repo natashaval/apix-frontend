@@ -1,17 +1,17 @@
 <template>
-    <div v-if="bodyData !== undefined" class="green-frame container" >
-        <div v-if="bodyData.headers !== undefined">
+    <div class="green-frame container" >
+        <div>
             <h1>ini headers</h1>
-            <PropertyForm ref="headers" :schemas-data="bodyData.headers"
+            <PropertyForm ref="headers" :schemas-data="headersData"
                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"/>
         </div>
         <div>
             <h1>ini query param</h1>
-            <PropertyForm ref="queryParams" :schemas-data="bodyData.queryParams"
+            <PropertyForm ref="queryParams" :schemas-data="queryParamsData"
                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"/>
         </div>
 
-        <BodyForm v-if="hasBody" ref="body" :body-data="operationData.requestBody"
+        <BodyForm v-if="hasBody" ref="body" :body-data="requestData"
                   :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged" style="padding-left: 10%"/>
     </div>
 </template>
@@ -28,18 +28,22 @@
         components: {PropertyForm, BodyForm},
         data : () => ({
             commitChangeCallback : [],
-            actionsQuery : []
+            actionsQuery : [],
         }),
         props : {
-            operationData : {
+            requestData : {
                 type : Object
-            }
-        }
-        ,
-        computed : {
-            operationApi : function () {
-                return this.$route.params.operationApi
             },
+            operationApi : {
+                type : String,
+                required : true
+            },
+            isCreateNew : {
+                type : Boolean,
+                required : true
+            }
+        },
+        computed : {
             hasBody : function () {
                 switch (this.operationApi) {
                     case "post":
@@ -49,14 +53,19 @@
                 }
                 return false
             },
-            bodyData : function () {
-                return this.operationData.requestBody
-            }
+            headersData : function () {
+                let od = this.requestData
+                return (od === undefined)?undefined : od.headers
+            },
+            queryParamsData : function () {
+                let od = this.requestData
+                return (od === undefined)?undefined : od.queryParams
+            },
         },
         methods : {
-            buildQuery : function (operationPointer,requestBodyPointer) {
+            buildQuery : function (operationPointer,requestPointer) {
                 let isEdited = false
-                let request = requestBodyPointer
+                let request = requestPointer
                 let callback = this.$refs.headers.buildQuery(request.headers = {})
                 if(callback === undefined){
                     delete request.headers
@@ -83,15 +92,16 @@
                     }
 
                     //content type berubah
-                    if(this.bodyData.in !== this.$refs.body._data.in){
+                    if(this.requestData.in !== this.$refs.body._data.in){
                         if(operationPointer._hasActions === undefined){
                             operationPointer._hasActions = true
                             operationPointer._actions = []
                         }
 
                         operationPointer._actions.push({
+                            action : 'put',
                             key : 'consumes',
-                            value : [this.contentType]
+                            value : [this.$refs.body.contentType]
                         })
                     }
                 }
@@ -101,21 +111,36 @@
                 return (isEdited)?this.commitChange : undefined
             },
             commitChange : function () {
-                ActionExecutorUtil.executeActions(this.operationData, this.actionsQuery)
+                ActionExecutorUtil.executeActions(this.requestData, this.actionsQuery)
                 this.commitChangeCallback.forEach(fn => fn())
             },
-            reloadData : function () {
+            loadData : function () {
                 this.$_changeObserverMixin_unObserve()
+                this.$_changeObserverMixin_initObserver()
+            },
+            reloadData : function () {
+                this.loadData()
                 this.$refs.headers.reloadData()
                 this.$refs.queryParams.reloadData()
                 if(this.hasBody) this.$refs.body.reloadData()
-                this.$_changeObserverMixin_initObserver()
             },
+            getData : function () {
+                let res = {}
+                if(this.hasBody){
+                    res = this.$refs.body.getData()
+                }
+                res.headers = this.$refs.headers.getData()
+                res.queryParams = this.$refs.queryParams.getData()
+                return res
+            }
         },
         watch : {
-            operationData : function () {
-                this.$_changeObserverMixin_initObserver([])
+            requestData : function () {
+                this.loadData()
             }
+        },
+        mounted() {
+            this.loadData()
         }
     }
 </script>

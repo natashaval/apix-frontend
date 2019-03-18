@@ -4,17 +4,40 @@
             <li><button @click="submit">Save</button></li>
             <li><button @click="cancel">Cancel</button></li>
         </ul>
+        <div>
+            <div class="row">
+                <label class="col-2">Summary :</label>
+                <b-input v-model="summary" class="col"></b-input>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    <label class="col-4">Method :</label>
+                    <b-select class="col-8" v-model="method" :options="selectMethodOptions"></b-select>
+                </div>
+                <div class="col-8">
+                    <label class="col-5 float-left">Path :</label>
+                    <b-input class="col-7" v-model="pathApi" disabled></b-input>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-2">Operation Id :</label>
+                <b-input v-model="operationId" class="col"></b-input>
+            </div>
+            <div class="row">
+                <label>Description:</label>
+                <vue-editor v-model="description"></vue-editor>
+            </div>
+        </div>
         <h1>method : {{operationApi}}</h1>
         <div v-if="dataUpdated">
             <h2>data Updated</h2>
         </div>
-        <RequestComponent v-if="operationData !== undefined"
-                          ref="request"
+        <RequestComponent ref="request"
+                          :is-create-new="isCreateNew"
                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
-                          :operation-data="operationData"/>
-        <ResponseComponent v-if="operationData !== undefined"
-                           ref="response"
-                           :responses-data="operationData.responses"
+                          :request-data="requestData" :operation-api="method"/>
+        <ResponseComponent ref="response"
+                           :responses-data="responsesData"
                            :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"/>
     </div>
 </template>
@@ -23,20 +46,49 @@
     import RequestComponent from "./editor-components/RequestComponent";
     import TreeBuilder from "@/utils/DeepTreeBuilderUtil";
     import * as axios from "axios";
+    import { VueEditor } from 'vue2-editor'
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
     import ResponseComponent from "./editor-components/ResponseComponent";
+    import uuidv4 from 'uuid/v4';
+    import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
+    import ActionBuilder from "../../utils/ActionBuilderUtil";
 
     export default {
         name: "OperationEditor",
-        components: {ResponseComponent, RequestComponent},
+        components: {ResponseComponent, RequestComponent,VueEditor},
         mixins : [ChangeObserverMixin],
         data : () => ({
+            isCreateNew : false,
             projectId : undefined,
             sectionApi : undefined,
             pathApi : undefined,
-            operationApi : undefined,
+            operationApi : 'get',
             dataUpdated : false,
-            isEdited : false
+            isEdited : false,
+
+            selectMethodOptions : [
+                {text : 'GET', value : 'get'},
+                {text : 'POST', value : 'post'},
+                {text : 'PUT', value : 'put'},
+                {text : 'DELETE', value : 'delete'},
+                {text : 'PATCH', value : 'patch'},
+                {text : 'HEAD', value : 'head'},
+                {text : 'OPTIONS', value : 'options'}
+            ],
+            path : '',
+            method : 'get',
+            description : '',
+            summary : '',
+            operationId : '',
+
+            attributesKey : [
+                {key : 'operationId'},
+                {key : 'summary'},
+                {key : 'description'}
+            ],
+
+            operationActionQuery : [],
+            pathActionQuery : []
         }),
         computed : {
             treeKeys : function () {
@@ -46,48 +98,142 @@
                     'methods',this.operationApi
                 ]
             },
-            operationData : function(){
+            pathData : function () {
+                return this.$store.getters['project/getPathData'](this.sectionApi,this.pathApi)
+            },
+            operationData : function () {
+                if(this.isCreateNew)return undefined
                 return this.$store.getters['project/getOperationData'](this.sectionApi,this.pathApi,this.operationApi)
+            },
+            requestData : function () {
+                let od = this.operationData
+                return (od === undefined)?undefined : od.request
+            },
+            responsesData : function () {
+                let od = this.operationData
+                return (od === undefined)?undefined : od.responses
             }
         },
         methods : {
+            getData : function () {
+                let res = {}
+                res.summary = this.summary
+                res.description = this.description
+                res.operationId = this.operationId
+                res.request = this.$refs.request.getData()
+                res.responses = this.$refs.response.getData()
+                return res
+            },
+            getActions : function () {
+                return ActionBuilder.createActions(this.operationData, this._data, this.attributesKey)
+            },
+            commitChange : function () {
+                ActionExecutorUtil.executeActions(this.operationData, this.operationActionQuery)
+                ActionExecutorUtil.executeActions(this.pathData.methods, this.pathActionQuery)
+            },
             submit : function () {
                 try{
-                    let tree = TreeBuilder.buildDeepTree(this.treeKeys)
-                    let pointer = tree.leaf
-                    pointer._signature = this.operationData._signature
-
                     let callbacks = []
+                    let signaturePointer = undefined
+                    let tree = undefined
+                    if(this.isCreateNew){//jika baru dibuat
+                        signaturePointer = this.pathData
 
-                    let callback = this.$refs.request.buildQuery(tree.leaf,pointer.requestBody = {})
-                    if(callback === undefined){
-                        delete pointer.requestBody
-                    }
-                    else{
-                        callbacks.push(callback)
-                    }
+                        let data = this.getData()
+                        data._signature = uuidv4()
 
-                    callback = this.$refs.response.buildQuery(pointer.responses = {})
-                    if(callback === undefined){
-                        delete pointer.responses
-                    }
-                    else{
-                        callbacks.push(callback)
-                    }
+                        tree =TreeBuilder.buildDeepTree(
+                            ['sections',this.sectionApi, 'paths',this.pathApi]
+                        )
 
+                        tree.leaf._signature = this.pathData._signature
+
+                        let leaf = tree.leaf.methods = {}
+                        leaf._hasActions = true
+                        leaf._actions = [{
+                            action : 'put',
+                            key : this.operationApi,
+                            value : data
+                        }]
+
+                        this.pathActionQuery = leaf._actions
+                    }
+                    else{//jika edit data
+                        tree = TreeBuilder.buildDeepTree(this.treeKeys)
+                        //jika ganti method
+                        if(this.operationApi !== this.method){
+                            signaturePointer = this.pathData
+
+                            let tmp = tree.root.sections[this.sectionApi].paths[this.pathApi].methods
+                            tmp._hasActions = true
+                            tmp._actions = [
+                                {
+                                    action : 'delete',
+                                    key : this.operationApi
+                                },
+                                {
+                                    action : 'put',
+                                    key : this.method,
+                                    value : this.getData()
+                                }
+                            ]
+                            callbacks.push(()=>{
+                                this.$router.push({
+                                    name :'operation-editor',
+                                    params: {sectionApi : this.sectionApi, pathApi : this.pathApi, operationApi : this.method}
+                                })
+                            })
+                            this.pathActionQuery = tmp._actions
+                            tree.root.sections[this.sectionApi].paths[this.pathApi]._signature = this.pathData._signature
+                        }
+                        else{
+                            signaturePointer = this.operationData
+
+                            let pointer = tree.leaf
+                            pointer._signature = this.operationData._signature
+
+                            this.operationActionQuery = this.getActions()
+
+                            if(this.operationActionQuery.length > 0){
+                                pointer._hasActions = true
+                                pointer._actions = this.operationActionQuery
+                            }
+
+                            let callback = this.$refs.request.buildQuery(tree.leaf,pointer.request = {})
+                            if(callback === undefined){
+                                delete pointer.request
+                            }
+                            else{
+                                callbacks.push(callback)
+                            }
+
+                            callback = this.$refs.response.buildQuery(pointer.responses = {})
+                            if(callback === undefined){
+                                delete pointer.responses
+                            }
+                            else{
+                                callbacks.push(callback)
+                            }
+                        }
+
+                    }//end else
                     console.log(tree)
                     axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
                         (response) => {
                             if(response.status === 200){
                                 callbacks.forEach(fn => fn())
-                                this.operationData._signature = response.data.new_signature
+                                signaturePointer._signature = response.data.new_signature
+                                this.commitChange()
                                 this.reloadData()
                             }
                         }
                     ).catch(function (error) {
                         console.log(error);
                     })
+
+
                     this.isEdited = false
+
                 }
                 catch (e) {
                     console.log(e)
@@ -99,19 +245,35 @@
             loadData : function () {
                 this.isEdited = false
                 let p = this.$route.params
+                //jika create new
                 this.projectId = p.projectId
                 this.sectionApi = p.sectionApi
                 this.pathApi = p.pathApi
-                this.operationApi = p.operationApi
-                this.$_changeObserverMixin_initObserver()
+
+                if(p.operationApi !== undefined){
+                    this.operationApi = p.operationApi
+                    this.method = p.operationApi
+                }
+                else{
+                    this.isCreateNew = true
+                    this.$_changeObserverMixin_initObserver(['summary','method','operationId','description'])
+                }
+                let od = this.operationData
+                if(od !== undefined){
+                    this.summary = od.summary
+                    this.description = od.description
+                    this.operationId = od.operationId
+                }
             },
             reloadData : function () {
+                this.$_changeObserverMixin_unObserve()
                 this.loadData()
                 this.$refs.request.reloadData()
                 this.$refs.response.reloadData()
+                this.$_changeObserverMixin_initObserver(['summary','method','operationId','description'])
             },
             //override
-            $_changeObserverMixin_onDataChanged : function () {
+            $_changeObserverMixin_onDataChanged : function (after,before) {
                 this.isEdited = true
             }
 
@@ -119,11 +281,28 @@
         watch : {
             $route : function () {
                 this.loadData()
+            },
+            operationData : function (after,before) {
+                if(before === undefined){
+                    this.description = after.description
+
+                    //diberi default html tag <p></p>
+                    //jika tidak, vue-editor akan mengedit sendiri dan terdeteksi di watcher sehingga
+                    // menunjukkan tombol save dan cancel diawal halaman
+                    if(this.description !== undefined && this.description[0] !== '<'){
+                        this.description = '<p>'+this.description+'</p>'
+                    }
+
+                    this.summary = after.summary
+                    this.operationId = after.operationId
+                    this.$_changeObserverMixin_initObserver(['summary','method','operationId','description'])
+                }
             }
         },
-        created() {
+        mounted() {
             this.loadData()
-        }
+        },
+
     }
 </script>
 

@@ -56,6 +56,14 @@
             },
         },
         methods : {
+            getData : function () {
+                let res = {}
+                let len = this.responseList.length
+                for(let i = 0; i < len; i++){
+                    res[this.responseList[i].code]  = this.$refs.responseForm[i].getData()
+                }
+                return res
+            },
             setActiveView : function (i) {
                 this.activeIndex = i
             },
@@ -142,6 +150,11 @@
             commitChange : function () {
                 ActionExecutorUtil.executeActions(this.responsesData, this.actionsQuery)
                 this.commitChangeCallback.forEach(fn => fn())
+            }
+        },
+        watch : {
+            responsesData : function (after, before) {
+                this.loadData()
             }
         },
         mounted() {
