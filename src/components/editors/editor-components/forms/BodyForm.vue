@@ -1,13 +1,11 @@
 <template>
     <div>
-        <!--body-->
         <div class="dot-border">
             <h1>Body</h1>
             <b-button @click="isEditing = !isEditing" class="float-right round-button">
                 <i class="fa fa-pencil-alt"></i>
             </b-button>
             <div class="row" v-if="isEditing">
-                <b-form-select v-model="contentType" :options="options"/>
                 <div style="margin-left: 15px">
                     <label>Description:</label>
                 </div>
@@ -16,7 +14,6 @@
                 </div>
             </div>
             <div v-else>
-                <div>Content Type : {{contentType}}</div>
                 <div v-html="description"></div>
             </div>
             <DataTypeInput ref="root"
@@ -50,13 +47,9 @@
         data : () => ({
             description : '',
             isEditMode : false,
-            contentType : 'application/json',
             in : 'body',
             isEditing : false,
-            options : [
-                {value : 'application/json', text : 'application/json'},
-                {value : 'multipart/form-data', text : 'multipart/form-data'}
-            ],
+
             attributesKey : [
                 {key : 'description'},
                 {key : 'in'},
@@ -117,19 +110,13 @@
                 if(this.bodyData !== undefined){
                     let bd = this.bodyData
                     this.in = bd.in
-                    switch (this.in) {
-                        case 'body':
-                            this.contentType = 'application/json'
-                            break
-                        case 'formData':
-                            this.contentType = 'multipart/form-data'
-                    }
                     this.description = (bd.description === undefined)?'':bd.description
                 }
+
                 if(this.parentIsEditing !== undefined){
                     this.isEditing = this.parentIsEditing
                 }
-                this.$_changeObserverMixin_initObserver(['in','description'])
+                this.$_changeObserverMixin_initObserver(['in','description','contentTypes.length'])
             },
             reloadData : function () {
                 this.loadData()
@@ -137,16 +124,6 @@
             }
         },
         watch : {
-            contentType : function () {
-                switch (this.contentType) {
-                    case 'application/json':
-                        this.in = 'body'
-                        break
-                    case 'multipart/form-data':
-                        this.in = 'formData'
-                        break
-                }
-            },
             bodyData : function () {
                 this.loadData()
             }

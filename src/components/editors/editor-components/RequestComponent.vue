@@ -91,19 +91,7 @@
                         this.commitChangeCallback.push(callback)
                     }
 
-                    //content type berubah
-                    if(this.requestData.in !== this.$refs.body._data.in){
-                        if(operationPointer._hasActions === undefined){
-                            operationPointer._hasActions = true
-                            operationPointer._actions = []
-                        }
 
-                        operationPointer._actions.push({
-                            action : 'put',
-                            key : 'consumes',
-                            value : [this.$refs.body.contentType]
-                        })
-                    }
                 }
                 if(request._actions !== undefined){
                     this.actionsQuery = request._actions

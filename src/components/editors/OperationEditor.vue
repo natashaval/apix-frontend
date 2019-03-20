@@ -27,6 +27,17 @@
                 <label>Description:</label>
                 <vue-editor v-model="description"></vue-editor>
             </div>
+            <div class="row">
+                <label>Consumes :</label>
+                <v-select multiple v-model="consumes" class="w-100" :options="options">
+                </v-select>
+            </div>
+            <div class="row">
+                <label>Produces :</label>
+                <v-select multiple v-model="produces" class="w-100" :options="options">
+                </v-select>
+            </div>
+
         </div>
         <h1>method : {{operationApi}}</h1>
         <div v-if="dataUpdated">
@@ -39,6 +50,7 @@
         <ResponseComponent ref="response"
                            :responses-data="responsesData"
                            :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"/>
+
     </div>
 </template>
 
@@ -52,10 +64,11 @@
     import uuidv4 from 'uuid/v4';
     import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
     import ActionBuilder from "../../utils/ActionBuilderUtil";
+    import vSelect from 'vue-select'
 
     export default {
         name: "OperationEditor",
-        components: {ResponseComponent, RequestComponent,VueEditor},
+        components: {ResponseComponent, RequestComponent,VueEditor,vSelect},
         mixins : [ChangeObserverMixin],
         data : () => ({
             isCreateNew : false,
@@ -80,11 +93,19 @@
             description : '',
             summary : '',
             operationId : '',
-
+            options : [
+                'application/json',
+                'multipart/form-data',
+                'application/xml'
+            ],
+            consumes : [],
+            produces : [],
             attributesKey : [
                 {key : 'operationId'},
                 {key : 'summary'},
-                {key : 'description'}
+                {key : 'description'},
+                {key : 'consumes'},
+                {key : 'produces'}
             ],
 
             operationActionQuery : [],
@@ -112,6 +133,12 @@
             responsesData : function () {
                 let od = this.operationData
                 return (od === undefined)?undefined : od.responses
+            },
+            consumesData : function () {
+                return (this.operationData === undefined)?[]:this.operationData.consumes
+            },
+            producesData : function () {
+                return (this.operationData === undefined)?[]:this.operationData.produces
             }
         },
         methods : {
@@ -122,6 +149,8 @@
                 res.operationId = this.operationId
                 res.request = this.$refs.request.getData()
                 res.responses = this.$refs.response.getData()
+                res.consumes = this.consumes
+                res.produces = this.produces
                 return res
             },
             getActions : function () {
@@ -194,10 +223,12 @@
 
                             this.operationActionQuery = this.getActions()
 
-                            if(this.operationActionQuery.length > 0){
-                                pointer._hasActions = true
-                                pointer._actions = this.operationActionQuery
-                            }
+                            // if(this.operationActionQuery.length > 0){
+                            pointer._hasActions = true
+                            pointer._actions = this.operationActionQuery
+                            // }else{
+                            //     point
+                            // }
 
                             let callback = this.$refs.request.buildQuery(tree.leaf,pointer.request = {})
                             if(callback === undefined){
@@ -213,6 +244,13 @@
                             }
                             else{
                                 callbacks.push(callback)
+                            }
+
+
+
+                            if(pointer._actions.length === 0){
+                                delete pointer._actions
+                                delete pointer._hasActions
                             }
                         }
 
@@ -243,6 +281,7 @@
                 this.reloadData()
             },
             loadData : function () {
+                this.$_changeObserverMixin_unObserve()
                 this.isEdited = false
                 let p = this.$route.params
                 //jika create new
@@ -256,21 +295,26 @@
                 }
                 else{
                     this.isCreateNew = true
-                    this.$_changeObserverMixin_initObserver(['summary','method','operationId','description'])
                 }
                 let od = this.operationData
                 if(od !== undefined){
                     this.summary = od.summary
                     this.description = od.description
                     this.operationId = od.operationId
+                    this.consumes = od.consumes
+                    this.produces = od.produces
+                    if(this.description !== undefined && this.description[0] !== '<'){
+                        this.description = '<p>'+this.description+'</p>'
+                    }
                 }
+                this.$_changeObserverMixin_initObserver(['summary','method','operationId','description','consumes.length',
+                'produces.length'])
+
             },
             reloadData : function () {
-                this.$_changeObserverMixin_unObserve()
                 this.loadData()
                 this.$refs.request.reloadData()
                 this.$refs.response.reloadData()
-                this.$_changeObserverMixin_initObserver(['summary','method','operationId','description'])
             },
             //override
             $_changeObserverMixin_onDataChanged : function (after,before) {
@@ -284,20 +328,10 @@
             },
             operationData : function (after,before) {
                 if(before === undefined){
-                    this.description = after.description
-
-                    //diberi default html tag <p></p>
-                    //jika tidak, vue-editor akan mengedit sendiri dan terdeteksi di watcher sehingga
-                    // menunjukkan tombol save dan cancel diawal halaman
-                    if(this.description !== undefined && this.description[0] !== '<'){
-                        this.description = '<p>'+this.description+'</p>'
-                    }
-
-                    this.summary = after.summary
-                    this.operationId = after.operationId
-                    this.$_changeObserverMixin_initObserver(['summary','method','operationId','description'])
+                    this.loadData()
                 }
-            }
+            },
+
         },
         mounted() {
             this.loadData()
