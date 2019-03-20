@@ -13,7 +13,7 @@
         data : () => ({
             refBefore : undefined,
             attributesKey : [
-                {keyBefore : '$ref',keyAfter : 'ref'}
+                {key : 'ref'}
             ]
         }),
         methods : {
@@ -27,15 +27,15 @@
             },
             getActions : function () {
                 return ActionBuilderUtil.createActions(
-                    {$ref : this.refBefore},
+                    {ref : this.refBefore},
                     {ref : this.currentRef},
                     this.attributesKey
                 )
             }
         },
-        created() {
+        mounted() {
             if(this.schemaData !== undefined){
-                this.refBefore = this.schemaData.$ref
+                this.refBefore = this.schemaData.ref
             }
             this.$_changeObserverMixin_initObserver()
         }
