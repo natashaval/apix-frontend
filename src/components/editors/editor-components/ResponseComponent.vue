@@ -18,8 +18,9 @@
                     <ResponseForm v-bind:style="{display: (i === activeIndex)?'block':'none'}"
                                   ref="responseForm"
                                   :component-idx="i"
+                                  :is-duplicate-code="isDuplicateCode"
                                   :notify-change-status-code="notifyChangeStatusCode"
-                                  :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                                  :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                   :response-data="response.data" :response-code="response.code" class="w-100"/>
                 </div>
             </div>
@@ -68,7 +69,6 @@
                 this.activeIndex = i
             },
             addResponse : function () {
-                // this.responseList
                 this.responseList.push({code : "200"})
                 this.activeIndex = this.responseList.length-1
 
@@ -112,22 +112,7 @@
 
                 let isEdited = false
 
-                let isUnique  = (code) => {
-                    let count = 0
-                    this.responseList.forEach(response => {
-                        if(response.code === code)count++
-                    })
-                    return count === 1
-                }
-
                 let rl = this.responseList
-                //validasi
-                for(let i in rl){
-                    if(!isUnique(rl[i].code)){
-                        'error'
-                        throw 'status code is not unique!'
-                    }
-                }
 
                 responsesPointer._actions = this.actionsQuery
                 responsesPointer._hasActions = true
@@ -150,6 +135,13 @@
             commitChange : function () {
                 ActionExecutorUtil.executeActions(this.responsesData, this.actionsQuery)
                 this.commitChangeCallback.forEach(fn => fn())
+            },
+            isDuplicateCode : function (i) {
+                let count = 0
+                this.responseList.forEach(response => {
+                    if(response.code === this.responseList[i].code)count++
+                })
+                return count === 1
             }
         },
         watch : {

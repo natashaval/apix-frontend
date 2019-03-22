@@ -6,7 +6,7 @@
                            :project-id="projectId"
                            :schema-data="property.schemaData"
                            :ref="'property-'+property.id"
-                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                            :component-id="idx" :f-self-delete="deleteChild"/>
         </div>
         <button @click="buildQuery">Dump!</button>

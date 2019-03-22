@@ -13,6 +13,7 @@
                 <div class="col-4">
                     <label class="col-4">Method :</label>
                     <b-select class="col-8" v-model="method" :options="selectMethodOptions"></b-select>
+                    <p v-if="!$_changeObserverMixin_isValid('method')" class="error-message">operation must be unique</p>
                 </div>
                 <div class="col-8">
                     <label class="col-5 float-left">Path :</label>
@@ -43,13 +44,14 @@
         <div v-if="dataUpdated">
             <h2>data Updated</h2>
         </div>
+                          <!--:$_changeObserverMixin_parent="$_changeObserverMixin_this"-->
         <RequestComponent ref="request"
                           :is-create-new="isCreateNew"
-                          :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                          :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                           :request-data="requestData" :operation-api="method"/>
         <ResponseComponent ref="response"
                            :responses-data="responsesData"
-                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"/>
+                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
 
     </div>
 </template>
@@ -162,6 +164,13 @@
             },
             submit : function () {
                 try{
+
+                    if(!this.$_changeObserverMixin_allIsValid()){
+                        console.log('can\'t submit due to unvalid field')
+                        return
+                    }
+
+
                     let callbacks = []
                     let signaturePointer = undefined
                     let tree = undefined
@@ -307,8 +316,18 @@
                         this.description = '<p>'+this.description+'</p>'
                     }
                 }
-                this.$_changeObserverMixin_initObserver(['summary','method','operationId','description','consumes.length',
-                'produces.length'])
+                this.$_changeObserverMixin_initObserver([
+                    'summary',
+                    {
+                        model : 'method', validator : () => {
+                            if(this.pathData === undefined)return true
+                            if(this.$route.params.operationApi === this.method)return true
+                            console.log('#return '+this.pathData.methods[this.method] === undefined)
+                            return this.pathData.methods[this.method] === undefined
+                        }
+                    },
+                    'operationId','description','consumes.length', 'produces.length'
+                ])
 
             },
             reloadData : function () {
@@ -340,6 +359,13 @@
     }
 </script>
 
+<style>
+    .error-message{
+        color : red;
+    }
+</style>
+
 <style scoped>
 
 </style>
+

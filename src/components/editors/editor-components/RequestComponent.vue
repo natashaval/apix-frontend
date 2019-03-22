@@ -3,16 +3,16 @@
         <div>
             <h1>ini headers</h1>
             <PropertyForm ref="headers" :schemas-data="headersData"
-                          :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"/>
+                          :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         </div>
         <div>
             <h1>ini query param</h1>
             <PropertyForm ref="queryParams" :schemas-data="queryParamsData"
-                          :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"/>
+                          :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         </div>
 
         <BodyForm v-if="hasBody" ref="body" :body-data="requestData"
-                  :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged" style="padding-left: 10%"/>
+                  :$_changeObserverMixin_parent="$_changeObserverMixin_this" style="padding-left: 10%"/>
     </div>
 </template>
 

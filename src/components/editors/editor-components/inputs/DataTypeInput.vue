@@ -11,7 +11,6 @@
                        v-bind:class="showChild"></i>
                 </b-button>
                 <div class="w-100"></div>
-                <!--<hr class="vline"/>-->
             </div>
             <div class="col-10 justify-content-end">
                 <div class="container row">
@@ -20,6 +19,7 @@
                         <div v-if="showEdit" class="form-inline">
                             <label v-if="nameAble" class="col-4">Name :</label>
                             <b-input v-if="nameAble" class="col-8" v-model="name"></b-input>
+                            <p v-if="!$_changeObserverMixin_isValid('name')" class="error-message">name can't be empty</p>
                             <label class="col-4">{{(isSubArray)?'Of :':'Type :'}}</label>
                             <b-select class="col-8" v-model="selectedType" @change="selectType">
                                 <option v-for="dataType in dataTypes"
@@ -75,31 +75,31 @@
                             <!--more attributes of selected datatype-->
                             <div class="w-100"></div>
                             <StringData ref="curDataType" v-if="type === 'string'"
-                                        :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                                        :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                         :is-editing="showEdit" :schema-data="schemaData"/>
                             <ArrayData ref="curDataType" v-else-if="type === 'array'"
-                                       :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                                       :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                        :is-editing="showEdit" :schema-data="schemaData"/>
                             <ObjectData ref="curDataType" v-else-if="type === 'object'"
-                                        :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                                        :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                         :is-editing="showEdit" :schema-data="schemaData"/>
 
                             <NumericData ref="curDataType" v-else-if="type === 'number'"
-                                         :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                                         :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                          :numeric-type="'number'" :is-editing="showEdit"
                                          :schema-data="schemaData"/>
 
                             <NumericData ref="curDataType" v-else-if="type === 'integer'"
-                                         :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                                         :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                          :numeric-type="'integer'" :is-editing="showEdit"
                                          :schema-data="schemaData"/>
 
                             <BooleanData ref="curDataType" v-else-if="type === 'boolean'"
-                                         :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                                         :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                          :is-editing="showEdit"
                                          :schema-data="schemaData"/>
                             <CustomData ref="curDataType" v-else
-                                        :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                                        :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                         :schema-data="schemaData" :current-ref="ref"/>
                         </div>
                     </div>
@@ -123,7 +123,7 @@
             <DataTypeInput ref="arrayItem" :schema-data="(schemaData !== undefined)?schemaData.items:undefined"
                            :border-able="false"
                            :name-able="false" :delete-able="false" :edit-able="false"
-                           :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                            :is-sub-array="true" :parent-is-editing="showEdit"/>
         </div>
 
@@ -137,7 +137,7 @@
                     <DataTypeInput :ref="'property-'+val.id" :parent-is-editing="val.isEditing"
                                    :schema-data="val.schemaData" :component-id="i"
                                    :f-self-delete="deleteChild"
-                                   :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                                   :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                    v-on:delete="deleteChild" class="col-11"/>
                     <!--<button @click="deleteProperty(i)">delete property</button>-->
                 </div>
@@ -159,6 +159,7 @@
     import CustomData from "./typedatas/CustomData";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
+    import ActionBuilderUtil from "../../../../utils/ActionBuilderUtil";
 
     export default {
         name: "DataTypeInput",
@@ -274,8 +275,6 @@
                 this.selectedType = value
                 if(value === 'array'){
                     this.type = 'array'
-                    // this.items = []
-                    // this.items.push({type : 'string'})
                 }
                 else if(this.isDefaultDataType(value)){
                     this.type = value
@@ -286,9 +285,6 @@
                 }
             },
             selectItemType : function (value,i) {
-                if(!this.isDefaultDataType(value)){
-                    // this.items[i].ref = '#/definitions/'+value
-                }
                 if(value === 'array' && i === this.items.length -1 ){
                     this.items.push({
                         type : 'string'
@@ -541,7 +537,19 @@
                 }
 
                 //init observer dari mixin
-                let watchList = ['propertiesData.length','selectedType','name']
+                let watchList = ['propertiesData.length','selectedType',
+                    {
+                        model : 'name',
+                        validator : () => {
+                            if(!this.nameAble){
+                                return true
+                            }
+                            else{
+                                return !ActionBuilderUtil.isEqual(this.name, '')
+                            }
+                        }
+                    }
+                ]
                 // watchList.push(this.attributesKey)
                 this.attributesKey.forEach(attr => watchList.push(attr.key))
                 this.$_changeObserverMixin_initObserver(watchList)

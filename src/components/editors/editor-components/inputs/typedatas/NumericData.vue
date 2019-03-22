@@ -30,7 +30,7 @@
             <div class="row" v-if="enums.length !== 1">
                 <p class="col-5">Enum</p>
                 <div class="col-5">
-                    <p v-for="_enum in enums" v-bind:key="_enum">{{_enum}}</p>
+                    <p v-for="(_enum,i) in enums" v-bind:key="i">{{_enum}}</p>
                 </div>
             </div>
             <div class="row" v-if="format !== '' && format !== undefined ">
@@ -53,6 +53,7 @@
 <script>
     import ActionBuilder from '@/utils/ActionBuilderUtil'
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
+    import ActionBuilderUtil from "../../../../../utils/ActionBuilderUtil";
 
     export default {
         name: "NumericData",
@@ -150,8 +151,29 @@
             }
             this.$_changeObserverMixin_initObserver(
                 this.attributesKey.map(attr => {
-                    if(attr.key !== undefined)return attr.key
-                    return attr.keyAfter
+                    let key = attr.key
+                    if(key === undefined)key = attr.keyAfter
+
+                    if(key === 'enums'){
+                        return {
+                            model : 'enums',
+                            validator : () => {
+                                let isValid = true
+                                this.enums.forEach(item => isValid &= !isNaN(item))
+                                return isValid
+                            }
+                        }
+                    }
+                    else if(key === 'defaultVal'){
+                        return {
+                            model : 'defaultVal',
+                            validator : () => {
+                                return !isNaN(this.defaultVal) || ActionBuilderUtil.isEqual(this.defaultVal,undefined)
+                            }
+                        }
+                    }
+                    return key
+
                 })
             )
 

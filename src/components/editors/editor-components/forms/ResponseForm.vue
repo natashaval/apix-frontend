@@ -3,6 +3,7 @@
         <div class="row">
             <div v-if="isEditing" class="col">
                 <b-select v-model="selectedCode" :options="statusOptions"/>
+                <p v-if="!$_changeObserverMixin_isValid('selectedCode')" class="error-message">response code must be unique</p>
             </div>
             <div v-else class="col">
                 <p>Status Code : {{selectedCode}}</p>
@@ -14,13 +15,13 @@
         <div>
             <button @click="hasHeaders = true">Add Header</button>
             <PropertyForm v-if="hasHeaders" ref="headers"
-                          :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                          :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                           :schemas-data="headersData"/>
         </div>
         <div>
             <button @click="hasBody = true">Add Body</button>
             <BodyForm v-if="hasBody" :body-data="responseData" ref="body"
-                      :$_changeObserverMixin_ParentCallback="$_changeObserverMixin_onDataChanged"
+                      :$_changeObserverMixin_parent="$_changeObserverMixin_this"
             />
         </div>
     </div>
@@ -53,6 +54,10 @@
                 type : Function,
                 required : true
             },
+            isDuplicateCode : {
+                type : Function,
+                required : true
+            }
         },
         data : () => ({
             isEditing : false,
@@ -85,9 +90,9 @@
                 this.notifyChangeStatusCode(this.componentIdx,this.selectedCode)
 
                 //karna watcher cuma boleh 1, maka code dari ChangeObserverMixin dicopy kesini
-                if(!this.$_changeObserverMixin_wasTriggered && this.$_changeObserverMixin_ParentCallback !== undefined){
+                if(!this.$_changeObserverMixin_wasTriggered && this.$_changeObserverMixin_parent !== undefined){
                     this.$_changeObserverMixin_unObserve()
-                    this.$_changeObserverMixin_ParentCallback()
+                    this.$_changeObserverMixin_parent.onDataChanged()
                 }
                 this.$_changeObserverMixin_wasTriggered = true
             },
@@ -111,6 +116,31 @@
                     this.initCode = this.responseCode
                 }
                 this.$watch('selectedCode',this.watchSelectedCode)
+                this.$_changeObserverMixin_initObserver([{
+                    model : 'selectedCode',
+                    callback : this.watchSelectedCode,
+                    validator : () => {
+                        return this.isDuplicateCode(this.componentIdx)
+                        // let isUnique  = (code) => {
+                        //     let count = 0
+                        //     this.responseList.forEach(response => {
+                        //         if(response.code === code)count++
+                        //     })
+                        //     return count === 1
+                        // }
+                        //
+                        // let rl = this.responseList
+                        // //validasi
+                        // for(let i in rl){
+                        //     if(!isUnique(rl[i].code)){
+                        //         console.log('return false.')
+                        //         return false
+                        //     }
+                        // }
+                        // console.log('return true.')
+
+                    }
+                }])
 
 
             },
