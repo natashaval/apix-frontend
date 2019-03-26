@@ -366,7 +366,9 @@
                     parentQuery[this.name] = query
                 }//ingat undefined == null tapi undefined !== null
                 else if(name !== '' && name != undefined ){//jika tidak ada perubahan nama
-                    parentQuery[name] = query
+                    if(parentQuery[name] === undefined){
+                        parentQuery[name] = query
+                    }
                 }
                 else{
                     throw 'Name can\'t be empty!'

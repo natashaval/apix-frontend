@@ -46,7 +46,6 @@
         </div>
                           <!--:$_changeObserverMixin_parent="$_changeObserverMixin_this"-->
         <RequestComponent ref="request"
-                          :is-create-new="isCreateNew"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                           :request-data="requestData" :operation-api="method"/>
         <ResponseComponent ref="response"
@@ -180,7 +179,7 @@
                         let data = this.getData()
                         data._signature = uuidv4()
 
-                        tree =TreeBuilder.buildDeepTree(
+                        tree = TreeBuilder.buildDeepTree(
                             ['sections',this.sectionApi, 'paths',this.pathApi]
                         )
 
@@ -190,10 +189,15 @@
                         leaf._hasActions = true
                         leaf._actions = [{
                             action : 'put',
-                            key : this.operationApi,
+                            key : this.method,
                             value : data
                         }]
-
+                        callbacks.push(()=>{
+                            this.$router.push({
+                                name :'operation-editor',
+                                params: {sectionApi : this.sectionApi, pathApi : this.pathApi, operationApi : this.method}
+                            })
+                        })
                         this.pathActionQuery = leaf._actions
                     }
                     else{//jika edit data
@@ -268,10 +272,10 @@
                     axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
                         (response) => {
                             if(response.status === 200){
-                                callbacks.forEach(fn => fn())
                                 signaturePointer._signature = response.data.new_signature
                                 this.commitChange()
                                 this.reloadData()
+                                callbacks.forEach(fn => fn())
                             }
                         }
                     ).catch(function (error) {
@@ -293,7 +297,6 @@
                 this.$_changeObserverMixin_unObserve()
                 this.isEdited = false
                 let p = this.$route.params
-                //jika create new
                 this.projectId = p.projectId
                 this.sectionApi = p.sectionApi
                 this.pathApi = p.pathApi
@@ -301,6 +304,7 @@
                 if(p.operationApi !== undefined){
                     this.operationApi = p.operationApi
                     this.method = p.operationApi
+                    this.isCreateNew = false
                 }
                 else{
                     this.isCreateNew = true
@@ -322,7 +326,6 @@
                         model : 'method', validator : () => {
                             if(this.pathData === undefined)return true
                             if(this.$route.params.operationApi === this.method)return true
-                            console.log('#return '+this.pathData.methods[this.method] === undefined)
                             return this.pathData.methods[this.method] === undefined
                         }
                     },

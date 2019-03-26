@@ -12,7 +12,7 @@
             <b-button v-b-toggle.model class="m-1">Models</b-button>
             <b-collapse visible id="model">
                 <ModelBar v-for="(value, key) in apiData.definitions"
-                      v-bind:key="key" :apiData="value" :definitionApi="key" />
+                      v-bind:key="key" :apiData="value" :definition-api="value.name" />
             </b-collapse>
         </ul>
     </div>

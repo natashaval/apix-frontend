@@ -38,10 +38,6 @@
                 type : String,
                 required : true
             },
-            isCreateNew : {
-                type : Boolean,
-                required : true
-            }
         },
         computed : {
             hasBody : function () {

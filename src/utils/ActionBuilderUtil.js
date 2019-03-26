@@ -43,9 +43,7 @@ export default {
                 before = objBefore[keys.key]
                 after = objAfter[keys.key]
             }
-            // console.log(before+' '+after+' '+keys.default)
             if(before === undefined){
-                // console.log('masyukk')
                 if(!this.isEqual(after, keys.default)){
                     actions.push({
                         action : 'put',

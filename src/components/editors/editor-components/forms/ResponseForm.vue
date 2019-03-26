@@ -121,24 +121,6 @@
                     callback : this.watchSelectedCode,
                     validator : () => {
                         return this.isDuplicateCode(this.componentIdx)
-                        // let isUnique  = (code) => {
-                        //     let count = 0
-                        //     this.responseList.forEach(response => {
-                        //         if(response.code === code)count++
-                        //     })
-                        //     return count === 1
-                        // }
-                        //
-                        // let rl = this.responseList
-                        // //validasi
-                        // for(let i in rl){
-                        //     if(!isUnique(rl[i].code)){
-                        //         console.log('return false.')
-                        //         return false
-                        //     }
-                        // }
-                        // console.log('return true.')
-
                     }
                 }])
 

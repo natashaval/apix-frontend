@@ -19,6 +19,7 @@
             <DataTypeInput ref="root"
                            :schema-data="(bodyData !== undefined)?bodyData.schema:undefined" :name-able="false"
                            :delete-able="false"
+                           fixed-name="schema"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                             style="margin-top: 130px"/>
         </div>
