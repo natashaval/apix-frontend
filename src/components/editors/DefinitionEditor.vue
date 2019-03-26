@@ -1,22 +1,184 @@
 <template>
     <div>
-        <h1>Model: {{definitionApi}}</h1>
-
-        <DataTypeInput v-if="apiData !== undefined" :schemaData="apiData"/>
-
+        <ul v-if="isEdited">
+            <li><button @click="submit">Save</button></li>
+            <li><button @click="cancel">Cancel</button></li>
+        </ul>
+        <div class="row">
+            <label class="col-2">Name :</label>
+            <b-input v-model="name" class="col"></b-input>
+        </div>
+        <div class="row">
+            <label>Description:</label>
+            <vue-editor v-model="description"></vue-editor>
+        </div>
+        <div class="container" style="padding-left: 60px">
+            <DataTypeInput :schema-data="schemaData" ref="root"
+                           :name-able="false"
+                           :delete-able="false"
+                           :fixed-name="'schema'"
+                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
+        </div>
     </div>
 </template>
 
 <script>
     import DataTypeInput from "./editor-components/inputs/DataTypeInput";
+    import { VueEditor } from 'vue2-editor'
+    import ChangeObserverMixin from "../../mixins/ChangeObserverMixin";
+    import DeepTreeBuilderUtil from "../../utils/DeepTreeBuilderUtil";
+    import uuidv4 from 'uuid/v4';
+    import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
+    import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
+    import * as axios from "axios";
+
     export default {
         name: "DefinitionEditor",
-        components: {DataTypeInput},
-        props: ['definitionApi'],
-        computed: {
-            apiData: function() {
-                return this.$store.getters['project/getDefinitionData'](this.definitionApi)
+        components: {DataTypeInput,VueEditor},
+        mixins : [ChangeObserverMixin],
+        props: {
+            definitionApi : {
+                type : String
             }
+        },
+        data : () => ({
+            name : '',
+            description : '',
+            isEdited : false,
+            isCreateNew : true,
+            attributesKey : [{key : 'name'},{key : 'description'}],
+            definitionsRootActions : [],
+            definitionActions : []
+        }),
+        computed: {
+            projectData : function () {
+                return this.$store.getters['project/getProjectData']
+            },
+            definitionData : function() {
+                return this.$store.getters['project/getDefinitionDataByName'](this.definitionApi)
+            },
+            schemaData : function () {
+                return (this.definitionData !== undefined)?this.definitionData.schema : undefined
+            },
+            definitionId : function () {
+                let defs = this.$store.getters['project/getDefinitions']
+                if(defs === undefined)return ''
+                let res = Object.keys(defs).find(key => {
+                    return this.definitionApi === defs[key].name
+                })
+                return (res === undefined)?'':res
+            },
+            projectId : function () {
+                return this.$route.params.projectId
+            }
+        },
+        methods : {
+            loadData : function () {
+                this.isEdited = false
+                this.$_changeObserverMixin_unObserve()
+                if(this.definitionData !== undefined){
+                    this.description = this.definitionData.description
+                }
+                if(this.definitionApi !== undefined){
+                    this.name = this.definitionApi
+                    this.isCreateNew = false
+                }
+                this.$_changeObserverMixin_initObserver(['name','description'])
+            },
+            reloadData : function () {
+                this.loadData()
+                this.$refs.root.reloadData()
+            },
+            //override
+            $_changeObserverMixin_onDataChanged : function (after,before) {
+                this.isEdited = true
+            },
+            getData : function () {
+                let res = {}
+                res.description = this.description
+                res.name = this.name
+                res.schema = this.$refs.root.getData().attributes
+                return res
+            },
+            getActions : function () {
+                return ActionBuilderUtil.createActions(this.definitionData,this._data,this.attributesKey)
+            },
+            commitChange : function () {
+                ActionExecutorUtil.executeActions(this.$store.getters['project/getDefinitions'], this.definitionsRootActions)
+                ActionExecutorUtil.executeActions(this.definitionData, this.definitionActions)
+            },
+            submit : function () {
+
+                let tree = undefined
+                let callbacks = []
+                this.definitionActions = []
+                this.definitionsRootActions = []
+                let signaturePointer = undefined
+                if(this.isCreateNew){
+                    tree = DeepTreeBuilderUtil.buildDeepTree(['definitions'])
+                    signaturePointer = this.projectData
+                    tree.root._signature = signaturePointer._signature
+                    let data = this.getData()
+                    data._signature = uuidv4()
+                    this.definitionsRootActions = tree.leaf._actions = [{
+                        action : 'put',
+                        key : uuidv4(),
+                        value : data
+                    }]
+                    tree.leaf._hasActions = true
+                    callbacks.push(()=>{
+                        this.$router.push({
+                            name :'definition-editor',
+                            params: {
+                                definitionApi : this.name
+                            }
+                        })
+                    })
+                }
+                else{
+                    tree = DeepTreeBuilderUtil.buildDeepTree(['definitions',this.definitionId])
+                    signaturePointer = this.definitionData
+                    tree.leaf._signature = signaturePointer._signature
+                    tree.leaf._actions = this.definitionActions = this.getActions()
+                    tree.leaf._hasActions = true
+
+                    let callback = this.$refs.root.buildQuery(tree.leaf)
+                    if(callback !== undefined)callbacks.push(callback)
+
+                    if(tree.leaf._actions.length === 0){
+                        delete tree.leaf._hasActions
+                        delete tree.leaf._actions
+                    }
+                }
+                console.log(tree)
+                axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
+                    (response) => {
+                        if(response.status === 200){
+                            signaturePointer._signature = response.data.new_signature
+                            this.commitChange()
+                            this.reloadData()
+                            callbacks.forEach(fn => fn())
+                        }
+                    }
+                ).catch(function (error) {
+                    console.log(error);
+                })
+
+            },
+            cancel : function () {
+                this.reloadData()
+            }
+        },
+        watch : {
+            $route : function () {
+                this.loadData()
+            },
+            definitionData : function () {
+                this.loadData()
+            }
+        },
+        mounted() {
+            this.loadData()
         }
     }
 </script>

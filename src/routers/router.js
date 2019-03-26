@@ -57,8 +57,12 @@ export const router = new VueRouter({
             component: DefinitionEditor, props: true,
             beforeEnter: initProject
         },
-        // List of Projects available
         {
+            name: 'definition-create', path: '/projects/:projectId/new-definition',
+            component: DefinitionEditor, props: true,
+            beforeEnter: initProject
+        },
+        {// List of Projects available
             name: 'project-repo', path: '/projects',
             component: ProjectRepo, props: true,
             // beforeEnter: listProjects
