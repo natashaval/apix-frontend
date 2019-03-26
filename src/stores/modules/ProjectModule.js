@@ -31,14 +31,20 @@ export default{
                 return (tmp === undefined)?undefined : tmp.methods[operation]
             }
         },
-        getDefinitionData(state){
-            return (definition) => {
-                return (state.project.definitions === undefined) ? undefined : state.project.definitions[definition]
+        getDefinitionDataByName(state){
+            return (definitionName) => {
+                return (state.project.definitions === undefined) ? undefined :
+                    Object.values(state.project.definitions).find(definition => definition.name === definitionName)
             }
         },
-        getDataTypes(state){
+        getDefinitionDataById(state){
+            return (definitionId) => {
+                return (state.project.definitions === undefined) ? undefined : state.project.definitions[definitionId]
+            }
+        },
+        getDefinitions(state){
             return state.project.definitions
-        }
+        },
     },
     mutations: {
         ASSIGN_DATA(state,newData){

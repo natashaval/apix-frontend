@@ -26,9 +26,9 @@
                                         v-bind:key="dataType.val"
                                         :value="dataType.val">{{dataType.text}}</option>
                                 <hr/>
-                                <option v-for="(value,name) in customDataTypes"
-                                        v-bind:key="name"
-                                        :value="name">{{name}}</option>
+                                <option v-for="dataType in customDataTypes"
+                                        v-bind:key="dataType.value"
+                                        :value="dataType.value">{{dataType.name}}</option>
                             </b-select>
                             <label>Required : </label>
                             <b-checkbox v-model="required"/>
@@ -182,6 +182,9 @@
                 type : Boolean,
                 default : true
             },
+            fixedName : {//jika @nameAble == false, maka nama yang dipakai adalah @fixedName
+                type : String
+            },
             borderAble : {//punya border (default : true)
                 type : Boolean,
                 default : true
@@ -249,13 +252,19 @@
                 if(this.ref === undefined){
                     return undefined
                 }
-                return this.ref.split('/')[2]
+                let defId = this.ref.split('/')[2]
+                let res = this.$store.getters['project/getDefinitionDataById'](defId)
+                if(res === undefined)return ''
+                return res.name
             },
             moreDisplay: function () {
                 return (this.isMoreDisplay)?'block':'none'
             },
             customDataTypes : function () {
-                return this.$store.getters['project/getDataTypes']
+                let defs = this.$store.getters['project/getDefinitions']
+                return Object.keys(defs).map(key => {
+                    return {name : defs[key].name, value : '#/definitions/'+key}
+                })
             },
             showEdit : function () {
                 if(this.isSubArray){
@@ -280,7 +289,7 @@
                     this.type = value
                 }
                 else{
-                    this.ref = '#/definitions/'+value
+                    this.ref = value
                     this.type = undefined
                 }
             },
@@ -329,7 +338,7 @@
                     name = 'items'
                 }
                 else if(!this.nameAble){
-                    name = 'schema'
+                    name = this.fixedName
                 }
 
                 if(this.schemaData === undefined){//jika object/field baru
@@ -512,7 +521,7 @@
                     this.example = sd.example
                     if(sd['ref'] !== undefined){
                         this.ref = sd['ref']
-                        this.selectedType = this.refName
+                        this.selectedType = this.ref
                     }
 
                     //punya properties/child
