@@ -521,8 +521,8 @@
                     this.description = sd.description
                     this.required = sd.required
                     this.example = sd.example
-                    if(sd['ref'] !== undefined){
-                        this.ref = sd['ref']
+                    if(sd['$ref'] !== undefined){
+                        this.ref = sd['$ref']
                         this.selectedType = this.ref
                     }
 

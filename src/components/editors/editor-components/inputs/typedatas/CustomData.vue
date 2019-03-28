@@ -13,7 +13,7 @@
         data : () => ({
             refBefore : undefined,
             attributesKey : [
-                {key : 'ref'}
+                {keyBefore : '$ref', keyAfter : 'ref'}
             ]
         }),
         methods : {
@@ -22,12 +22,12 @@
             },
             getAttributes : function() {
                 return {
-                    ref: this.currentRef
+                    $ref: this.currentRef
                 }
             },
             getActions : function () {
                 return ActionBuilderUtil.createActions(
-                    {ref : this.refBefore},
+                    {$ref : this.refBefore},
                     {ref : this.currentRef},
                     this.attributesKey
                 )
