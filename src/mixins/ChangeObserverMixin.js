@@ -16,26 +16,35 @@ export default {
         $_changeObserverMixin_unwatchFunctions : [],//list fungsi untuk unwatch key
         $_changeObserverMixin_wasTriggered : false,//penanda agar ditrigger sekali saja
         $_changeObserverMixin_validators : {},
-        $_changeObserverMixin_childs : []
+        $_changeObserverMixin_childs : [],
+        $_changeObserverMixin_this_index : undefined,
     }),
     computed : {
         $_changeObserverMixin_this : function () {
             return {
                 onDataChanged : this.$_changeObserverMixin_onDataChanged,
                 addChild : this.$_changeObserverMixin_addChild,
-                allIsValid : this.$_changeObserverMixin_allIsValid
+                allIsValid : this.$_changeObserverMixin_allIsValid,
+                deleteChild : this.$_changeObserverMixin_deleteChild
             }
         }
     },
     methods : {
+        $_changeObserverMixin_deleteChild : function (i) {
+            this._data.$_changeObserverMixin_childs.splice(i, 1)
+        },
+        //return index
         $_changeObserverMixin_addChild : function (child) {
             this._data.$_changeObserverMixin_childs.push(child)
+            return this._data.$_changeObserverMixin_childs - 1
         },
         //menghapus listener/observer
         $_changeObserverMixin_unObserve : function () {
             this.$_changeObserverMixin_wasTriggered = false
             this._data.$_changeObserverMixin_unwatchFunctions.forEach(fn => fn())
             this._data.$_changeObserverMixin_unwatchFunctions.length = 0
+            delete this.$_changeObserverMixin_childs
+            this.$_changeObserverMixin_childs = []
         },
         //inisiasi observer, @watchList berisi list dari key @data yang akan di observe
         $_changeObserverMixin_initObserver : function (watchList = []) {
@@ -94,7 +103,12 @@ export default {
     created() {
         if(this._props.$_changeObserverMixin_parent !== undefined){
             let p = this.$_changeObserverMixin_parent
-            p.addChild(this.$_changeObserverMixin_this)
+            this.$_changeObserverMixin_this_index = p.addChild(this.$_changeObserverMixin_this)
+        }
+    },
+    beforeDestroy() {
+        if(this._props.$_changeObserverMixin_parent !== undefined){
+            this.$_changeObserverMixin_parent.deleteChild(this.$_changeObserverMixin_this_index)
         }
     }
 }

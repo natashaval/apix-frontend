@@ -3,27 +3,27 @@
         <div v-if="isEditing">
             <div class="form-inline float-right" v-for="(key,i) in enumCount" v-bind:key="i">
                 <label class="col-4">Enum :</label>
-                <b-input class="col-8" @keyup.native="onEnumTyped(i)" v-model="enums[i]"></b-input>
+                <input class="col-8" type="number" name="enum" @keyup="onEnumTyped(i)" v-model="enums[i]"/>
             </div>
             <div class="form-inline float-right">
                 <label class="col-4">Format :</label>
-                <b-select class="col-8" v-model="format">
+                <select class="col-8 custom-select" v-model="format" name="format">
                     <option v-for="format in formats" v-bind:key="format" :value="format">{{format}}</option>
-                </b-select>
+                </select>
             </div>
             <div class="form-inline row float-right">
                 <div class="form-inline col-6 row">
                     <label class="col-6">Mininum :</label>
-                    <b-input type="number" class="col-6" v-model="minimum"></b-input>
+                    <input type="number" name="minimum" class="col-6" v-model="minimum"/>
                 </div>
                 <div class="form-inline col-6 row">
                     <label class="col-6">Maximum :</label>
-                    <b-input type="number" class="col-6" v-model="maximum"></b-input>
+                    <input type="number" name="maximum" class="col-6" v-model="maximum"/>
                 </div>
             </div>
             <div class="form-inline float-right">
                 <label class="col-4">default :</label>
-                <b-input class="col-8" v-model="defaultVal"></b-input>
+                <input class="col-8" name="default-val" v-model="defaultVal"/>
             </div>
         </div>
         <div v-else class="float-right">
@@ -59,8 +59,14 @@
         name: "NumericData",
         mixins : [ChangeObserverMixin],
         props : {
-            numericType : String,
-            isEditing : Boolean,
+            numericType : {
+                type : String,
+                required : true
+            },
+            isEditing : {
+                type : Boolean,
+                default : false
+            },
             schemaData : Object
         },
         data: () => ({
@@ -133,50 +139,56 @@
                 this.enums.push('')
                 return res
             },
+            loadData : function () {
+                if(this.schemaData !== undefined &&
+                    (this.schemaData.type === 'number' || this.schemaData.type === 'integer') ){
+                    let sd = this.schemaData
+                    if(sd.enum !== undefined){
+                        this.enums = Object.assign([],sd.enum)
+                        this.enums.push('')
+                        this.enumCount = this.enums.length
+                    }
+                    this.format = sd.format
+                    this.minimum = this._toString(sd.minimum)
+                    this.maximum = this._toString(sd.maximum)
+                    this.defaultVal = this._toString(sd.default)
+                }
+                this.$_changeObserverMixin_initObserver(
+                    this.attributesKey.map(attr => {
+                        let key = attr.key
+                        if(key === undefined)key = attr.keyAfter
+
+                        if(key === 'enums'){
+                            return {
+                                model : 'enums',
+                                validator : () => {
+                                    let isValid = true
+                                    this.enums.forEach(item => isValid &= !isNaN(item))
+                                    return isValid
+                                }
+                            }
+                        }
+                        else if(key === 'defaultVal'){
+                            return {
+                                model : 'defaultVal',
+                                validator : () => {
+                                    return !isNaN(this.defaultVal) || ActionBuilderUtil.isEqual(this.defaultVal,undefined)
+                                }
+                            }
+                        }
+                        return key
+
+                    })
+                )
+            }
+        },
+        watch : {
+            schemaData : function () {
+                this.loadData()
+            }
         },
         created(){
-
-            if(this.schemaData !== undefined &&
-                (this.schemaData.type === 'number' || this.schemaData.type === 'integer') ){
-                let sd = this.schemaData
-                if(sd.enum !== undefined){
-                    this.enums = Object.assign([],sd.enum)
-                    this.enums.push('')
-                    this.enumCount = this.enums.length
-                }
-                this.format = sd.format
-                this.minimum = this._toString(sd.minimum)
-                this.maximum = this._toString(sd.maximum)
-                this.defaultVal = this._toString(sd.default)
-            }
-            this.$_changeObserverMixin_initObserver(
-                this.attributesKey.map(attr => {
-                    let key = attr.key
-                    if(key === undefined)key = attr.keyAfter
-
-                    if(key === 'enums'){
-                        return {
-                            model : 'enums',
-                            validator : () => {
-                                let isValid = true
-                                this.enums.forEach(item => isValid &= !isNaN(item))
-                                return isValid
-                            }
-                        }
-                    }
-                    else if(key === 'defaultVal'){
-                        return {
-                            model : 'defaultVal',
-                            validator : () => {
-                                return !isNaN(this.defaultVal) || ActionBuilderUtil.isEqual(this.defaultVal,undefined)
-                            }
-                        }
-                    }
-                    return key
-
-                })
-            )
-
+            this.loadData()
         }
     }
 </script>

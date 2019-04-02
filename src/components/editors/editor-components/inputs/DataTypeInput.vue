@@ -137,6 +137,7 @@
                     <DataTypeInput :ref="'property-'+val.id" :parent-is-editing="val.isEditing"
                                    :schema-data="val.schemaData" :component-id="i"
                                    :f-self-delete="deleteChild"
+                                   :parent-functions="publicFunctions"
                                    :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                    v-on:delete="deleteChild" class="col-11"/>
                     <!--<button @click="deleteProperty(i)">delete property</button>-->
@@ -168,6 +169,9 @@
         props : {
             fSelfDelete : {//delete function from parent
                 type : Function
+            },
+            parentFunctions : {//wrapper function dari parent yang bisa diakses child
+                type : Object
             },
             parentIsEditing : {//default value dari @isEditing
                 type : Boolean
@@ -271,9 +275,27 @@
                     return this.parentIsEditing
                 }
                 return this.isEditing
-            }
+            },
+            publicFunctions : function () {
+                return {
+                    deleteChild : this.deleteChild,
+                    isValidName : this.isValidName
+                }
+            },
         },
         methods : {
+            isValidName : function (name) {
+                let p = this.propertiesData
+                let len = p.length
+                let count = 0
+                for(let i = 0; i < len; ++i){
+                    let id = p[i].id
+                    if(name === this.$refs['property-'+id][0]._data.name){
+                        count++
+                    }
+                }
+                return count === 1 && name !== '' && name !== undefined
+            },
             isDefaultDataType : function (type) {
                 return this.dataTypes.find(item => type === item.val) !== undefined
             },
@@ -319,6 +341,7 @@
                     )
                 }
                 this.commitChangeCallback.forEach(fn => fn())
+                this.loadData()
             },
             /* parameter : @parentQuery(pointer object dari parent, semua query akan langsung di assign ke pointer,
             * tidak melalui return value)
@@ -469,7 +492,8 @@
             },
             selfDelete() {
                 //panggil deleteChild() dari parent
-                this.fSelfDelete(this.componentId)
+                // this.fSelfDelete(this.componentId)
+                this.parentFunctions.deleteChild(this.componentId)
             },
             deleteChild : function (childIndex) {
                 //jika bukan property baru, maka bikin query delete
@@ -498,6 +522,7 @@
                 let tmp = {}
                 this.buildQuery(tmp)
                 console.log(tmp)
+                console.log(this.getData())
             },
             /*
             * input : #/definitions/mydatatype
@@ -552,16 +577,15 @@
                     {
                         model : 'name',
                         validator : () => {
-                            if(!this.nameAble){
-                                return true
+                            if(this.nameAble){
+                                return this.parentFunctions.isValidName(this.name)
                             }
                             else{
-                                return !ActionBuilderUtil.isEqual(this.name, '')
+                                return true
                             }
                         }
                     }
                 ]
-                // watchList.push(this.attributesKey)
                 this.attributesKey.forEach(attr => watchList.push(attr.key))
                 this.$_changeObserverMixin_initObserver(watchList)
             },
