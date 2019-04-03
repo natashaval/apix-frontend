@@ -2,7 +2,11 @@
     <div>
         <div v-if="isEditing" class="form-inline float-right">
             <label>Additional properties</label>
-            <b-checkbox value="true" v-model="additionalProperties"></b-checkbox>
+            <input type="checkbox" class="form-check" value="true"
+                   name="additional-properties" v-model="additionalProperties"/>
+        </div>
+        <div v-else>
+            <p>Additional Properties : {{additionalProperties}}</p>
         </div>
     </div>
 </template>
@@ -15,8 +19,13 @@
         name: "ObjectData",
         mixins : [ChangeObserverMixin],
         props : {
-            isEditing : Boolean,
-            schemaData : Object
+            isEditing : {
+                type : Boolean,
+                default : false
+            },
+            schemaData : {
+                type : Object
+            }
         },
         data : () => ({
             additionalProperties : true,

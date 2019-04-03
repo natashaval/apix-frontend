@@ -8,7 +8,14 @@
 
     export default {
         name: "CustomData",
-        props : ['schemaData','currentRef'],
+        props : {
+            schemaData : {
+                type : Object
+            },
+            currentRef : {
+                type : String
+            }
+        },
         mixins : [ChangeObserverMixin],
         data : () => ({
             refBefore : undefined,

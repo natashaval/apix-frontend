@@ -98,7 +98,7 @@
                                          :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                          :is-editing="showEdit"
                                          :schema-data="schemaData"/>
-                            <CustomData ref="curDataType" v-else
+                            <CustomData ref="curDataType" v-else-if="ref !== undefined"
                                         :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                         :schema-data="schemaData" :current-ref="ref"/>
                         </div>
@@ -160,16 +160,12 @@
     import CustomData from "./typedatas/CustomData";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
-    import ActionBuilderUtil from "../../../../utils/ActionBuilderUtil";
 
     export default {
         name: "DataTypeInput",
         components: {CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
         mixins : [ChangeObserverMixin],
         props : {
-            fSelfDelete : {//delete function from parent
-                type : Function
-            },
             parentFunctions : {//wrapper function dari parent yang bisa diakses child
                 type : Object
             },
@@ -341,7 +337,7 @@
                     )
                 }
                 this.commitChangeCallback.forEach(fn => fn())
-                this.loadData()
+                this.reloadData()
             },
             /* parameter : @parentQuery(pointer object dari parent, semua query akan langsung di assign ke pointer,
             * tidak melalui return value)
@@ -491,9 +487,8 @@
                 this.propertiesData.push({id : this.propertyId++,isEditing : true})
             },
             selfDelete() {
-                //panggil deleteChild() dari parent
-                // this.fSelfDelete(this.componentId)
                 this.parentFunctions.deleteChild(this.componentId)
+                // this.$_changeObserverMixin_selfDelete()
             },
             deleteChild : function (childIndex) {
                 //jika bukan property baru, maka bikin query delete

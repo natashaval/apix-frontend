@@ -17,26 +17,39 @@ export default {
         $_changeObserverMixin_wasTriggered : false,//penanda agar ditrigger sekali saja
         $_changeObserverMixin_validators : {},
         $_changeObserverMixin_childs : [],
-        $_changeObserverMixin_this_index : undefined,
+        $_changeObserverMixin_childId : 0,
+        $_changeObserverMixin_this_id : undefined,
     }),
     computed : {
+        __bla : function(){
+            if(this.$props.schemaData !== undefined){
+                return this.$props.schemaData.name
+            }
+            return ''
+        },
         $_changeObserverMixin_this : function () {
             return {
                 onDataChanged : this.$_changeObserverMixin_onDataChanged,
                 addChild : this.$_changeObserverMixin_addChild,
                 allIsValid : this.$_changeObserverMixin_allIsValid,
-                deleteChild : this.$_changeObserverMixin_deleteChild
+                deleteChild : this.$_changeObserverMixin_deleteChild,
+                id : this.$vnode.tag,
+                name : this.__bla
             }
         }
     },
     methods : {
-        $_changeObserverMixin_deleteChild : function (i) {
-            this._data.$_changeObserverMixin_childs.splice(i, 1)
+        $_changeObserverMixin_deleteChild : function (id) {
+            let childs = this._data.$_changeObserverMixin_childs
+            this._data.$_changeObserverMixin_childs = childs.filter(child => child.id !== id)
         },
         //return index
         $_changeObserverMixin_addChild : function (child) {
-            this._data.$_changeObserverMixin_childs.push(child)
-            return this._data.$_changeObserverMixin_childs - 1
+            this._data.$_changeObserverMixin_childs.push({
+                id : this._data.$_changeObserverMixin_childId,
+                methods : child
+            })
+            return this._data.$_changeObserverMixin_childId++
         },
         //menghapus listener/observer
         $_changeObserverMixin_unObserve : function () {
@@ -77,12 +90,14 @@ export default {
             let validators = this._data.$_changeObserverMixin_validators
             for(let key in validators){
                 isValid &= validators[key]()
-                if(!isValid)return false
+                if(!isValid){
+                    return false
+                }
             }
 
             let childs = this._data.$_changeObserverMixin_childs
             for(let i in childs){
-                isValid &= childs[i].allIsValid()
+                isValid &= childs[i].methods.allIsValid()
             }
             return isValid
         },
@@ -98,17 +113,20 @@ export default {
 
             }
             this.$_changeObserverMixin_wasTriggered = true
+        },
+        $_changeObserverMixin_selfDelete : function () {
+            if(this._props.$_changeObserverMixin_parent !== undefined){
+                this.$_changeObserverMixin_parent.deleteChild(this.$_changeObserverMixin_this_id)
+            }
         }
     },
     created() {
         if(this._props.$_changeObserverMixin_parent !== undefined){
             let p = this.$_changeObserverMixin_parent
-            this.$_changeObserverMixin_this_index = p.addChild(this.$_changeObserverMixin_this)
+            this.$_changeObserverMixin_this_id = p.addChild(this.$_changeObserverMixin_this)
         }
     },
     beforeDestroy() {
-        if(this._props.$_changeObserverMixin_parent !== undefined){
-            this.$_changeObserverMixin_parent.deleteChild(this.$_changeObserverMixin_this_index)
-        }
+        this.$_changeObserverMixin_selfDelete()
     }
 }

@@ -2,7 +2,7 @@
     <div>
         <div v-if="isEditing" class="form-inline float-right">
             <label class="col-4">default :</label>
-            <b-checkbox class="col-8" v-model="defaultVal"/>{{defaultVal}}
+            <input type="checkbox" name="default-val" class="col-8 form-check" v-model="defaultVal"/>{{defaultVal}}
         </div>
         <div v-else>
             <p>default : {{defaultVal}}</p>

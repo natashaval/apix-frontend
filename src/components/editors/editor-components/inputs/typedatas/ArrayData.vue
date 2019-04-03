@@ -4,16 +4,16 @@
             <div class="form-inline row float-right">
                 <div class="form-inline col-6 row">
                     <label class="col-6">Min items:</label>
-                    <b-input type="number" class="col-6" v-model="minItems"></b-input>
+                    <input type="number" name="min-items" class="col-6 form-control" v-model="minItems">
                 </div>
                 <div class="form-inline col-6 row">
                     <label class="col-6">Max items:</label>
-                    <b-input type="number" class="col-6" v-model="maxItems"></b-input>
+                    <input type="number" name="max-items" class="col-6 form-control" v-model="maxItems">
                 </div>
             </div>
             <div class="form-inline row float-right">
                 <label>Unique items</label>
-                <b-checkbox v-model="uniqueItems"></b-checkbox>
+                <input type="checkbox" name="unique-items" v-model="uniqueItems" class="form-check">
             </div>
         </div>
         <div v-else class="float-right">
@@ -38,7 +38,10 @@
         name: "ArrayData",
         mixins : [ChangeObserverMixin],
         props : {
-            isEditing : Boolean,
+            isEditing : {
+                type : Boolean,
+                default : false
+            },
             schemaData : Object
         },
         data : () => ({
