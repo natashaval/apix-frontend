@@ -1,7 +1,3 @@
-import Vue from 'vue'
-import BootstrapVue from 'bootstrap-vue'
-
-Vue.use(BootstrapVue)
 import { shallowMount } from "@vue/test-utils";
 import NumericData from "@/components/editors/editor-components/inputs/typedatas/NumericData"
 
@@ -80,18 +76,6 @@ describe('getAttributes() tests',() => {
 
 
 describe('getActions() tests', () => {
-
-    test('data type changed', () => {
-        let cpy = Object.assign({},schemaData)
-        cpy['type'] = 'string'
-        let wrapper = shallowMount(NumericData,{
-            propsData: {
-                schemaData: cpy,
-                numericType : 'number'
-            }
-        })
-        expect(wrapper.vm.getActions()).toEqual([])
-    })
 
     test('attributes changed', () => {
         let wrapper = shallowMount(NumericData,{

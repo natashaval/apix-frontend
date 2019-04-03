@@ -61,17 +61,6 @@ describe('getAttributes() tests',() => {
 
 describe('getActions() tests', () => {
 
-    test('data type changed', () => {
-        let cpy = Object.assign({},schemaData)
-        cpy['type'] = 'Number'
-        let wrapper = shallowMount(StringData,{
-            propsData: {
-                schemaData: cpy
-            }
-        })
-        expect(wrapper.vm.getActions()).toEqual([])
-    })
-
     test('attributes changed', () => {
         let wrapper = shallowMount(StringData,{
             propsData: {
