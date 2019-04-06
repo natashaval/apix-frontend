@@ -1,15 +1,18 @@
 <template>
     <div :class="(borderAble)?'dot-border':''">
+        <div ref="alwaysShown">
+
+        </div>
         <div class="row justify-content-end" style="margin-left: -10%">
             <div class="col-1 ">
-                <b-button class="round-button"
-                          style="margin: 10px"
-                          v-if="type === 'object'"
-                          @click="showChild = (showChild === 'down')?'':'down'"
-                    v-b-toggle="childCollapseId">
+                <button class="round-button btn"
+                        style="margin: 10px"
+                        v-if="type === 'object'"
+                        @click="showChild = (showChild === 'down')?'':'down'"
+                        v-b-toggle="_uid+'-child-collapse'">
                     <i class="fa fa-angle-right rotate"
                        v-bind:class="showChild"></i>
-                </b-button>
+                </button>
                 <div class="w-100"></div>
             </div>
             <div class="col-10 justify-content-end">
@@ -18,10 +21,10 @@
                     <div class="col-6">
                         <div v-if="showEdit" class="form-inline">
                             <label v-if="nameAble" class="col-4">Name :</label>
-                            <b-input v-if="nameAble" class="col-8" v-model="name"></b-input>
+                            <input v-if="nameAble" class="col-8 form-control" v-model="name" :name="_uid+'-name'"/>
                             <p v-if="!$_changeObserverMixin_isValid('name')" class="error-message">name can't be empty</p>
                             <label class="col-4">{{(isSubArray)?'Of :':'Type :'}}</label>
-                            <b-select class="col-8" v-model="selectedType" @change="selectType">
+                            <select class="col-8 form-control" :name="_uid+'-select-type'" v-model="selectedType">
                                 <option v-for="dataType in dataTypes"
                                         v-bind:key="dataType.val"
                                         :value="dataType.val">{{dataType.text}}</option>
@@ -29,9 +32,9 @@
                                 <option v-for="dataType in customDataTypes"
                                         v-bind:key="dataType.value"
                                         :value="dataType.value">{{dataType.name}}</option>
-                            </b-select>
+                            </select>
                             <label>Required : </label>
-                            <b-checkbox v-model="required"/>
+                            <input type="checkbox" class="form-check" v-model="required" :name="_uid+'-is-required'"/>
                         </div>
                         <div v-else class="row">
                             <p v-if="isSubArray">Of: </p>
@@ -51,14 +54,14 @@
                         <div v-if="showEdit">
                             <div class="row">
                                 <label class="col-4">Description :</label>
-                                <b-input class="col-8" v-model="description"></b-input>
+                                <input class="col-8" v-model="description" :name="_uid+'-description'"/>
                             </div>
                             <div class="row">
                                 <label class="col-4">Example :</label>
-                                <b-input class="col-8" v-model="example"></b-input>
+                                <input class="col-8" v-model="example"/>
                             </div>
                             <div class="form-inline float-right w-100">
-                                <a style="float: right;color: #4493e2;cursor: pointer;"
+                                <a style="float: right;color: #4493e2;cursor: pointer;" v-bind:id="_uid+'-more-attribute'"
                                    class="more-attribute btn-link" @click="clickMoreDisplay">more attributes</a>
                             </div>
                             <br/>
@@ -71,7 +74,8 @@
                                 <p v-if="example !== undefined">Example : {{example}}</p>
                             </div>
                         </div>
-                        <div v-bind:style="{display: (showEdit)?moreDisplay:'block'}">
+                        <div v-bind:style="{display: (showEdit)?moreDisplay:'block'}"
+                            v-bind:id="_uid+'-more-attr-form'">
                             <!--more attributes of selected datatype-->
                             <div class="w-100"></div>
                             <StringData ref="curDataType" v-if="type === 'string'"
@@ -110,12 +114,14 @@
 
             </div>
             <div class="col-1 " style="padding: 10px 25px;">
-                <b-button v-if="editAble" @click="isEditing = !isEditing" class="float-right round-button">
+                <button v-if="editAble" @click="isEditing = !isEditing"
+                        class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
                     <i class="fa fa-pencil-alt"></i>
-                </b-button>
-                <b-button v-if="deleteAble" @click="selfDelete" class="float-right round-button" style="margin-top:5px;">
+                </button>
+                <button v-if="deleteAble" @click="selfDelete" class="float-right round-button btn"
+                        style="margin-top:5px;" v-bind:id="_uid+'-delete-btn'">
                     <i class="fa fa-trash"></i>
-                </b-button>
+                </button>
             </div>
         </div>
         <!--tambahan view jika tipe datanya array-->
@@ -127,7 +133,7 @@
                            :is-sub-array="true" :parent-is-editing="showEdit"/>
         </div>
 
-        <b-collapse :id="childCollapseId" visible>
+        <b-collapse v-bind:id="_uid+'-child-collapse'" visible>
             <div v-if="type === 'object'">
                 <!--child object-->
                 <div v-for="(val,i) in propertiesData" v-bind:key="val.id" class="row justify-content-end">
@@ -136,13 +142,11 @@
                     </div>
                     <DataTypeInput :ref="'property-'+val.id" :parent-is-editing="val.isEditing"
                                    :schema-data="val.schemaData" :component-id="i"
-                                   :f-self-delete="deleteChild"
                                    :parent-functions="publicFunctions"
                                    :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                    v-on:delete="deleteChild" class="col-11"/>
-                    <!--<button @click="deleteProperty(i)">delete property</button>-->
                 </div>
-                <button @click="addNewProperty">Add more property</button>
+                <button :ref="_uid+'-add-child-btn'" @click="addNewProperty">Add more property</button>
             </div>
         </b-collapse>
     </div>
@@ -244,7 +248,7 @@
                 {text : 'String', val : 'string'},
                 {text : 'Number', val : 'number'},
                 {text : 'Integer', val : 'integer'},
-                {text : 'Boolean', val : 'boolean'},
+                {text : 'Boolean', val : 'boolean'}
             ]
         }),
         computed : {
@@ -297,19 +301,6 @@
             },
             clickMoreDisplay : function(){
                 this.isMoreDisplay = ! this.isMoreDisplay
-            },
-            selectType : function (value) {
-                this.selectedType = value
-                if(value === 'array'){
-                    this.type = 'array'
-                }
-                else if(this.isDefaultDataType(value)){
-                    this.type = value
-                }
-                else{
-                    this.ref = value
-                    this.type = undefined
-                }
             },
             selectItemType : function (value,i) {
                 if(value === 'array' && i === this.items.length -1 ){
@@ -376,7 +367,7 @@
                     })
                     return undefined
                 }
-                else if(this.schemaData.name !== this.name){//jika ganti nama
+                else if(this.nameAble && this.schemaData.name !== this.name){//jika ganti nama
                     parentQuery._actions.push({
                         action : 'rename',
                         key : this.schemaData.name,
@@ -464,9 +455,12 @@
             * */
             getData : function () {
                 let res = this.$refs.curDataType.getAttributes()
-                res.name = this.name
+                if(this.nameAble){
+                    res.name = this.name
+                }
                 res.description = this.description
                 res.example = this.example
+                res.required = this.required
                 if(this.type === 'object'){
                     res.properties = {}
                     for(let i=0; i <  this.propertiesData.length; i++){
@@ -525,7 +519,7 @@
             * */
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
-                this.projectId = this.$router.currentRoute.params.projectId
+                this.projectId = this.$route.params.projectId
 
                 this.deletedProperty = []
                 this.propertiesData = []
@@ -562,6 +556,10 @@
                     }
                 }
 
+                if(!this.nameAble){
+                    this.name = this.fixedName
+                }
+
                 if(this.type === undefined && this.ref === undefined){
                     this.type = 'string'
                     this.selectedType = 'string'
@@ -591,6 +589,20 @@
         watch : {
             schemaData : function () {
                 this.loadData()
+            },
+            selectedType : function () {
+                let value = this.selectedType
+                this.selectedType = value
+                if(value === 'array'){
+                    this.type = 'array'
+                }
+                else if(this.isDefaultDataType(value)){
+                    this.type = value
+                }
+                else{
+                    this.ref = value
+                    this.type = undefined
+                }
             }
         },
         mounted() {
