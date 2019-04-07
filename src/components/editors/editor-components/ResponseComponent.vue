@@ -100,20 +100,12 @@
                 }
                 this.$_changeObserverMixin_initObserver(['responseList.length'])
             },
-            reloadData : function () {
-                this.loadData()
-                let responseForms = this.$refs.responseForm
-                for(let i in this.responseList){
-                    if(responseForms[i] !== undefined) responseForms[i].reloadData()
-                }
-            },
             buildQuery : function (responsesPointer) {
                 this.commitChangeCallback = []
 
                 let isEdited = false
 
                 let rl = this.responseList
-
                 responsesPointer._actions = this.actionsQuery
                 responsesPointer._hasActions = true
                 for(let i in rl){
@@ -130,7 +122,6 @@
                 }
 
                 return (isEdited)?this.commitChange : undefined
-
             },
             commitChange : function () {
                 ActionExecutorUtil.executeActions(this.responsesData, this.actionsQuery)
@@ -141,7 +132,7 @@
                 this.responseList.forEach(response => {
                     if(response.code === this.responseList[i].code)count++
                 })
-                return count === 1
+                return count !== 1
             }
         },
         watch : {
