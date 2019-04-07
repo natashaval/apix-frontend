@@ -34,20 +34,21 @@ export default {
             return new Promise(((resolve, reject) => {
                 commit(AUTH_REQUEST)
                 axios({url: 'http://localhost:8080/auth/login', data: user, method: 'POST'})
-                    .then(resp => {
-                        const token = resp.data.token
+                    .then(response => {
+                        const token = response.data.token
                         localStorage.setItem('apix-token', token)
                         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-                        commit(AUTH_SUCCESS, resp)
+                        commit(AUTH_SUCCESS, response)
 
-                        dispatch(USER_REQUEST) // to log in user
-                        resolve(resp)
+                        dispatch('user/' + USER_REQUEST) // to log in user
+                        resolve(response)
                     })
-                    .catch(err => {
-                        commit(AUTH_ERROR, err)
+                    .catch(error => {
+                        commit(AUTH_ERROR, error)
                         localStorage.removeItem('apix-token')
-                        reject(err)
+                        reject(error)
                     })
+
             }))
         },
 

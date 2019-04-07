@@ -96,3 +96,18 @@ export const router = new VueRouter({
 
     ]
 })
+
+// redirect to login if not logged in
+router.beforeEach((to, from, next) => {
+    //redirect to login if not logged in and trying to access restricted page
+    // http://jasonwatmore.com/post/2018/07/14/vue-vuex-user-registration-and-login-tutorial-example#loginpage-vue
+    const publicPages = ['/login'];
+    const  authRequired = !publicPages.includes(to.path);
+    const loggedIn = localStorage.getItem('apix-token');
+
+    if (authRequired && !loggedIn) {
+        return next('/login');
+    }
+
+    next();
+})

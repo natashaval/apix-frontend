@@ -3,9 +3,9 @@
         <form class="login" @submit.prevent="login">
             <h1>Login</h1>
             <label>Username</label>
-            <input required type="text" v-model="username" />
+            <input type="text" v-model="username" class="form-control" required/>
             <label>Password</label>
-            <input required type="password" v-model="password" />
+            <input type="password" v-model="password" class="form-control" required/>
             <hr />
             <button type="submit">Login</button>
         </form>
@@ -13,7 +13,7 @@
 </template>
 
 <script>
-    import {AUTH_REQUEST} from "../../stores/actions/auth";
+    import {AUTH_REQUEST, AUTH_LOGOUT} from "../../stores/actions/auth";
 
     export default {
         name: "Login",
@@ -29,9 +29,11 @@
             },
             login: function () {
                 const {username, password} = this
-                this.$store.dispatch ('auth/AUTH_REQUEST', {username, password})
+                this.$store.dispatch ('auth/' + AUTH_REQUEST, {username, password})
                     .then(() => {
                         this.$router.push({path: '/sampahlogin'})
+                    }, (err) => {
+                        console.log('login', err)
                     })
 
             }
@@ -40,6 +42,10 @@
             this.$nextTick(function () {
                 this.setLayout('all-layout');
             });
+        },
+        created() {
+            // to reset login status
+            this.$store.dispatch('auth/' + AUTH_LOGOUT)
         }
     }
 </script>
