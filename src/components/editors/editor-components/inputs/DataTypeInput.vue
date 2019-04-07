@@ -22,7 +22,9 @@
                         <div v-if="showEdit" class="form-inline">
                             <label v-if="nameAble" class="col-4">Name :</label>
                             <input v-if="nameAble" class="col-8 form-control" v-model="name" :name="_uid+'-name'"/>
-                            <p v-if="!$_changeObserverMixin_isValid('name')" class="error-message">name can't be empty</p>
+                            <p v-for="(error,i) in $_changeObserverMixin_getErrors('name')"
+                               v-bind:key="i"
+                               class="error-message">{{error}}</p>
                             <label class="col-4">{{(isSubArray)?'Of :':'Type :'}}</label>
                             <select class="col-8 form-control" :name="_uid+'-select-type'" v-model="selectedType">
                                 <option v-for="dataType in dataTypes"
@@ -328,7 +330,6 @@
                     )
                 }
                 this.commitChangeCallback.forEach(fn => fn())
-                this.reloadData()
             },
             /* parameter : @parentQuery(pointer object dari parent, semua query akan langsung di assign ke pointer,
             * tidak melalui return value)
@@ -571,19 +572,18 @@
                         model : 'name',
                         validator : () => {
                             if(this.nameAble){
-                                return this.parentFunctions.isValidName(this.name)
+                                if(this.name.length === 0){
+                                    return ['name can\'t be empty']
+                                }
+                                else if(!this.parentFunctions.isValidName(this.name))
+                                return ['name must be unique']
                             }
-                            else{
-                                return true
-                            }
+                            return []
                         }
                     }
                 ]
                 this.attributesKey.forEach(attr => watchList.push(attr.key))
                 this.$_changeObserverMixin_initObserver(watchList)
-            },
-            reloadData : function () {
-                this.loadData()
             }
         },
         watch : {

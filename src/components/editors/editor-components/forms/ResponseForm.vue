@@ -3,7 +3,9 @@
         <div class="row">
             <div v-if="isEditing" class="col">
                 <b-select v-model="selectedCode" :options="statusOptions"/>
-                <p v-if="!$_changeObserverMixin_isValid('selectedCode')" class="error-message">response code must be unique</p>
+                <p v-for="(error,i) in $_changeObserverMixin_getErrors('selectedCode')"
+                   v-bind:key="i"
+                   class="error-message">{{error}}</p>
             </div>
             <div v-else class="col">
                 <p>Status Code : {{selectedCode}}</p>
@@ -120,17 +122,12 @@
                     model : 'selectedCode',
                     callback : this.watchSelectedCode,
                     validator : () => {
-                        return this.isDuplicateCode(this.componentIdx)
+                        if(this.isDuplicateCode(this.componentIdx)){
+                            return ['response code must be unique']
+                        }
+                        return []
                     }
                 }])
-
-
-            },
-            reloadData : function () {
-                this.loadData()
-                this.$forceUpdate()
-                if(this.hasHeaders) this.$refs.headers.reloadData()
-                if(this.hasBody) this.$refs.body.reloadData()
             },
             getActions : function () {
                 if(this.responseData === undefined)return []
@@ -157,7 +154,6 @@
             },
             buildQuery : function (responsesPointer) {
                 let isEdited = false
-                let codePointer = responsesPointer[this.selectedCode] = {}
                 let callback = undefined
                 if(this.responseData === undefined){
                     responsesPointer._actions.push({
@@ -167,6 +163,7 @@
                     })
                     return undefined
                 }
+                let codePointer = responsesPointer[this.selectedCode] = {}
                 this.actionsQuery = codePointer._actions = this.getActions()
                 codePointer._hasActions = true
                 if(this.initCode !== this.selectedCode){
@@ -225,6 +222,11 @@
                 ActionExecutorUtil.executeActions(this.responseData, this.actionsQuery)
                 this.commitChangeCallback.forEach(fn => fn())
             },
+        },
+        watch : {
+            responseData : function () {
+                this.loadData()
+            }
         },
         mounted() {
             this.loadData()

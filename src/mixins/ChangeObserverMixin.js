@@ -21,20 +21,13 @@ export default {
         $_changeObserverMixin_this_id : undefined,
     }),
     computed : {
-        __bla : function(){
-            if(this.$props.schemaData !== undefined){
-                return this.$props.schemaData.name
-            }
-            return ''
-        },
         $_changeObserverMixin_this : function () {
             return {
                 onDataChanged : this.$_changeObserverMixin_onDataChanged,
                 addChild : this.$_changeObserverMixin_addChild,
                 allIsValid : this.$_changeObserverMixin_allIsValid,
                 deleteChild : this.$_changeObserverMixin_deleteChild,
-                id : this.$vnode.tag,
-                name : this.__bla
+                id : this.$vnode.tag
             }
         }
     },
@@ -85,11 +78,16 @@ export default {
                 }
             }
         },
+        $_changeObserverMixin_getErrors : function (name) {
+            if(this._data.$_changeObserverMixin_validators[name] === undefined)return []
+            let errors = this._data.$_changeObserverMixin_validators[name]()
+            return errors
+        },
         $_changeObserverMixin_allIsValid : function () {
             let isValid = true
             let validators = this._data.$_changeObserverMixin_validators
             for(let key in validators){
-                isValid &= validators[key]()
+                isValid &= (validators[key]().length === 0)
                 if(!isValid){
                     return false
                 }
