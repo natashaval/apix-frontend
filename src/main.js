@@ -11,11 +11,11 @@ import BootstrapVue from 'bootstrap-vue'
 Vue.use(BootstrapVue)
 
 Vue.config.productionTip = false
-const apixToken = localStorage.getItem('apix-token')
 
 axios.interceptors.request.use(function (config) {
+  const apixToken = localStorage.getItem('apix-token')
   if (apixToken) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${apixToken}`
+    config.headers.Authorization = `Bearer ${apixToken}`
   }
   return config
 })
