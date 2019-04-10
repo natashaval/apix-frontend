@@ -11,6 +11,7 @@
 <script>
     import SingleLayout from "./layouts/SingleLayout";
     import AllLayout from "./layouts/AllLayout";
+    import axios from 'axios'
 
     export default {
         name: 'app',
@@ -30,6 +31,17 @@
         },
         methods: {
 
+        },
+        created: function () {
+            axios.interceptors.response.use(undefined, function (err) {
+                return new Promise (function (resolve, reject) {
+                    if(err.status === 401 && err.config && !err.config.__isRetryRequest) {
+                        // if get 401 unauthorized, logout user
+                        this.$store.dispatch('auth/AUTH_LOGOUT')
+                    }
+                    throw err;
+                })
+            })
         }
     }
 </script>
