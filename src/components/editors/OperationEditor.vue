@@ -13,7 +13,9 @@
                 <div class="col-4">
                     <label class="col-4">Method :</label>
                     <b-select class="col-8" v-model="method" :options="selectMethodOptions"></b-select>
-                    <p v-if="!$_changeObserverMixin_isValid('method')" class="error-message">operation must be unique</p>
+                    <p v-for="(error,i) in $_changeObserverMixin_getErrors('method')"
+                       v-bind:key="i"
+                       class="error-message">{{error}}</p>
                 </div>
                 <div class="col-8">
                     <label class="col-5 float-left">Path :</label>
@@ -274,7 +276,6 @@
                             if(response.status === 200){
                                 signaturePointer._signature = response.data.new_signature
                                 this.commitChange()
-                                this.reloadData()
                                 callbacks.forEach(fn => fn())
                             }
                         }
@@ -291,7 +292,9 @@
                 }
             },
             cancel : function () {
-                this.reloadData()
+                this.loadData()
+                this.$refs.request.loadData()
+                this.$refs.response.loadData()
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
@@ -323,20 +326,17 @@
                 this.$_changeObserverMixin_initObserver([
                     'summary',
                     {
-                        model : 'method', validator : () => {
-                            if(this.pathData === undefined)return true
-                            if(this.$route.params.operationApi === this.method)return true
-                            return this.pathData.methods[this.method] === undefined
+                        model : 'method',
+                        validator : () => {
+                            if(this.pathData === undefined)return []
+                            if(this.$route.params.operationApi === this.method)return []
+                            let isDuplicate = this.pathData.methods[this.method] !== undefined
+                            if(isDuplicate)return ['operation must be unique']
+                            return []
                         }
                     },
                     'operationId','description','consumes.length', 'produces.length'
                 ])
-
-            },
-            reloadData : function () {
-                this.loadData()
-                this.$refs.request.reloadData()
-                this.$refs.response.reloadData()
             },
             //override
             $_changeObserverMixin_onDataChanged : function (after,before) {
@@ -349,9 +349,7 @@
                 this.loadData()
             },
             operationData : function (after,before) {
-                if(before === undefined){
-                    this.loadData()
-                }
+                this.loadData()
             },
 
         },

@@ -7,7 +7,8 @@
                            :schema-data="property.schemaData"
                            :ref="'property-'+property.id"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                           :component-id="idx" :f-self-delete="deleteChild"/>
+                           :component-id="idx"
+                           :parent-functions="publicFunctions"/>
         </div>
         <button @click="buildQuery">Dump!</button>
     </div>
@@ -38,6 +39,12 @@
         computed : {
             projectId : function () {
                 return this.$route.params.projectId
+            },
+            publicFunctions : function () {
+                return {
+                    deleteChild : this.deleteChild,
+                    isValidName : this.isValidName
+                }
             }
         },
         watch : {
@@ -54,6 +61,18 @@
                     res[child.name] = child.attributes
                 }
                 return res
+            },
+            isValidName : function (name) {
+                let p = this.propertiesData
+                let len = p.length
+                let count = 0
+                for(let i = 0; i < len; ++i){
+                    let id = p[i].id
+                    if(name === this.$refs['property-'+id][0]._data.name){
+                        count++
+                    }
+                }
+                return count === 1 && name !== '' && name !== undefined
             },
             addProperty : function () {
                 this.propertiesData.push({id : this.propertyId++,isEditing : true})
@@ -74,9 +93,6 @@
                     }
                 }
                 this.$_changeObserverMixin_initObserver(['propertiesData.length'])
-            },
-            reloadData : function () {
-                this.loadData()
             },
             commitChange : function () {
                 ActionExecutorUtil.executeActions(this.schemasData, this.actionsQuery)

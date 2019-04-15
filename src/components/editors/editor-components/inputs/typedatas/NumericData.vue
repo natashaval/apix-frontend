@@ -164,7 +164,8 @@
                                 validator : () => {
                                     let isValid = true
                                     this.enums.forEach(item => isValid &= !isNaN(item))
-                                    return isValid
+                                    if(isValid)return []
+                                    else return ['enum must be numeric']
                                 }
                             }
                         }
@@ -172,7 +173,10 @@
                             return {
                                 model : 'defaultVal',
                                 validator : () => {
-                                    return !isNaN(this.defaultVal) || ActionBuilderUtil.isEqual(this.defaultVal,undefined)
+                                    if(isNaN(this.defaultVal) && !ActionBuilderUtil.isEqual(this.defaultVal,undefined)){
+                                        return ['default value must be numeric']
+                                    }
+                                    return []
                                 }
                             }
                         }
