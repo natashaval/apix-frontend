@@ -14,19 +14,23 @@ Vue.config.productionTip = false
 const apixToken = localStorage.getItem('apix-token')
 
 // request interceptor
-axios.interceptors.request.use(function (config) {
-  if (apixToken) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${apixToken}`
+axios.interceptors.request.use(config => {
+  if (!config.headers.Authorization && apixToken) {
+    config.headers['Authorization'] = `Bearer ${apixToken}`
+    console.log('Comfig = ', config)
   }
   return config
-}, function (error) {
+
+}, error => {
   return Promise.reject(error);
 })
 
 // response interceptor
-axios.interceptors.response.use(function (response) {
+axios.interceptors.response.use(response => {
   return response
-}, function (error) {
+
+}, error => {
+  // console.log(error.response)
   console.log('dari axios interceptor', error.response.data)
   console.log(error.response.status)
   console.log(error.response.headers)

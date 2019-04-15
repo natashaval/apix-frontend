@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="all-layout">
         <h2>All Layout</h2>
         <router-view></router-view>
     </div>
@@ -7,10 +7,15 @@
 
 <script>
     export default {
-        name: "AllLayout"
+        name: "AllLayout",
     }
 </script>
 
 <style scoped>
+    .all-layout {
+        width: 80%;
+        margin: auto;
+        /*background-color: beige;*/
+    }
 
 </style>

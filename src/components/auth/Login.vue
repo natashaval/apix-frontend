@@ -2,6 +2,12 @@
     <div>
         <form class="login" @submit.prevent="login">
             <h1>Login</h1>
+            <div v-if="authStatus == 'loading' ">
+                <b-spinner small label="Small Spinner"></b-spinner>
+            </div>
+            <div v-if="authStatus == 'error' ">
+                <div class="alert alert-danger">Invalid Username or Password</div>
+            </div>
             <label>Username</label>
             <input type="text" v-model="username" class="form-control" required/>
             <label>Password</label>
@@ -14,6 +20,7 @@
 
 <script>
     import {AUTH_REQUEST, AUTH_LOGOUT} from "../../stores/actions/auth";
+    import {USER_REQUEST} from "../../stores/actions/user";
 
     export default {
         name: "Login",
@@ -31,7 +38,9 @@
                 const {username, password} = this
                 this.$store.dispatch ('auth/' + AUTH_REQUEST, {username, password})
                     .then(() => {
+                        // this.$store.dispatch('user/' + USER_REQUEST)
                         this.$router.push({path: '/sampahlogin'})
+
                     }, (err) => {
                         console.log('login', err)
                     })
@@ -46,6 +55,11 @@
         created() {
             // to reset login status
             this.$store.dispatch('auth/' + AUTH_LOGOUT)
+        },
+        computed: {
+            authStatus() {
+                return this.$store.getters['auth/authStatus']
+            }
         }
     }
 </script>
