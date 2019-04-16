@@ -8,8 +8,8 @@ import PathEditor from "../components/editors/PathEditor";
 import OperationEditor from "../components/editors/OperationEditor";
 import ProjectRepo from "../components/projects/ProjectRepo";
 import DefinitionEditor from "../components/editors/DefinitionEditor";
-import Login from "../components/auth/Login";
-import SampahLogin from "../components/auth/SampahLogin";
+import AuthLogin from "../components/auth/AuthLogin";
+import UserProfile from "../components/auth/UserProfile";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -86,12 +86,12 @@ export const router = new VueRouter({
             // beforeEnter: listProjects
         },
         {
-            name: 'login', path: '/login',
-            component: Login
+            name: 'auth-login', path: '/login',
+            component: AuthLogin
         },
         {
-            name: 'sampahlogin', path: '/sampahlogin',
-            component: SampahLogin
+            name: 'user-profile', path: '/user/profile',
+            component: UserProfile
         }
 
     ]

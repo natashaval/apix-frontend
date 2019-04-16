@@ -13,7 +13,7 @@
     import {AUTH_LOGOUT} from "../../stores/actions/auth";
 
     export default {
-        name: "SampahLogin",
+        name: "UserProfile",
         computed: {
             profile() {
                 return this.$store.getters['user/getProfile']

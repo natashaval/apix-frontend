@@ -23,7 +23,7 @@
     import {USER_REQUEST} from "../../stores/actions/user";
 
     export default {
-        name: "Login",
+        name: "AuthLogin",
         data: function () {
             return {
                 username : "",
@@ -39,7 +39,7 @@
                 this.$store.dispatch ('auth/' + AUTH_REQUEST, {username, password})
                     .then(() => {
                         // this.$store.dispatch('user/' + USER_REQUEST)
-                        this.$router.push({path: '/sampahlogin'})
+                        this.$router.push({path: '/projects'})
 
                     }, (err) => {
                         console.log('login', err)
