@@ -6,11 +6,12 @@
                  title="Create New Project"
                  @show="resetModal"
                  @hidden="resetModal"
-                 @ok="handleOk"
+                 @ok="handleOk" ok-title="Save"
+                 header-bg-variant="info"
         >
             <form ref="form" @submit.stop.prevent="handleSubmit">
                 <b-form-group :state="title.state" label="Title" label-for="title-input" :invalid-feedback="requiredField('Title')">
-                    <input id="title-input" v-model="title.field" :state="title.state" required></input>
+                    <b-form-input id="title-input" v-model="title.field" :state="title.state" required />
                 </b-form-group>
 
                 <b-form-group :state="version.state" label="Version" label-for="version-input" invalid-feedback="Version is required">
@@ -21,8 +22,8 @@
                     <b-form-input id="host-input" v-model="host.field"></b-form-input>
                 </b-form-group>
 
-                <b-form-group :state="basepath.state" label="basePath" label-for="basepath-input" :invalid-feedback="validBasePath">
-                    <b-form-input id="basepath-input" v-model="basepath.field" :state="basepath.state"></b-form-input>
+                <b-form-group :state="basepath.state" label="basePath" label-for="basepath-input" :invalid-feedback="validBasePath()">
+                    <b-form-input id="basepath-input" pattern="(\/)\w+" v-model="basepath.field" :state="basepath.state" title="Leading slash (/) is required"></b-form-input>
                 </b-form-group>
 
             </form>
@@ -56,18 +57,24 @@
         methods: {
             checkFormValidity(){
                 const valid = this.$refs.form.checkValidity()
-                this.title.state = this.title.state != null ? 'valid' : 'invalid'
-                this.version.state = this.version.state != null ? 'valid' : 'invalid'
-                this.validBasePath()
+                this.title.state = this.title.field.length > 0 ? 'valid' : 'invalid'
+                this.version.state = this.version.field.length > 0 ? 'valid' : 'invalid'
+
+                if (this.basepath.field.length > 0 && this.basepath.field.charAt(0) == '/') {
+                    this.basepath.state = 'valid'
+                }
+                else if (this.basepath.field.length == 0) this.basepath.state = null
+                else {
+                    this.basepath.state = 'invalid'
+                }
+
                 return valid
             },
             validBasePath() {
-                if(this.basepath.field[0] != '/' && this.basepath.field.length > 0) {
+                if(this.basepath.field.charAt(0) != '/' && this.basepath.field.length > 0) {
                     return 'Leading slash (/) is required'
                 }
-                else {
-                    return ''
-                }
+                return ''
             },
             requiredField(field){
                 return field + ' is required'
