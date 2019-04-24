@@ -41,7 +41,7 @@ export default {
                         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
                         commit(AUTH_SUCCESS, response)
 
-                        dispatch('user/' + USER_REQUEST, null, {root: true}) // to log in user (INI BELUM BERHASIL)
+                        dispatch('user/' + USER_REQUEST, null, {root: true}) // to log in user
                         resolve(response)
                     })
                     .catch(error => {

@@ -1,11 +1,36 @@
 <template>
     <div>
-        <h1>INI HABIS DARI LOGIN</h1>
-        <span v-if="isAuthenticated">{{profile.username}} | <a @click="logout">Logout</a> </span>
-        <h2>This page is protected by auth</h2>
-        <a href="https://scotch.io/tutorials/handling-authentication-in-vue-using-vuex">Sctoch.io</a>
-
         {{ profile }}
+
+        <div>
+            <b-media right-align>
+                <b-img slot="aside" blank blank-color="#ccc" width="70" alt="profile picture"></b-img>
+                <h4 class="mt-0 mb-1">Hello, {{profile.username}}</h4>
+            </b-media>
+        </div>
+
+        <div>
+            <b-tabs>
+                <b-tab title="Team" active>
+                    <!--b-list-group v-for="team in profile.teams" :key="team">
+                        <b-list-group-item :to="{name: '', params: {}} ">{{team}}</b-list-group-item>
+                    </b-list-group-->
+                    <div class="mt-3">
+                        <b-card-group deck class="mb-3">
+                            <b-card v-for="team in profile.teams" :key="team"
+                                    :title="team" cols="4">
+                                <div slot="footer">
+                                    <b-button :href="team" variant="primary">Enter</b-button>
+                                </div>
+                            </b-card>
+                        </b-card-group>
+                    </div>
+                </b-tab>
+                <b-tab title="Version">
+                    Ongoing version
+                </b-tab>
+            </b-tabs>
+        </div>
     </div>
 </template>
 

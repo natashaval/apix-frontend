@@ -1,5 +1,8 @@
 <template>
     <div>
+        Is Profile Loaded: {{isProfile}}
+        is Authenticated: {{isAuthenticated}}
+
         <b-navbar toggleable="lg" type="light" variant="light">
             <b-navbar-brand href="#">APIX</b-navbar-brand>
 
@@ -26,16 +29,21 @@
 
 <script>
     import {AUTH_LOGOUT} from "../stores/actions/auth";
+    import {USER_REQUEST} from "../stores/actions/user";
 
     export default {
         name: "MenuBar",
         computed: {
             profile() {
+                if (!this.isProfile) this.$store.dispatch('user/' + USER_REQUEST)
                 return this.$store.getters['user/getProfile']
             },
             isAuthenticated () {
                 console.log(this.$store.getters['auth/isAuthenticated'])
                 return this.$store.getters['auth/isAuthenticated']
+            },
+            isProfile(){
+                return this.$store.getters['user/isProfileLoaded']
             }
         },
         methods: {
@@ -46,7 +54,14 @@
                     console.log('login', err)
                 })
             }
+        },
+        /*
+        watch: {
+            isProfile() {
+                    this.$store.dispatch('user/' + USER_REQUEST)
+            }
         }
+        */
     }
 </script>
 
