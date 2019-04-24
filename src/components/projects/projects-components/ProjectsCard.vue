@@ -1,8 +1,11 @@
 <template>
     <div>
-        <b-card @click="enterProject" text-variant="primary"
-                :title="project.info.title" :sub-title="project.host">
-            <button @click="deleteProject">Delete</button>
+        <b-card text-variant="primary"
+               :title="project.info.title" :sub-title="project.host">
+            <b-button-group>
+                <b-button @click="enterProject" variant="outline-primary">Enter</b-button>
+                <b-button @click="deleteProject" variant="outline-danger">Delete</b-button>
+            </b-button-group>
         </b-card>
     </div>
 </template>

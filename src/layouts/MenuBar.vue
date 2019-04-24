@@ -1,6 +1,5 @@
 <template>
     <div>
-        {{ profile }}
         <b-navbar toggleable="lg" type="light" variant="light">
             <b-navbar-brand href="#">APIX</b-navbar-brand>
 

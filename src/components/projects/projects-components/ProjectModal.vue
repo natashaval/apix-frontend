@@ -33,6 +33,9 @@
 </template>
 
 <script>
+    import {BASE_URL} from "../../../stores/actions/const";
+    import axios from 'axios';
+
     export default {
         name: "ProjectModal",
         data: function () {
@@ -51,6 +54,10 @@
                 basepath: {
                     field: '',
                     state: null
+                },
+                newProject: {
+                    id: '',
+                    project: {}
                 }
             }
         },
@@ -107,6 +114,21 @@
                 }
 
                 console.log(newProject)
+                this.$store.dispatch('project/createProjectData', newProject)
+                    .then((response) => {
+                        console.log('diterima modal', response)
+
+                        if (response.data.success && response.status == 201){
+                            alert(response.data.message)
+                        } else {
+                            alert('Error! '  + response.data.message)
+                        }
+
+                    })
+
+                this.$nextTick(() => {
+                    this.$refs.modal.hide()
+                })
             }
         }
     }
