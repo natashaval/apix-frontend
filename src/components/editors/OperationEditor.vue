@@ -4,7 +4,9 @@
             <li><button @click="submit">Save</button></li>
             <li><button @click="cancel">Cancel</button></li>
         </ul>
-        <div>
+        <div class="row">
+
+        <div v-if="showEdit" class="col-11">
             <div class="row">
                 <label class="col-2">Summary :</label>
                 <b-input v-model="summary" class="col"></b-input>
@@ -40,18 +42,47 @@
                 <v-select multiple v-model="produces" class="w-100" :options="options">
                 </v-select>
             </div>
+        </div>
+        <div v-else class="col-11">
+                <div class="row">
+                    <p>Summary : {{summary}}</p>
+                </div>
+                <div class="row">
+                    <p>Method :{{method}}</p>
+                </div>
+                <div class="row">
+                    <p>Path : {{pathApi}}</p>
+                </div>
+                <div class="row">
+                    <p>Operation Id :{{operationId}}</p>
+                </div>
+                <div class="row">
+                    <p>Description:</p>
+                    <p v-html="description"></p>
+                </div>
+                <div class="row">
+                    <p>Consumes :</p>
+                    <p v-for="consume in consumes" v-bind:key="consume">{{consume}}</p>
+                </div>
+                <div class="row">
+                    <p>Produces :</p>
+                    <p v-for="produce in produces" v-bind:key="produce">{{produce}}</p>
+                </div>
+            </div>
+            <button v-if="editable" @click="isEditing = !isEditing"
+                class="col-1 float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
+            <i class="fa fa-pencil-alt"></i>
+        </button>
+        </div>
 
-        </div>
-        <h1>method : {{operationApi}}</h1>
-        <div v-if="dataUpdated">
-            <h2>data Updated</h2>
-        </div>
-                          <!--:$_changeObserverMixin_parent="$_changeObserverMixin_this"-->
+        <!--:$_changeObserverMixin_parent="$_changeObserverMixin_this"-->
         <RequestComponent ref="request"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
+                          :editable="editable"
                           :request-data="requestData" :operation-api="method"/>
         <ResponseComponent ref="response"
                            :responses-data="responsesData"
+                           :editable="editable"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
 
     </div>
@@ -81,7 +112,7 @@
             operationApi : 'get',
             dataUpdated : false,
             isEdited : false,
-
+            isEditing : false,
             selectMethodOptions : [
                 {text : 'GET', value : 'get'},
                 {text : 'POST', value : 'post'},
@@ -115,6 +146,17 @@
             pathActionQuery : []
         }),
         computed : {
+            editable : function () {
+                let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
+                if(hasEditingPrivilege === undefined)return false
+                return hasEditingPrivilege
+            },
+            showEdit : function () {
+                if(!this.editable){
+                    return false
+                }
+                return this.isEditing
+            },
             treeKeys : function () {
                 return [
                     'sections',this.sectionApi,
