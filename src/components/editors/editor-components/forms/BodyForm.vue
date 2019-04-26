@@ -2,7 +2,7 @@
     <div>
         <div class="dot-border">
             <h1>Body</h1>
-            <b-button @click="isEditing = !isEditing" class="float-right round-button">
+            <b-button v-if="editable" @click="isEditing = !isEditing" class="float-right round-button">
                 <i class="fa fa-pencil-alt"></i>
             </b-button>
             <div class="row" v-if="isEditing">
@@ -17,8 +17,9 @@
                 <div v-html="description"></div>
             </div>
             <DataTypeInput ref="root"
-                           :schema-data="(bodyData !== undefined)?bodyData.schema:undefined" :name-able="false"
-                           :delete-able="false"
+                           :schema-data="(bodyData !== undefined)?bodyData.schema:undefined" :nameable="false"
+                           :deleteable="false"
+                           :editable="editable"
                            fixed-name="schema"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                             style="margin-top: 130px"/>
@@ -38,6 +39,10 @@
         components: {DataTypeInput,VueEditor},
         mixins : [ChangeObserverMixin],
         props : {
+            editable : {
+                type : Boolean,
+                default : true
+            },
             bodyData : {
                 type : Object
             },

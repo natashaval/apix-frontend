@@ -1,5 +1,5 @@
 <template>
-    <div :class="(borderAble)?'dot-border':''">
+    <div :class="(borderable)?'dot-border':''">
         <div ref="alwaysShown">
 
         </div>
@@ -20,11 +20,9 @@
                     <!--kolom kiri-->
                     <div class="col-6">
                         <div v-if="showEdit" class="form-inline">
-                            <label v-if="nameAble" class="col-4">Name :</label>
-                            <input v-if="nameAble" class="col-8 form-control" v-model="name" :name="_uid+'-name'"/>
-                            <p v-for="(error,i) in $_changeObserverMixin_getErrors('name')"
-                               v-bind:key="i"
-                               class="error-message">{{error}}</p>
+                            <label v-if="nameable" class="col-4">Name :</label>
+                            <input v-if="nameable" class="col-8 form-control" v-model="name" :name="_uid+'-name'"/>
+                            <p v-if="!$_changeObserverMixin_isValid('name')" class="error-message">name can't be empty</p>
                             <label class="col-4">{{(isSubArray)?'Of :':'Type :'}}</label>
                             <select class="col-8 form-control" :name="_uid+'-select-type'" v-model="selectedType">
                                 <option v-for="dataType in dataTypes"
@@ -116,11 +114,11 @@
 
             </div>
             <div class="col-1 " style="padding: 10px 25px;">
-                <button v-if="editAble" @click="isEditing = !isEditing"
+                <button v-if="editable" @click="isEditing = !isEditing"
                         class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
                     <i class="fa fa-pencil-alt"></i>
                 </button>
-                <button v-if="deleteAble" @click="selfDelete" class="float-right round-button btn"
+                <button v-if="deleteable" @click="selfDelete" class="float-right round-button btn"
                         style="margin-top:5px;" v-bind:id="_uid+'-delete-btn'">
                     <i class="fa fa-trash"></i>
                 </button>
@@ -129,8 +127,8 @@
         <!--tambahan view jika tipe datanya array-->
         <div class="w-100" v-if="type === 'array'">
             <DataTypeInput ref="arrayItem" :schema-data="(schemaData !== undefined)?schemaData.items:undefined"
-                           :border-able="false"
-                           :name-able="false" :delete-able="false" :edit-able="false"
+                           :borderable="false"
+                           :nameable="false" :deleteable="false" :editable="false"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                            :is-sub-array="true" :parent-is-editing="showEdit"/>
         </div>
@@ -145,6 +143,8 @@
                     <DataTypeInput :ref="'property-'+val.id" :parent-is-editing="val.isEditing"
                                    :schema-data="val.schemaData" :component-id="i"
                                    :parent-functions="publicFunctions"
+                                   :editable="editable"
+                                   :deleteable="editable"
                                    :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                    v-on:delete="deleteChild" class="col-11"/>
                 </div>
@@ -184,22 +184,22 @@
             componentId : {//id atau index yang diberi oleh parent berdasarkan array childs parent
                 type : Number
             },
-            nameAble : {//punya nama (default : true)
+            nameable : {//punya nama (default : true)
                 type : Boolean,
                 default : true
             },
-            fixedName : {//jika @nameAble == false, maka nama yang dipakai adalah @fixedName
+            fixedName : {//jika @nameable == false, maka nama yang dipakai adalah @fixedName
                 type : String
             },
-            borderAble : {//punya border (default : true)
+            borderable : {//punya border (default : true)
                 type : Boolean,
                 default : true
             },
-            deleteAble : {//punya tombol delete (default : true)
+            deleteable : {//punya tombol delete (default : true)
                 type : Boolean,
                 default : true
             },
-            editAble : {//jika false maka edit hanya bisa di trigger dari parentnya karna tidak ada tombol edit
+            editable : {//jika false maka edit hanya bisa di trigger dari parentnya karna tidak ada tombol edit
                 type : Boolean,
                 default : true
             },
@@ -348,7 +348,7 @@
                 if(this.isSubArray){
                     name = 'items'
                 }
-                else if(!this.nameAble){
+                else if(!this.nameable){
                     name = this.fixedName
                 }
 
@@ -368,7 +368,7 @@
                     })
                     return undefined
                 }
-                else if(this.nameAble && this.schemaData.name !== this.name){//jika ganti nama
+                else if(this.nameable && this.schemaData.name !== this.name){//jika ganti nama
                     parentQuery._actions.push({
                         action : 'rename',
                         key : this.schemaData.name,
@@ -456,7 +456,7 @@
             * */
             getData : function () {
                 let res = this.$refs.curDataType.getAttributes()
-                if(this.nameAble){
+                if(this.nameable){
                     res.name = this.name
                 }
                 res.description = this.description
@@ -557,7 +557,7 @@
                     }
                 }
 
-                if(!this.nameAble){
+                if(!this.nameable){
                     this.name = this.fixedName
                 }
 
@@ -572,11 +572,7 @@
                         model : 'name',
                         validator : () => {
                             if(this.nameAble){
-                                if(this.name.length === 0){
-                                    return ['name can\'t be empty']
-                                }
-                                else if(!this.parentFunctions.isValidName(this.name))
-                                return ['name must be unique']
+                                return this.parentFunctions.isValidName(this.name)
                             }
                             return []
                         }

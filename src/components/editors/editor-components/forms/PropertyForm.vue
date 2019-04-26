@@ -1,9 +1,12 @@
 <template>
     <div>
-        <button @click="addProperty">Add</button>
+        <button v-if="editable" @click="addProperty">Add</button>
         <div v-for="(property,idx) in propertiesData" v-bind:key="property.id">
             <DataTypeInput :parent-is-editing="property.isEditing"
                            :project-id="projectId"
+                           :editable="editable"
+                           :deleteable="editable"
+                           :parent-functions="publicFunctions"
                            :schema-data="property.schemaData"
                            :ref="'property-'+property.id"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
@@ -24,6 +27,10 @@
         props : {
             schemasData : {
                 type : Object
+            },
+            editable : {
+                type : Boolean,
+                default : true
             }
         },
         components: {DataTypeInput},
@@ -53,6 +60,18 @@
             }
         },
         methods : {
+            isValidName : function (name) {
+                let p = this.propertiesData
+                let len = p.length
+                let count = 0
+                for(let i = 0; i < len; ++i){
+                    let id = p[i].id
+                    if(name === this.$refs['property-'+id][0]._data.name){
+                        count++
+                    }
+                }
+                return count === 1 && name !== '' && name !== undefined
+            },
             getData : function () {
                 let res = {}
                 for(let i = 0; i < this.propertiesData.length; i++){
