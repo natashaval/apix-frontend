@@ -6,17 +6,18 @@
                 <ul>
                     <li v-for="(response,i) in responseList" v-bind:key="i" class="row">
                         <button @click="setActiveView(i)">{{response.code}}</button>
-                        <b-button @click="deleteChild(i)">
+                        <b-button v-if="editable" @click="deleteChild(i)">
                             <i class="fa fa-trash"></i>
                         </b-button>
                     </li>
-                    <button @click="addResponse">Add</button>
+                    <button v-if="editable" @click="addResponse">Add</button>
                 </ul>
             </div>
             <div class="col-10 red-frame">
                 <div class="row" v-for="(response,i) in responseList" v-bind:key="response.id">
                     <ResponseForm v-bind:style="{display: (i === activeIndex)?'block':'none'}"
                                   ref="responseForm"
+                                  :editable="editable"
                                   :component-idx="i"
                                   :is-duplicate-code="isDuplicateCode"
                                   :notify-change-status-code="notifyChangeStatusCode"
@@ -41,6 +42,10 @@
         props : {
             responsesData : {
                 type : Object
+            },
+            editable : {
+                type : Boolean,
+                default : true
             }
         },
         data : () => ({

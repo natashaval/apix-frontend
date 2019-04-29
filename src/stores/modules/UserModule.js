@@ -11,7 +11,8 @@ export default {
     },
     getters: {
         getProfile: state => state.profile,
-        isProfileLoaded: state => !!state.profile.username
+        isProfileLoaded: state => !!state.profile.username,
+        hasEditingPrivilege : () => false
     },
     actions: {
         [USER_REQUEST]: ({commit, dispatch}) => {
