@@ -16,8 +16,9 @@
             <div v-else>
                 <div v-html="description"></div>
             </div>
+            <input type="file" v-on:change="jsonFileLoaded">
             <DataTypeInput ref="root"
-                           :schema-data="(bodyData !== undefined)?bodyData.schema:undefined" :nameable="false"
+                           :schema-data="schemaData" :nameable="false"
                            :deleteable="false"
                            :editable="editable"
                            fixed-name="schema"
@@ -33,6 +34,7 @@
     import ActionBuilderUtil from "@/utils/ActionBuilderUtil";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
+    import JsonOasUtil from "@/utils/JsonOasUtil";
 
     export default {
         name: "bodyForm",
@@ -51,11 +53,13 @@
             },
         },
         data : () => ({
+            jsonFile : undefined,
             description : '',
             isEditMode : false,
+            dataFromExternal : false,
+            externalData : undefined,
             in : 'body',
             isEditing : false,
-
             attributesKey : [
                 {key : 'description'},
                 {key : 'in'},
@@ -65,9 +69,30 @@
             actionsQuery : []
         }),
         computed : {
-
+            schemaData : function () {
+                if(this.dataFromExternal){
+                    return this.externalData
+                }
+                else{
+                    if(this.bodyData === undefined)return undefined
+                    return this.bodyData.schema
+                }
+            }
         },
         methods : {
+            jsonFileLoaded : function(event){
+                let file = event.target.files[0]
+
+                let fr = new FileReader()
+                fr.onload = e => {
+                    // console.log(parsed(e.target.result))
+                    this.externalData = JsonOasUtil.toSwaggerOas(JSON.parse(e.target.result))
+                    this.$_changeObserverMixin_onDataChanged()
+                    this.dataFromExternal = true
+                };
+                fr.readAsText(file)
+
+            },
             getData : function () {
                 return {
                     description : this.description,
@@ -85,14 +110,23 @@
                 )
                 requestPointer._hasActions = true
 
-                let callback = this.$refs.root.buildQuery(requestPointer)
-
-                if(callback === undefined){
-                    delete requestPointer.schema
+                if(this.dataFromExternal){
+                    requestPointer._actions.push({
+                        action : 'put',
+                        key : 'schema',
+                        value : this.$refs.root.getData().attributes
+                    })
                 }
                 else{
-                    isEdited = true
-                    this.commitChangeCallback.push(callback)
+                    let callback = this.$refs.root.buildQuery(requestPointer)
+
+                    if(callback === undefined){
+                        delete requestPointer.schema
+                    }
+                    else{
+                        isEdited = true
+                        this.commitChangeCallback.push(callback)
+                    }
                 }
 
                 if(requestPointer._actions.length > 0){
@@ -113,6 +147,7 @@
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
+                this.dataFromExternal = false
                 if(this.bodyData !== undefined){
                     let bd = this.bodyData
                     this.in = bd.in
