@@ -11,7 +11,7 @@
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav v-if="isAuthenticated">
                     <b-nav-item :to="{name: 'project-repo'}">Projects</b-nav-item>
-                    <b-nav-item href="#" v-if="profile.roles.includes('ROLE_ADMIN')">User Management</b-nav-item>
+                    <b-nav-item href="#" v-if="isAdmin">User Management</b-nav-item>
                 </b-navbar-nav>
 
                 <b-navbar-nav v-if="isAuthenticated" class="ml-auto">
@@ -35,7 +35,10 @@
         name: "MenuBar",
         computed: {
             profile() {
-                if (!this.isProfile) this.$store.dispatch('user/' + USER_REQUEST)
+                if (!this.isProfile) {
+                    this.$store.dispatch('user/' + USER_REQUEST)
+                    // return undefined;
+                }
                 return this.$store.getters['user/getProfile']
             },
             isAuthenticated () {
@@ -44,6 +47,10 @@
             },
             isProfile(){
                 return this.$store.getters['user/isProfileLoaded']
+            },
+            isAdmin(){
+                if(typeof this.profile.roles === 'undefined' || !this.isProfile) return false;
+                else return this.profile.roles.includes('ROLE_ADMIN');
             }
         },
         methods: {
@@ -58,10 +65,11 @@
         /*
         watch: {
             isProfile() {
-                    this.$store.dispatch('user/' + USER_REQUEST)
+                    if(!this.isProfile()) this.$store.dispatch('user/' + USER_REQUEST)
             }
         }
         */
+
     }
 </script>
 

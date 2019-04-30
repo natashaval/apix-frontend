@@ -11,7 +11,7 @@
                            :ref="'property-'+property.id"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                            :component-id="idx"
-                           :parent-functions="publicFunctions"/>
+                           />
         </div>
         <button @click="buildQuery">Dump!</button>
     </div>

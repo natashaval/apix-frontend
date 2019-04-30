@@ -16,6 +16,7 @@
                     <button @click="dumpTeam">{{dump}}</button>
                     <p v-if="dump">TRUE {{grantUser}}</p>
                     <p v-if="!dump"> FALSE {{ ungrantUser }}</p>
+
                     <!--b-list-group v-for="team in profile.teams" :key="team">
                         <b-list-group-item :to="{name: '', params: {}} ">{{team}}</b-list-group-item>
                     </b-list-group-->
@@ -67,11 +68,14 @@
                 return this.$store.getters['auth/isAuthenticated']
             },
             grantUser: function() {
+                // https://laracasts.com/discuss/channels/vue/computed-function-is-running-before-data-is-loaded?page=0
+                if (!this.teams) return null;
                 return  this.teams.filter(u =>
                     u.members.some((members) => members.grant && members.username.includes(this.profile.username))
                 );
             },
             ungrantUser: function () {
+                if (!this.teams) return null;
                 return this.teams.filter((u) =>
                     u.members.some((members) => !members.grant && members.username.includes(this.profile.username))
                 );
@@ -99,11 +103,14 @@
             });
         },
         created() {
+            const self = this;
+
             axios.get(BASE_URL + "teams/my-team").then((response) => {
-                this.teams = response.data
+                self.teams = response.data
             }).catch((e) => {
                 console.error(e)
             })
+
         }
     }
 </script>
