@@ -334,9 +334,12 @@
                 }
             },
             cancel : function () {
+                this.reloadData()
+            },
+            reloadData : function () {
                 this.loadData()
-                this.$refs.request.loadData()
-                this.$refs.response.loadData()
+                this.$refs.request.reloadData()
+                this.$refs.response.reloadData()
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()

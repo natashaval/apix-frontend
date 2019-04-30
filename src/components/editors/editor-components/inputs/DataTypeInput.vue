@@ -22,7 +22,9 @@
                         <div v-if="showEdit" class="form-inline">
                             <label v-if="nameable" class="col-4">Name :</label>
                             <input v-if="nameable" class="col-8 form-control" v-model="name" :name="_uid+'-name'"/>
-                            <p v-if="!$_changeObserverMixin_isValid('name')" class="error-message">name can't be empty</p>
+                            <p v-for="(error,i) in $_changeObserverMixin_getErrors('name')"
+                               v-bind:key="i"
+                               class="error-message">{{error}}</p>
                             <label class="col-4">{{(isSubArray)?'Of :':'Type :'}}</label>
                             <select class="col-8 form-control" :name="_uid+'-select-type'" v-model="selectedType">
                                 <option v-for="dataType in dataTypes"
@@ -514,6 +516,9 @@
                 console.log(tmp)
                 console.log(this.getData())
             },
+            reloadData : function(){
+                this.loadData()
+            },
             /*
             * input : #/definitions/mydatatype
             * output : mydatatype
@@ -571,8 +576,12 @@
                     {
                         model : 'name',
                         validator : () => {
-                            if(this.nameAble){
-                                return this.parentFunctions.isValidName(this.name)
+                            if(this.nameable){
+                                if(this.name.length === 0){
+                                    return ['name can\'t be empty']
+                                }
+                                else if(!this.parentFunctions.isValidName(this.name))
+                                    return ['name must be unique']
                             }
                             return []
                         }

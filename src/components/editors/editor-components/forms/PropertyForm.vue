@@ -10,8 +10,7 @@
                            :schema-data="property.schemaData"
                            :ref="'property-'+property.id"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                           :component-id="idx"
-                           :parent-functions="publicFunctions"/>
+                           :component-id="idx"/>
         </div>
         <button @click="buildQuery">Dump!</button>
     </div>
@@ -81,20 +80,11 @@
                 }
                 return res
             },
-            isValidName : function (name) {
-                let p = this.propertiesData
-                let len = p.length
-                let count = 0
-                for(let i = 0; i < len; ++i){
-                    let id = p[i].id
-                    if(name === this.$refs['property-'+id][0]._data.name){
-                        count++
-                    }
-                }
-                return count === 1 && name !== '' && name !== undefined
-            },
             addProperty : function () {
                 this.propertiesData.push({id : this.propertyId++,isEditing : true})
+            },
+            reloadData : function(){
+                this.loadData()
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
