@@ -10,6 +10,7 @@ import ProjectRepo from "../components/projects/ProjectRepo";
 import DefinitionEditor from "../components/editors/DefinitionEditor";
 import AuthLogin from "../components/auth/AuthLogin";
 import UserProfile from "../components/auth/UserProfile";
+import ProjectsUpload from "../components/projects/ProjectsUpload";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -84,6 +85,10 @@ export const router = new VueRouter({
             name: 'project-repo', path: '/projects',
             component: ProjectRepo, props: true,
             // beforeEnter: listProjects
+        },
+        {
+          name: 'project-import', path: '/projects/import',
+            component: ProjectsUpload
         },
         {
             name: 'auth-login', path: '/login',

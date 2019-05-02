@@ -2,7 +2,8 @@
     <div>
         <h2>All Layout Repos</h2>
         <ProjectModal></ProjectModal>
-        <ProjectsUpload></ProjectsUpload>
+
+        <b-button variant="secondary" :to="{name: 'project-import'}">Import Projects</b-button>
 
         <div v-for="project in projectsData" v-bind:key="project.id">
             <ProjectsCard :project="project" />
@@ -13,7 +14,7 @@
 <script>
     import ProjectsCard from "./projects-components/ProjectsCard";
     import ProjectModal from "./projects-components/ProjectModal";
-    import ProjectsUpload from "./projects-components/ProjectsUpload";
+    import ProjectsUpload from "./ProjectsUpload";
     export default {
         name: "ProjectRepo",
         components: {ProjectsUpload, ProjectModal, ProjectsCard},

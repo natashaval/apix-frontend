@@ -20,7 +20,7 @@
                 </b-navbar-nav>
 
                 <b-navbar-nav v-else-if="!isAuthenticated" class="ml-auto">
-                    <b-nav-item href="#">Login</b-nav-item>
+                    <b-nav-item :to="{name: 'auth-login'}">Login</b-nav-item>
                 </b-navbar-nav>
             </b-collapse>
         </b-navbar>
