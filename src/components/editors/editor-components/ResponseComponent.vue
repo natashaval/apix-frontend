@@ -90,6 +90,9 @@
                 }
                 this.responseList.splice(childIndex,1)
             },
+            reloadData : function(){
+                this.loadData()
+            },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
                 this.activeIndex = 0
