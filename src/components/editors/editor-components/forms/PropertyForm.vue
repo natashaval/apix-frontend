@@ -1,14 +1,16 @@
 <template>
     <div>
-        <button @click="addProperty">Add</button>
+        <button v-if="editable" @click="addProperty">Add</button>
         <div v-for="(property,idx) in propertiesData" v-bind:key="property.id">
             <DataTypeInput :parent-is-editing="property.isEditing"
                            :project-id="projectId"
+                           :editable="editable"
+                           :deleteable="editable"
+                           :parent-functions="publicFunctions"
                            :schema-data="property.schemaData"
                            :ref="'property-'+property.id"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                           :component-id="idx"
-                           :parent-functions="publicFunctions"/>
+                           :component-id="idx"/>
         </div>
         <button @click="buildQuery">Dump!</button>
     </div>
@@ -24,6 +26,10 @@
         props : {
             schemasData : {
                 type : Object
+            },
+            editable : {
+                type : Boolean,
+                default : true
             }
         },
         components: {DataTypeInput},
@@ -53,15 +59,6 @@
             }
         },
         methods : {
-            getData : function () {
-                let res = {}
-                for(let i = 0; i < this.propertiesData.length; i++){
-                    let id = this.propertiesData[i].id
-                    let child = this.$refs['property-'+id][0].getData()
-                    res[child.name] = child.attributes
-                }
-                return res
-            },
             isValidName : function (name) {
                 let p = this.propertiesData
                 let len = p.length
@@ -74,8 +71,20 @@
                 }
                 return count === 1 && name !== '' && name !== undefined
             },
+            getData : function () {
+                let res = {}
+                for(let i = 0; i < this.propertiesData.length; i++){
+                    let id = this.propertiesData[i].id
+                    let child = this.$refs['property-'+id][0].getData()
+                    res[child.name] = child.attributes
+                }
+                return res
+            },
             addProperty : function () {
                 this.propertiesData.push({id : this.propertyId++,isEditing : true})
+            },
+            reloadData : function(){
+                this.loadData()
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()

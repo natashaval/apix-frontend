@@ -4,7 +4,8 @@
             <li><button @click="submit">Save</button></li>
             <li><button @click="cancel">Cancel</button></li>
         </ul>
-        <div>
+        <div class="row">
+        <div v-if="showEdit" class="col-11">
             <div class="row">
                 <label class="col-2">Summary :</label>
                 <b-input v-model="summary" class="col"></b-input>
@@ -40,34 +41,62 @@
                 <v-select multiple v-model="produces" class="w-100" :options="options">
                 </v-select>
             </div>
+        </div>
+        <div v-else class="col-11">
+                <div class="row">
+                    <p>Summary : {{summary}}</p>
+                </div>
+                <div class="row">
+                    <p>Method :{{method}}</p>
+                </div>
+                <div class="row">
+                    <p>Path : {{pathApi}}</p>
+                </div>
+                <div class="row">
+                    <p>Operation Id :{{operationId}}</p>
+                </div>
+                <div class="row">
+                    <p>Description:</p>
+                    <p v-html="description"></p>
+                </div>
+                <div class="row">
+                    <p>Consumes :</p>
+                    <p v-for="consume in consumes" v-bind:key="consume">{{consume}}</p>
+                </div>
+                <div class="row">
+                    <p>Produces :</p>
+                    <p v-for="produce in produces" v-bind:key="produce">{{produce}}</p>
+                </div>
+            </div>
+            <button v-if="editable" @click="isEditing = !isEditing"
+                class="col-1 float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
+            <i class="fa fa-pencil-alt"></i>
+        </button>
+        </div>
 
-        </div>
-        <h1>method : {{operationApi}}</h1>
-        <div v-if="dataUpdated">
-            <h2>data Updated</h2>
-        </div>
-                          <!--:$_changeObserverMixin_parent="$_changeObserverMixin_this"-->
         <RequestComponent ref="request"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
+                          :editable="editable"
                           :request-data="requestData" :operation-api="method"/>
         <ResponseComponent ref="response"
                            :responses-data="responsesData"
+                           :editable="editable"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
 
     </div>
 </template>
 
 <script>
-    import RequestComponent from "./editor-components/RequestComponent";
+    import RequestComponent from "@/editors/editor-components/RequestComponent";
     import TreeBuilder from "@/utils/DeepTreeBuilderUtil";
     import * as axios from "axios";
     import { VueEditor } from 'vue2-editor'
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
-    import ResponseComponent from "./editor-components/ResponseComponent";
+    import ResponseComponent from "@/editors/editor-components/ResponseComponent";
     import uuidv4 from 'uuid/v4';
-    import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
-    import ActionBuilder from "../../utils/ActionBuilderUtil";
-    import vSelect from 'vue-select'
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
+    import ActionBuilder from "@/utils/ActionBuilderUtil";
+    import vSelect from 'vue-select';
 
     export default {
         name: "OperationEditor",
@@ -81,7 +110,11 @@
             operationApi : 'get',
             dataUpdated : false,
             isEdited : false,
-
+            isEditing : false,
+            aceModel : '{}',
+            testModel : {
+                name : 'alfian'
+            },
             selectMethodOptions : [
                 {text : 'GET', value : 'get'},
                 {text : 'POST', value : 'post'},
@@ -112,9 +145,23 @@
             ],
 
             operationActionQuery : [],
-            pathActionQuery : []
+            pathActionQuery : [],
         }),
         computed : {
+            modelName : function (){
+                return this.testModel.name
+            },
+            editable : function () {
+                let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
+                if(hasEditingPrivilege === undefined)return false
+                return hasEditingPrivilege
+            },
+            showEdit : function () {
+                if(!this.editable){
+                    return false
+                }
+                return this.isEditing
+            },
             treeKeys : function () {
                 return [
                     'sections',this.sectionApi,
@@ -170,7 +217,6 @@
                         console.log('can\'t submit due to unvalid field')
                         return
                     }
-
 
                     let callbacks = []
                     let signaturePointer = undefined
@@ -277,6 +323,7 @@
                                 signaturePointer._signature = response.data.new_signature
                                 this.commitChange()
                                 callbacks.forEach(fn => fn())
+                                this.reloadData()
                             }
                         }
                     ).catch(function (error) {
@@ -292,9 +339,12 @@
                 }
             },
             cancel : function () {
+                this.reloadData()
+            },
+            reloadData : function () {
                 this.loadData()
-                this.$refs.request.loadData()
-                this.$refs.response.loadData()
+                this.$refs.request.reloadData()
+                this.$refs.response.reloadData()
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
@@ -303,7 +353,7 @@
                 this.projectId = p.projectId
                 this.sectionApi = p.sectionApi
                 this.pathApi = p.pathApi
-
+                this.aceModel = JSON.stringify(this.operationData,null,2)
                 if(p.operationApi !== undefined){
                     this.operationApi = p.operationApi
                     this.method = p.operationApi

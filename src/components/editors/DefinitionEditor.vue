@@ -14,8 +14,8 @@
         </div>
         <div class="container" style="padding-left: 60px">
             <DataTypeInput :schema-data="schemaData" ref="root"
-                           :name-able="false"
-                           :delete-able="false"
+                           :nameable="false"
+                           :deleteable="false"
                            :fixed-name="'schema'"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         </div>

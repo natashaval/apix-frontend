@@ -8,8 +8,9 @@ import PathEditor from "../components/editors/PathEditor";
 import OperationEditor from "../components/editors/OperationEditor";
 import ProjectRepo from "../components/projects/ProjectRepo";
 import DefinitionEditor from "../components/editors/DefinitionEditor";
-import Login from "../components/auth/Login";
-import SampahLogin from "../components/auth/SampahLogin";
+import AuthLogin from "../components/auth/AuthLogin";
+import UserProfile from "../components/auth/UserProfile";
+import ProjectsUpload from "../components/projects/ProjectsUpload";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -86,13 +87,33 @@ export const router = new VueRouter({
             // beforeEnter: listProjects
         },
         {
-            name: 'login', path: '/login',
-            component: Login
+          name: 'project-import', path: '/projects/import',
+            component: ProjectsUpload
         },
         {
-            name: 'sampahlogin', path: '/sampahlogin',
-            component: SampahLogin
+            name: 'auth-login', path: '/login',
+            component: AuthLogin
+        },
+        {
+            name: 'user-profile', path: '/user/profile',
+            component: UserProfile
         }
 
     ]
+})
+
+// redirect to login if not logged in
+router.beforeEach((to, from, next) => {
+    //redirect to login if not logged in and trying to access restricted page
+    // http://jasonwatmore.com/post/2018/07/14/vue-vuex-user-registration-and-login-tutorial-example#loginpage-vue
+    const publicPages = ['/login'];
+    const  authRequired = !publicPages.includes(to.path);
+    const loggedIn = localStorage.getItem('apix-token');
+
+    if (authRequired && !loggedIn) {
+        // return next('/login');
+        router.push('/login');
+    }
+
+    next();
 })

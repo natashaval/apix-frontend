@@ -10,19 +10,21 @@
             <div v-else class="col">
                 <p>Status Code : {{selectedCode}}</p>
             </div>
-            <b-button @click="isEditing = !isEditing" class="float-right round-button">
+            <b-button v-if="editable" @click="isEditing = !isEditing" class="float-right round-button">
                 <i class="fa fa-pencil-alt"></i>
             </b-button>
         </div>
         <div>
-            <button @click="hasHeaders = true">Add Header</button>
+            <button v-if="editable" @click="hasHeaders = true">Add Header</button>
             <PropertyForm v-if="hasHeaders" ref="headers"
+                          :editable="editable"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                           :schemas-data="headersData"/>
         </div>
         <div>
-            <button @click="hasBody = true">Add Body</button>
+            <button v-if="editable" @click="hasBody = true">Add Body</button>
             <BodyForm v-if="hasBody" :body-data="responseData" ref="body"
+                      :editable="editable"
                       :$_changeObserverMixin_parent="$_changeObserverMixin_this"
             />
         </div>
@@ -59,6 +61,10 @@
             isDuplicateCode : {
                 type : Function,
                 required : true
+            },
+            editable : {
+                type : Boolean,
+                default : true
             }
         },
         data : () => ({

@@ -18,6 +18,22 @@ axios.interceptors.request.use(function (config) {
     config.headers.Authorization = `Bearer ${apixToken}`
   }
   return config
+
+}, error => {
+  return Promise.reject(error);
+})
+
+// response interceptor
+axios.interceptors.response.use(response => {
+  return response
+
+}, error => {
+  // console.log(error.response)
+  console.log('dari axios interceptor', error.response.data)
+  console.log(error.response.status)
+  console.log(error.response.headers)
+  alert(error.response.data.message)
+  return Promise.reject(error)
 })
 
 new Vue({

@@ -40,7 +40,7 @@ describe('create new tests',() => {
         wrapper = mount(DataTypeInput,{
             propsData:{
                 parentIsEditing : true,
-                nameAble : false,
+                nameable : false,
                 fixedName : 'schema'
             },
             localVue,
@@ -200,7 +200,7 @@ describe('edit available data tests',() => {
         wrapper = mount(DataTypeInput,{
             propsData:{
                 parentIsEditing : true,
-                nameAble : false,
+                nameable : false,
                 fixedName : 'schema',
                 schemaData : schemaData
             },
@@ -248,7 +248,7 @@ describe('edit available data tests',() => {
         delete schemaBeforeCommit.description
         delete schemaData.description
         expect(schemaBeforeCommit).toEqual(schemaData)
-        
+
     })
 
     test('vm.buildQuery() should build queries of childs if they had been edited,' +

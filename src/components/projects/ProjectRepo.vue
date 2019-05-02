@@ -1,7 +1,10 @@
 <template>
     <div>
         <h2>All Layout Repos</h2>
-        <router-link to="/projects/5c61963e2fd74228b44ebddd">Swagger PetStore</router-link>
+        <ProjectModal></ProjectModal>
+
+        <b-button variant="secondary" :to="{name: 'project-import'}">Import Projects</b-button>
+
         <div v-for="project in projectsData" v-bind:key="project.id">
             <ProjectsCard :project="project" />
         </div>
@@ -10,9 +13,11 @@
 
 <script>
     import ProjectsCard from "./projects-components/ProjectsCard";
+    import ProjectModal from "./projects-components/ProjectModal";
+    import ProjectsUpload from "./ProjectsUpload";
     export default {
         name: "ProjectRepo",
-        components: {ProjectsCard},
+        components: {ProjectsUpload, ProjectModal, ProjectsCard},
         methods: {
             setLayout (layout) {
                 this.$store.commit('layout/SET_LAYOUT', layout);

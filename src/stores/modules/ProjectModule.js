@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+import {BASE_URL} from "../actions/const";
 
 export default{
     namespaced : true,
@@ -58,11 +58,15 @@ export default{
         DELETE_DATA (state, idxData) {
             const projectIndex = state.projects.findIndex(p => p.id === idxData);
             state.projects.splice(projectIndex, 1)
+        },
+
+        ADD_DATA(state, newData) {
+            state.projects.push(newData)
         }
     },
     actions : {
         fetchProjectData({ commit }, idProject) {
-            let fetchData = () => axios.get('http://localhost:8080/projects/'+idProject).then(
+            let fetchData = () => axios.get(BASE_URL + 'projects/'+idProject).then(
                 (response) => {
                     commit('ASSIGN_DATA', response.data)
                 }
@@ -71,7 +75,7 @@ export default{
         },
         
         fetchAllProjectsData({ commit }) {
-            let fetchProjects = () => axios.get('http://localhost:8080/projects/all/info')
+            let fetchProjects = () => axios.get(BASE_URL + 'projects/all/info')
                 .then((response) => {
                     commit('LIST_DATA', response.data)
                 })
@@ -79,7 +83,7 @@ export default{
         },
 
         deleteProjectData({ commit }, idProject) {
-            let deleteProject = () => axios.delete('http://localhost:8080/projects/' + idProject).then(
+            let deleteProject = () => axios.delete(BASE_URL + 'projects/' + idProject).then(
                 (response) => {
                     commit('DELETE_DATA', idProject)
                 }
@@ -87,6 +91,21 @@ export default{
                 console.log(error);
             })
             deleteProject()
+        },
+
+        createProjectData({commit}, newProjectForm) {
+            return new Promise((resolve, reject) => {
+                axios.post(BASE_URL + 'projects', newProjectForm)
+                    .then((response) => {
+                        console.log('hasil axios dari module', response.data)
+                        commit('ADD_DATA', response.data.newProject)
+                        resolve(response)
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                        reject(error)
+                    })
+            })
         }
     }
 }

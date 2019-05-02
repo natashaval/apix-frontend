@@ -3,15 +3,18 @@
         <div>
             <h1>ini headers</h1>
             <PropertyForm ref="headers" :schemas-data="headersData"
+                          :editable="editable"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         </div>
         <div>
             <h1>ini query param</h1>
             <PropertyForm ref="queryParams" :schemas-data="queryParamsData"
+                          :editable="editable"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         </div>
 
         <BodyForm v-if="hasBody" ref="body" :body-data="requestData"
+                  :editable="editable"
                   :$_changeObserverMixin_parent="$_changeObserverMixin_this" style="padding-left: 10%"/>
     </div>
 </template>
@@ -38,6 +41,10 @@
                 type : String,
                 required : true
             },
+            editable : {
+                type : Boolean,
+                default : true
+            }
         },
         computed : {
             hasBody : function () {
