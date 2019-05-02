@@ -17,28 +17,39 @@
                 <div v-html="description"></div>
             </div>
             <input type="file" v-on:change="jsonFileLoaded">
-            <DataTypeInput ref="root"
-                           :schema-data="schemaData" :nameable="false"
+            <button @click="showHighLevelEditor = !showHighLevelEditor">change editor</button>
+            <DataTypeInput
+                    ref="root"
+                           v-bind:style="{display : isShow(EDITOR_TYPE_HIGH_LEVEL)}"
+                           :schema-data="schemaDataWrapper.data" :nameable="false"
                            :deleteable="false"
                            :editable="editable"
                            fixed-name="schema"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                            style="margin-top: 130px"/>
+                           style="margin-top: 130px"/>
+            <LowLvlJsonEditor
+                    v-if="schemaDataWrapper.data !== undefined"
+                    v-bind:style="{display : isShow(EDITOR_TYPE_LOW_LEVEL)}"
+                              :$_changeObserverMixin_parent="$_changeObserverMixin_this"
+                              ref="lowLvlEditor" :json-input="schemaDataWrapper.data"/>
         </div>
     </div>
 </template>
 
 <script>
+    import Vue from "vue";
     import DataTypeInput from "../inputs/DataTypeInput";
     import { VueEditor } from 'vue2-editor'
     import ActionBuilderUtil from "@/utils/ActionBuilderUtil";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
     import JsonOasUtil from "@/utils/JsonOasUtil";
+    import LowLvlJsonEditor from "../inputs/LowLvlJsonEditor";
+
 
     export default {
         name: "bodyForm",
-        components: {DataTypeInput,VueEditor},
+        components: {LowLvlJsonEditor, DataTypeInput,VueEditor},
         mixins : [ChangeObserverMixin],
         props : {
             editable : {
@@ -53,6 +64,8 @@
             },
         },
         data : () => ({
+            EDITOR_TYPE_HIGH_LEVEL : true,
+            EDITOR_TYPE_LOW_LEVEL : false,
             jsonFile : undefined,
             description : '',
             isEditMode : false,
@@ -66,20 +79,19 @@
                 {keyBefore : 'name', keyAfter: 'in'}
             ],
             commitChangeCallback : [],
-            actionsQuery : []
+            actionsQuery : [],
+            schemaDataWrapper : {data : undefined},
+            showHighLevelEditor : true
         }),
-        computed : {
-            schemaData : function () {
-                if(this.dataFromExternal){
-                    return this.externalData
-                }
-                else{
-                    if(this.bodyData === undefined)return undefined
-                    return this.bodyData.schema
-                }
-            }
-        },
         methods : {
+            isShow : function (type){
+                switch (type) {
+                    case this.EDITOR_TYPE_HIGH_LEVEL:
+                        return (this.showHighLevelEditor)?'block':'none'
+                    case this.EDITOR_TYPE_LOW_LEVEL:
+                        return (!this.showHighLevelEditor)?'block':'none'
+                }
+            },
             jsonFileLoaded : function(event){
                 let file = event.target.files[0]
 
@@ -102,8 +114,20 @@
                 }
             },
             buildQuery : function (requestPointer) {
-
                 let isEdited = false
+                if(this.$refs.lowLvlEditor.isEdited){
+                    let json = this.$refs.lowLvlEditor.getJson()
+                    requestPointer._actions = [{
+                        action : 'put',
+                        key : 'schema',
+                        value : json
+                    }]
+                    this.commitChangeCallback.push(()=>{
+                        Vue.delete(this.bodyData.schema)
+                        Vue.set(this.bodyData, 'schema', json)
+                    })
+                    return this.commitChange
+                }
 
                 requestPointer._actions = ActionBuilderUtil.createActions(
                     this.bodyData,this._data,this.attributesKey
@@ -144,6 +168,10 @@
             commitChange : function () {
                 ActionExecutorUtil.executeActions(this.bodyData, this.actionsQuery)
                 this.commitChangeCallback.forEach(fn => fn())
+                if(!this.$refs.lowLvlEditor.isEdited){
+                    Vue.delete(this.bodyData.schema)
+                    Vue.set(this.bodyData, 'schema', this.$refs.root.getData().attributes)
+                }
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
@@ -152,6 +180,8 @@
                     let bd = this.bodyData
                     this.in = bd.in
                     this.description = (bd.description === undefined)?'':bd.description
+                    this.schemaDataWrapper.data = Object.assign({},this.bodyData.schema)
+                    this.bodyData.schema.original = true
                 }
 
                 if(this.parentIsEditing !== undefined){
@@ -167,6 +197,14 @@
         watch : {
             bodyData : function () {
                 this.loadData()
+            },
+            showHighLevelEditor : function (after, before) {
+                if(after === this.EDITOR_TYPE_HIGH_LEVEL){
+                    this.schemaDataWrapper.data = this.$refs.lowLvlEditor.getJson()
+                }
+                else{
+                    this.schemaDataWrapper.data = this.$refs.root.getData().attributes
+                }
             }
         },
         mounted() {

@@ -5,7 +5,6 @@
             <li><button @click="cancel">Cancel</button></li>
         </ul>
         <div class="row">
-
         <div v-if="showEdit" class="col-11">
             <div class="row">
                 <label class="col-2">Summary :</label>
@@ -75,7 +74,7 @@
         </button>
         </div>
 
-        <!--:$_changeObserverMixin_parent="$_changeObserverMixin_this"-->
+        :$_changeObserverMixin_parent="$_changeObserverMixin_this"
         <RequestComponent ref="request"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                           :editable="editable"
@@ -96,9 +95,9 @@
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
     import ResponseComponent from "./editor-components/ResponseComponent";
     import uuidv4 from 'uuid/v4';
-    import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
-    import ActionBuilder from "../../utils/ActionBuilderUtil";
-    import vSelect from 'vue-select'
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
+    import ActionBuilder from "@/utils/ActionBuilderUtil";
+    import vSelect from 'vue-select';
 
     export default {
         name: "OperationEditor",
@@ -113,6 +112,10 @@
             dataUpdated : false,
             isEdited : false,
             isEditing : false,
+            aceModel : '{}',
+            testModel : {
+                name : 'alfian'
+            },
             selectMethodOptions : [
                 {text : 'GET', value : 'get'},
                 {text : 'POST', value : 'post'},
@@ -143,9 +146,12 @@
             ],
 
             operationActionQuery : [],
-            pathActionQuery : []
+            pathActionQuery : [],
         }),
         computed : {
+            modelName : function (){
+                return this.testModel.name
+            },
             editable : function () {
                 let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
                 if(hasEditingPrivilege === undefined)return false
@@ -212,7 +218,6 @@
                         console.log('can\'t submit due to unvalid field')
                         return
                     }
-
 
                     let callbacks = []
                     let signaturePointer = undefined
@@ -319,6 +324,7 @@
                                 signaturePointer._signature = response.data.new_signature
                                 this.commitChange()
                                 callbacks.forEach(fn => fn())
+                                this.reloadData()
                             }
                         }
                     ).catch(function (error) {
@@ -348,7 +354,7 @@
                 this.projectId = p.projectId
                 this.sectionApi = p.sectionApi
                 this.pathApi = p.pathApi
-
+                this.aceModel = JSON.stringify(this.operationData,null,2)
                 if(p.operationApi !== undefined){
                     this.operationApi = p.operationApi
                     this.method = p.operationApi
