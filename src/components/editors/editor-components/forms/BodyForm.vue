@@ -16,8 +16,10 @@
             <div v-else>
                 <div v-html="description"></div>
             </div>
-            <input type="file" v-on:change="jsonFileLoaded">
-            <button @click="showHighLevelEditor = !showHighLevelEditor">change editor</button>
+            <div style="margin-top: 30px" class="container">
+                <b-button v-b-modal.modal-importer>import from external json</b-button>
+                <button @click="showHighLevelEditor = !showHighLevelEditor">change editor</button>
+            </div>
             <DataTypeInput
                     ref="root"
                            v-bind:style="{display : isShow(EDITOR_TYPE_HIGH_LEVEL)}"
@@ -29,9 +31,21 @@
                            style="margin-top: 130px"/>
             <LowLvlJsonEditor
                     v-if="schemaDataWrapper.data !== undefined"
-                    v-bind:style="{display : isShow(EDITOR_TYPE_LOW_LEVEL)}"
-                              :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                              ref="lowLvlEditor" :json-input="schemaDataWrapper.data"/>
+                    v-bind:style="{
+                        display : isShow(EDITOR_TYPE_LOW_LEVEL),
+                        width:'600px',height: '1000px'
+                    }"
+                    :$_changeObserverMixin_parent="$_changeObserverMixin_this"
+                    ref="lowLvlEditor" :json-input="schemaDataWrapper.data"/>
+
+            <b-modal id="modal-importer" title="Import From External Json" hide-footer>
+                <p>select json file or paste to here</p>
+                <input type="file" v-on:change="jsonFileLoaded">
+                <LowLvlJsonEditor
+                        ref="modalJsonInput"
+                        v-bind:style="{display: 'block',width:'400px',height: '400px'}"/>
+                <b-button class="mt-3" @click="()=>{doImport();$bvModal.hide('modal-importer');}">import</b-button>
+            </b-modal>
         </div>
     </div>
 </template>
@@ -84,6 +98,13 @@
             showHighLevelEditor : true
         }),
         methods : {
+            doImport : function () {
+                Vue.delete(this.schemaDataWrapper.data)
+                Vue.set(this.schemaDataWrapper, 'data', JsonOasUtil.toSwaggerOas(this.$refs.modalJsonInput.getJson()))
+                this.$_changeObserverMixin_onDataChanged()
+                this.$refs.lowLvlEditor._data.isEdited = true
+                console.log(this.$refs.lowLvlEditor._data)
+            },
             isShow : function (type){
                 switch (type) {
                     case this.EDITOR_TYPE_HIGH_LEVEL:
@@ -97,10 +118,7 @@
 
                 let fr = new FileReader()
                 fr.onload = e => {
-                    // console.log(parsed(e.target.result))
-                    this.externalData = JsonOasUtil.toSwaggerOas(JSON.parse(e.target.result))
-                    this.$_changeObserverMixin_onDataChanged()
-                    this.dataFromExternal = true
+                    this.$refs.modalJsonInput.setJson(JSON.parse(e.target.result))
                 };
                 fr.readAsText(file)
 
@@ -192,6 +210,7 @@
             reloadData : function () {
                 this.loadData()
                 this.$refs.root.reloadData()
+                this.$refs.lowLvlEditor.reloadData()
             }
         },
         watch : {

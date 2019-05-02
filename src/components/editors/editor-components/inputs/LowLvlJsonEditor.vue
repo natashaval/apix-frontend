@@ -1,7 +1,7 @@
 <template>
  <div>
      <AceEditor v-model="jsonText" @init="editorInit()" lang="json" theme="apix" :options="editorOptions"
-     width="600" height="1000"></AceEditor>
+     style="width: 100%;height: 100%"></AceEditor>
  </div>
 </template>
 
@@ -16,17 +16,17 @@
         props : {
             jsonInput : {
                 type : Object,
-                required : true
+                required : false
             }
         },
         data : () => ({
-            jsonText : undefined,
+            jsonText : '',
             editorOptions:{
                 fontSize: 12,
                 fontFamily: 'monospace'
             },
             isEdited : false,
-            unwatchJsonText : () => {}
+            unwatchList : []
         }),
         methods : {
             editorInit : function () {
@@ -36,22 +36,39 @@
             getJson : function () {
                 return JSON.parse(this.jsonText)
             },
-            loadData : function () {
-                this.$_changeObserverMixin_unObserve()
-                this.unwatchJsonText()
-                this.jsonText = JSON.stringify(this.jsonInput,null,2)
-                this.isEdited = false
-                this.$_changeObserverMixin_initObserver(['jsonText'])
-                this.unwatchJsonText = this.$watch('jsonText',()=>{
-                    this.isEdited = true
-                    this.unwatchJsonText()
-                })
-
-            }
-        },
-        watch : {
-            jsonInput : function () {
+            reloadData: function () {
                 this.loadData()
+            },
+            loadData : function () {
+                if(this.jsonInput !== undefined){
+                    this.$_changeObserverMixin_unObserve()
+                    this.unwatchList.forEach(fn => fn())
+                    this.jsonText = JSON.stringify(this.jsonInput,null,2)
+                    this.isEdited = false
+                    this.$_changeObserverMixin_initObserver(['jsonText'])
+
+                    this.unwatchList = []
+                    let unwatchTmp = this.$watch('jsonText',()=>{
+                        this.isEdited = true
+                        unwatchTmp()
+                    })
+                    this.unwatchList.push(unwatchTmp)
+                }
+            },
+            setJson : function (json) {
+                this.$_changeObserverMixin_unObserve()
+                this.isEdited = false
+                if(typeof json === 'string'){
+                    this.jsonText = json
+                }
+                else{
+                    this.jsonText = JSON.stringify(json,null,2)
+                }
+                this.$_changeObserverMixin_initObserver(['jsonText'])
+                let unwatchTmp = this.$watch('jsonText',()=>{
+                    this.isEdited = true
+                    unwatchTmp()
+                })
             }
         },
         created() {

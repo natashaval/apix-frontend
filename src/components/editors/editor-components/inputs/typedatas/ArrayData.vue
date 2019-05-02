@@ -73,7 +73,7 @@
                 return ActionBuilder.createActions(tmp, this._data, this.attributesKey)
             },
             _toString : function (value) {
-                return (value !== undefined)?value.toString():undefined
+                return (value !== undefined && value !== null)?value.toString():undefined
             }
         },
         created(){

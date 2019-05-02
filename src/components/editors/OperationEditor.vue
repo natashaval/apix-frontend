@@ -74,7 +74,6 @@
         </button>
         </div>
 
-        :$_changeObserverMixin_parent="$_changeObserverMixin_this"
         <RequestComponent ref="request"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                           :editable="editable"
@@ -88,12 +87,12 @@
 </template>
 
 <script>
-    import RequestComponent from "./editor-components/RequestComponent";
+    import RequestComponent from "@/editors/editor-components/RequestComponent";
     import TreeBuilder from "@/utils/DeepTreeBuilderUtil";
     import * as axios from "axios";
     import { VueEditor } from 'vue2-editor'
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
-    import ResponseComponent from "./editor-components/ResponseComponent";
+    import ResponseComponent from "@/editors/editor-components/ResponseComponent";
     import uuidv4 from 'uuid/v4';
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import ActionBuilder from "@/utils/ActionBuilderUtil";
