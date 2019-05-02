@@ -12,29 +12,21 @@
         <div>
             <b-tabs>
                 <b-tab title="Team" active>
+                    <b-button variant="info">Create Team</b-button>
 
-                    <button @click="dumpTeam">{{dump}}</button>
-                    <p v-if="dump">TRUE {{grantUser}}</p>
-                    <p v-if="!dump"> FALSE {{ ungrantUser }}</p>
-
-                    <!--b-list-group v-for="team in profile.teams" :key="team">
-                        <b-list-group-item :to="{name: '', params: {}} ">{{team}}</b-list-group-item>
-                    </b-list-group-->
-
-                    <!--div class="mt-3" v-if="ungrantUser.length">
-                        <b-card-group deck class="mb-3">
-                            INI YANG GRANT FALSE (perlu confirm invitation)
-                            {{ ungrantUser }}
+                    <div class="mt-3 mb-3">
+                        <h3>Need Confirmation</h3>
+                        <b-card-group columns class="mb-3">
+                            <TeamCard :teams="ungrantUser" :isGrant="false"></TeamCard>
                         </b-card-group>
                     </div>
 
-                    <div class="mt-3" v-if="grantUser.length">
-                        INI YANG GRANT tRUE
-                        <b-card-group deck class="mb-3" v-for="team in grantUser" :key="team.id">
-                            <TeamCard :team="team"></TeamCard>
+                    <div class="mt-3">
+                        <h3>My Teams</h3>
+                        <b-card-group columns class="mb-3">
+                            <TeamCard :teams="grantUser" :isGrant="true"></TeamCard>
                         </b-card-group>
-                        {{ grantUser }}
-                    </div-->
+                    </div>
                 </b-tab>
                 <!--b-tab title="Version">
                     Ongoing version

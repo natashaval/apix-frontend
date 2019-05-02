@@ -42,7 +42,6 @@
                 return this.$store.getters['user/getProfile']
             },
             isAuthenticated () {
-                console.log(this.$store.getters['auth/isAuthenticated'])
                 return this.$store.getters['auth/isAuthenticated']
             },
             isProfile(){

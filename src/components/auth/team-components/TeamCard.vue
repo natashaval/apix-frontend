@@ -1,11 +1,15 @@
 <template>
     <div>
-        <b-card cols="4" class="mb-2"
-                :title="team.name" >
-            {{ team }}
-            <div slot="footer">
-                <b-button :href="team" variant="primary">Confirm</b-button>
-            </div>
+        <b-card class="mb-2" no-body
+                v-for="team in teams" :key="team.id"
+                >
+            <b-card-body>
+                <b-card-title> <b-link href="#">{{team.name}}</b-link> </b-card-title>
+            </b-card-body>
+            <b-card-footer v-if="!isGrant">
+                <b-button variant="primary">Confirm</b-button>
+            </b-card-footer>
+
         </b-card>
     </div>
 </template>
@@ -13,7 +17,7 @@
 <script>
     export default {
         name: "TeamCard",
-        props: ['team']
+        props: ['teams', 'isGrant']
     }
 </script>
 

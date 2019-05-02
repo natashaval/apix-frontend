@@ -106,7 +106,8 @@ router.beforeEach((to, from, next) => {
     const loggedIn = localStorage.getItem('apix-token');
 
     if (authRequired && !loggedIn) {
-        return next('/login');
+        // return next('/login');
+        router.push('/login');
     }
 
     next();
