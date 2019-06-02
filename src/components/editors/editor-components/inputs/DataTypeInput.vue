@@ -20,8 +20,15 @@
                     <!--kolom kiri-->
                     <div class="col-6">
                         <div v-if="showEdit" class="form-inline">
-                            <label v-if="nameable" class="col-4">Name :</label>
-                            <input v-if="nameable" class="col-8 form-control" v-model="name" :name="_uid+'-name'"/>
+                            <slot v-if="nameable">
+                                <label class="col-4">Name :</label>
+                                <slot v-if="disableName">
+                                    <input class="col-8 form-control" disabled v-model="name" :name="_uid+'-name'"/>
+                                </slot>
+                                <slot v-else>
+                                    <input class="col-8 form-control" v-model="name" :name="_uid+'-name'"/>
+                                </slot>
+                            </slot>
                             <p v-for="(error,i) in $_changeObserverMixin_getErrors('name')"
                                v-bind:key="i"
                                class="error-message">{{error}}</p>
@@ -175,7 +182,10 @@
         mixins : [ChangeObserverMixin],
         props : {
             parentFunctions : {//wrapper function dari parent yang bisa diakses child
-                type : Object
+                type : Object,
+                default : ()=>({
+                    isValidName : ()=>true
+                })
             },
             parentIsEditing : {//default value dari @isEditing
                 type : Boolean
@@ -189,6 +199,10 @@
             nameable : {//punya nama (default : true)
                 type : Boolean,
                 default : true
+            },
+            disableName : {
+                type : Boolean,
+                default : false
             },
             fixedName : {//jika @nameable == false, maka nama yang dipakai adalah @fixedName
                 type : String
