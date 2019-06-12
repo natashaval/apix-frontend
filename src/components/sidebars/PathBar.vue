@@ -1,7 +1,7 @@
 <template>
     <div>
         <li @click="pathClick">
-            <i v-b-toggle="'link-'+pathApi" class="fa fa-angle-right"></i>
+            &nbsp;&nbsp;&nbsp;<i v-b-toggle="'link-'+pathApi" class="fa fa-angle-right"></i>
             {{pathApi}}
         </li>
         <b-collapse :id="'link-'+pathApi" class="mt-2">

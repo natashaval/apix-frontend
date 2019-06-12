@@ -14,6 +14,11 @@
                 <ModelBar v-for="(value, key) in apiData.definitions"
                       v-bind:key="key" :apiData="value" :definition-api="value.name" />
             </b-collapse>
+
+            <hr />
+            <!--<GithubBar :githubData="apiData.githubProject"></GithubBar>-->
+            <b-button :to="{name: 'github-editor'}">Github</b-button>
+
         </ul>
     </div>
 
@@ -24,7 +29,6 @@
     import Section from "./SectionBar";
     import ProjectBar from "./ProjectBar";
     import ModelBar from "./ModelBar";
-
 
     export default {
         name: "SideBar",

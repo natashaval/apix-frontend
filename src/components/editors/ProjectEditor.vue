@@ -6,6 +6,8 @@
             <DescriptionComponent :apiData="apiData"></DescriptionComponent>
 
         </div>
+
+        {{apiData.githubProject}}
     </div>
 </template>
 
