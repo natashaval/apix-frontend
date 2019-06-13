@@ -16,13 +16,13 @@ export default{
     },
     actions: {
         fetchOwner({commit}){
-            axios({url: BASE_URL + 'github/api/user'})
+            axios.get(BASE_URL + 'github/api/user')
                 .then(resp => {
                     commit('ASSIGN_OWNER', resp.data)
                 })
         },
         fetchRepos({commit}){
-            axios({url: BASE_URL + 'github/api/repos'})
+            axios.get(BASE_URL + 'github/api/user/repos')
                 .then(resp => {
                     commit('ASSIGN_REPOS', resp.data)
                 })
