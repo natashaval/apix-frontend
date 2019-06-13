@@ -45,9 +45,6 @@ export default{
         getDefinitions(state){
             return state.project.definitions
         },
-        getGithubData(state){
-            return state.project.githubProject
-        }
     },
     mutations: {
         ASSIGN_DATA(state,newData){

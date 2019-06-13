@@ -1,18 +1,18 @@
 import axios from 'axios'
 import {BASE_URL} from "../actions/const";
-import {USER_ERROR, USER_SUCCESS} from "../actions/user";
-import {AUTH_LOGOUT} from "../actions/auth";
 
 export default{
     namespaced : true,
     state : {
         owner: {},
-        repos: {}
+        repos: {},
+        content: undefined
     },
     getters : {
         getOwner: state => state.owner,
         isOwnerLoaded: state => !!state.owner.login,
         getRepos: state => state.repos,
+        getContent: state => state.content,
     },
     actions: {
         fetchOwner({commit}){
@@ -26,6 +26,17 @@ export default{
                 .then(resp => {
                     commit('ASSIGN_REPOS', resp.data)
                 })
+        },
+        fetchOas({commit}, payload) {
+            axios.get(BASE_URL + 'github/api/repos/' + payload.owner + '/' + payload.repo + '/contents/' + payload.path,
+                {params: {
+                        ref: this.branch
+                    }}
+            )
+                .then((response) => {
+                    commit('ASSIGN_CONTENT', response.data.content)
+                })
+                .catch((e) => {console.error(e)})
         }
     },
     mutations: {
@@ -34,6 +45,9 @@ export default{
         },
         ASSIGN_REPOS(state, newData){
             state.repos = newData
+        },
+        ASSIGN_CONTENT (state, newData) {
+            state.content = newData
         }
     }
 
