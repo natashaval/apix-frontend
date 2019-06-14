@@ -3,6 +3,8 @@
         GithubEditor {{projectId}}
         {{githubApi}}
 
+        FetchOwner: <small>{{isOwner}}</small> {{ownerData}}
+
         <div class="row">
             <button class="btn btn-primary float-right" v-if="!isEditing" @click="push">Push to Github</button>
         </div>
@@ -102,7 +104,7 @@
                 filteredRepos: [],
                 // attributesKey : [{key : 'owner'},{key : 'repo'}, {key : 'branch'},{key : 'path'}],
                 projectId: undefined,
-                githubApi: {},
+                githubApi: undefined,
                 commitResponse: {}
             }
         },
@@ -118,9 +120,9 @@
                 }
                 return this.isEditing
             },
-            githubData() {
-                return this.$store.getters['project/getGithubData']
-            },
+            // githubData() {
+            //     return this.$store.getters['project/getGithubData']
+            // },
             projectData : function () {
                 return this.$store.getters['project/getProjectData']
             },
@@ -157,7 +159,11 @@
               this.isEdited = false;
               // this.fetchFirstOas();
               this.$_changeObserverMixin_unObserve();
-              if (this.githubApi !== undefined) {
+              console.log('mounted load data githubApi', this.githubApi)
+
+              // if (this.githubApi !== null) {
+                if (this.githubApi.owner !== null && this.githubApi.repo !== null){
+                  console.log('this.githubApi defined')
                   this.owner = this.githubApi.owner;
                   this.repo = this.githubApi.repo;
                   this.branch = this.githubApi.branch;
@@ -171,6 +177,19 @@
               //
               // this.fetchBranchList();
               // this.fetchOas();
+              else if (this.isOwner && (this.githubApi.owner == null || this.githubApi.repo == null)) {
+                  console.log('this githubapi isnull and use owner inyytstead')
+                  this.owner = this.ownerData.login
+                  this.isCreateNew = true
+              }
+              else {
+                  console.log('fallback else')
+                //     if (this.isOwner){
+                //         this.owner = this.ownerData.login
+                //         this.isCreateNew = true
+                //     }
+                // else {console.log('there nothing you can do')}
+              }
 
               this.$_changeObserverMixin_initObserver(['owner','repo', 'branch', 'path', 'message'])
             },
@@ -188,9 +207,12 @@
                 this.githubApi = p.githubApi
             },
             getActions: function(){
-                return ActionBuilderUtil.createActions(this.githubData,this._data,this.attributesKey)
+                return ActionBuilderUtil.createActions(this.githubApi,this._data,this.attributesKey)
             },
-
+            // commitChange: function(){
+            //     ActionExecutorUtil.executeActions(this.$store.getters['project/getGithubData'], this.gitRootActions)
+            //     ActionExecutorUtil.executeActions(this.githubApi, this.gitActions)
+            // },
             //override
             $_changeObserverMixin_onDataChanged : function (after,before) {
                 this.isEdited = true
@@ -203,6 +225,11 @@
                 this.isEdited = false
 
                 let tree = undefined
+                let pendek = {
+                    _hasActions: false,
+                    _actions: [],
+                    _signature: ''
+                }
                 let callbacks = []
                 this.gitActions = []
                 this.gitRootActions = []
@@ -210,31 +237,47 @@
 
                 if (this.isCreateNew){
                     console.log('New github link')
+                    /* // milik alfian
                     tree = TreeBuilder.buildDeepTree(['githubProject'])
                     signaturePointer = this.projectData
                     tree.root._signature = signaturePointer._signature
                     let data = this.getData()
                     data._signature = uuidv4()
-                    this.gitRootActions = tree.leaf._actions = [{
+                    this.gitRootActions = tree.root._actions = [{
                         action : 'put',
                         key : 'githubProject',
                         value : data
                     }]
                     tree.leaf._hasActions = true
+                    */
+                    let data = this.getData()
+                    data._signature = uuidv4()
+
+                    pendek._hasActions = true
+                    pendek._actions = [{
+                        action : 'put',
+                        key : 'githubProject',
+                        value : data
+                    }]
+                    signaturePointer = this.projectData
+                    pendek._signature = signaturePointer._signature
+
                     callbacks.push(()=>{
                         this.$router.push({
                             name :'github-editor',
-                            params: {githubApi : this.githubApi}
+                            params: {githubApi : data}
                         })
                     })
                 }
-                else {
+                /*else {
                     console.log('Edit github link')
                     tree = TreeBuilder.buildDeepTree(['githubProject', this.githubApi])
-                    signaturePointer = this.githubData
+                    signaturePointer = this.githubApi
                     tree.leaf._signature = signaturePointer._signature
                     tree.leaf._actions = this.gitActions = this.getActions()
                     tree.leaf._hasActions = true
+
+                    console.log('============ has Actions ============', this.gitActions)
 
                     let callback = this.$refs.root.buildQuery(tree.leaf)
                     if(callback !== undefined)callbacks.push(callback)
@@ -243,9 +286,24 @@
                         delete tree.leaf._hasActions
                         delete tree.leaf._actions
                     }
-                }
 
-                console.log(tree);
+                }*/
+
+                console.log('Tree: ', tree);
+                console.log('Pendek: ', pendek);
+                axios.put('http://localhost:8080/projects/'+this.projectId,pendek).then(
+                    (response) => {
+                        if(response.status === 200){
+                            console.log('berhasil diganti')
+                            signaturePointer._signature = response.data.new_signature
+                            // this.commitChange()
+                            this.loadData()
+                            callbacks.forEach(fn => fn())
+                        }
+                    }
+                ).catch(function (error) {
+                    console.log(error);
+                })
 
 
             },
@@ -353,13 +411,14 @@
         },
         watch: {
             $route: function () {
-                this.loadData();
+                if (this.githubApi !== undefined) this.loadData();
             }
         },
         mounted() {
             this.loadData();
+
             // this.fetchBranchList();
-            this.fetchInitial();
+            // if (this.githubApi !== undefined) this.fetchInitial();
         }
     }
 </script>

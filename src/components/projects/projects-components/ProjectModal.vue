@@ -120,6 +120,15 @@
 
                         if (response.data.success && response.status == 201){
                             alert(response.data.message)
+                            this.newProject.id = response.data.newProject.id
+                            this.newProject.project = response.data.newProject
+                            console.log('newProject Id', this.newProject.id)
+
+                            this.$router.push({
+                                name :'project-editor',
+                                params: {projectId : this.newProject.id}
+                            })
+
                         } else {
                             alert('Error! '  + response.data.message)
                         }
@@ -128,6 +137,7 @@
 
                 this.$nextTick(() => {
                     this.$refs.modal.hide()
+
                 })
             }
         }
