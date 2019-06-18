@@ -63,6 +63,11 @@ export const router = new VueRouter({
             beforeEnter : initProject
         },
         {
+            name : 'path-create', path : '/projects/:projectId/sections/:sectionApi/new-path',
+            component : PathEditor, props : true,
+            beforeEnter : initProject
+        },
+        {
             name : 'operation-editor', path : '/projects/:projectId/sections/:sectionApi/paths/:pathApi/operations/:operationApi',
             component : OperationEditor, props : true,
             beforeEnter : initProject
