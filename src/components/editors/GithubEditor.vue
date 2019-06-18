@@ -1,68 +1,63 @@
 <template>
     <div>
-        GithubEditor {{projectId}}
-        {{githubData}}
+        <!--GithubEditor {{projectId}}-->
+        <!--{{githubData}}-->
 
-        FetchOwner: <small>{{isOwner}}</small> {{ownerData}}
+        <!--FetchOwner: <small>{{isOwner}}</small> {{ownerData}}-->
 
-        <div class="row">
-            <button class="btn btn-primary float-right" v-if="!isEditing" @click="push">Push to Github</button>
+        <!--<div class="row">-->
+            <!--<button class="btn btn-primary float-right" v-if="!isEditing" @click="push">Push to Github</button>-->
+        <!--</div>-->
+
+    <div class="row">
+        <div v-if="showEdit" class="col-11 editRepo" style="border-color: crimson">
+            <ul v-if="isEdited">
+                <li><button @click="submit">Save</button></li>
+                <li><button @click="cancel">Cancel</button></li>
+            </ul>
+
+            Owner: <span class="badge badge-secondary">{{owner}}</span>
+            Repo: <input class="input-group" v-model="repo" @input="searchRepo">
+            <button @click="dump">Dump!</button>
+            <ul v-show="isRepoSearch">
+                <li v-for="(repoList,r) in filteredRepos" :key="r" @click="setRepo(repoList)">
+                    {{repoList.fullName}}
+                </li>
+            </ul>
+            Branch:
+            <select v-model="branch" @change="fetchOas">
+                <option v-for="(availBranch,i) in branchList" :key="i">
+                    {{availBranch}}
+                </option>
+            </select>
+            Selected Branch: {{branch}}
+
+            Path: <input v-model="path" @change="fetchOas"/>
+            <i v-show="oasLoading" class="fa fa-spinner fa-spin"></i>
+            <p>current sha: {{content.sha}}</p>
+            Commit message: <input type="text" class="form-control" v-model="message" />
+                <button class="btn btn-outline-dark" @click="push">Push to Github</button>
+            <div v-if="commitResponse.commitDate">Has been updated!
+                {{commitResponse}}
+            </div>
         </div>
 
-        <div class="row">
-            <div v-if="showEdit" class="col-11 editRepo">
-                <ul v-if="isEdited">
-                    <li><button @click="submit">Save</button></li>
-                    <li><button @click="cancel">Cancel</button></li>
-                </ul>
-
-                Owner: <span class="badge badge-secondary">{{owner}}</span>
-                Repo: <input class="input-group" v-model="repo" @input="searchRepo">
-                <button @click="dump">Dump!</button>
-                <ul v-show="isRepoSearch">
-                    <li v-for="(repoList,r) in filteredRepos" :key="r" @click="setRepo(repoList)">
-                        {{repoList.fullName}}
-                    </li>
-                </ul>
-                Branch:
-                <select v-model="branch" @change="fetchOas">
-                    <option v-for="(availBranch,i) in branchList" :key="i">
-                        {{availBranch}}
-                    </option>
-                </select>
-                Selected Branch: {{branch}}
-
-                <hr />
-                <input v-model="path" @change="fetchOas"/>
-                <i v-show="oasLoading" class="fa fa-spinner fa-spin"></i>
-                <p>current sha: {{content.sha}}</p>
-                Commit message: <input type="text" class="form-control" v-model="message" />
-                <div v-if="commitResponse.commitDate">Has been updated!
-                    {{commitResponse}}
-                </div>
-                Preview:
-                <vue-editor disabled v-model="content.content"></vue-editor>
-            </div>
-
-            <div v-else class="col-11 existRepo">
+            <div v-else class="col-11 existRepo" style="border-color: crimson">
                 Owner: <span class="badge badge-secondary">{{owner}}</span>
                 Repo: {{repo}}
                 Branch: {{branch}}
-
-                <hr />
-                <div class="row">
-                    Path: <input v-model="path" class="form-control-plaintext" readonly/>
-                </div>
-                <div class="row">
-                    Content: <vue-editor disabled v-model="content.content"></vue-editor>
-                </div>
+                Path: {{ path }}
             </div>
 
             <button v-if="editable" @click="revertEditable"
                     class="col-1 btn float-right">
                 <i class="fa fa-pencil-alt"></i>
             </button>
-        </div>
+
+            Preview:
+            <vue-editor disabled v-model="content.content"></vue-editor>
+
+    </div>
 
     </div>
 </template>
@@ -94,15 +89,12 @@
 
                 isEditing: false,
                 isEdited: false,
-                isCreateNew: false,
                 gitActions: [],
                 attributesKey: [{key : 'owner'},{key : 'repo'}, {key : 'branch'},{key : 'path'}],
 
                 isRepoSearch: false,
                 filteredRepos: [],
-                // attributesKey : [{key : 'owner'},{key : 'repo'}, {key : 'branch'},{key : 'path'}],
                 projectId: undefined,
-                githubApi: undefined,
                 commitResponse: {}
             }
         },
@@ -133,28 +125,15 @@
             isOwner(){
                 return this.$store.getters['github/isOwnerLoaded']
             },
-            // contentData() {
-            //     return this.$store.getters['github/getContent']
-            // },
             reposData() {
                 return this.$store.getters['github/getRepos']
             },
-            // filteredRepos: function() {
-            //     return this.reposData.filter((u) => {
-            //         u.name.toLowerCase().includes(this.repo.toLowerCase())
-            //     });
-            // }
         },
         created() {
-            // this.fetchInitial();
-            // if (this.githubData !== undefined) this.fetchFirstOas(); // untuk mendapatkan first content agar bisa di init observe
-
             this.$store.dispatch('github/fetchRepos');
         },
         methods: {
             loadData: function(){
-              // this.isEdited = false;
-              // this.fetchFirstOas();
               this.$_changeObserverMixin_unObserve();
               this.projectId = this.$route.params.projectId;
               console.log('mounted load data githubApi', this.githubData)
@@ -166,26 +145,9 @@
                   this.repo = this.githubData.repo;
                   this.branch = this.githubData.branch;
                   this.path = this.githubData.path;
-                  this.isCreateNew = false;
+                  this.fetchInitial();
               }
-              // if (this.contentData !== undefined) {
-              //     this.content = this.contentData
-              // }
-
-              //
-              // this.fetchBranchList();
-              // this.fetchOas();
-
-                    /*
-              else if (this.isOwner && (this.githubApi.owner == null || this.githubApi.repo == null)) {
-                  console.log('this githubapi isnull and use owner inyytstead')
-                  this.owner = this.ownerData.login
-                  this.isCreateNew = true
-              }
-              */
-
               else {
-                  console.log('fallback else')
                     if (this.isOwner){
                         this.owner = this.ownerData.login
                         this.isCreateNew = false
@@ -220,9 +182,9 @@
             },
             submit: function(){
                 console.log('submit tree githubProject') // refer to DefinitionEditor & PathEditor
-                // this.isEdited = false
+                this.isEdited = false
 
-                let pendek = {
+                let payload = {
                     githubProject: {
                         _actions: [],
                         _hasActions: false,
@@ -232,59 +194,18 @@
                 }
                 let callbacks = []
                 this.gitActions = []
-                let signaturePointer = undefined
 
-                if (this.isCreateNew){
-                    console.log('New github link')
-                    /* // milik alfian
-                    tree = TreeBuilder.buildDeepTree(['githubProject'])
-                    signaturePointer = this.projectData
-                    tree.root._signature = signaturePointer._signature
-                    let data = this.getData()
-                    data._signature = uuidv4()
-                    this.gitRootActions = tree.root._actions = [{
-                        action : 'put',
-                        key : 'githubProject',
-                        value : data
-                    }]
-                    tree.leaf._hasActions = true
-                    */
-                    let data = this.getData()
-                    data._signature = uuidv4()
+                console.log('Edit github link')
+                this.gitActions = this.getActions()
 
-                    pendek._hasActions = true
-                    pendek._actions = [{
-                        action : 'put',
-                        key : 'githubProject',
-                        value : data
-                    }]
-                    signaturePointer = this.projectData
-                    pendek._signature = signaturePointer._signature
+                // console.log('============ has Actions ============', this.gitActions)
+                payload.githubProject._actions = this.gitActions
+                payload.githubProject._hasActions = true
+                payload.githubProject._signature = this.githubData._signature
 
-                    callbacks.push(()=>{
-                        ActionExecutorUtil.executeActions(this.githubData, pendek._actions)
-                    })
+                console.log('Pendek: ', payload);
 
-                    callbacks.push(()=>{
-                        this.$router.push({
-                            name :'github-editor'
-                        })
-                    })
-                }
-                else {
-                    console.log('Edit github link')
-                    this.gitActions = this.getActions()
-
-                    // console.log('============ has Actions ============', this.gitActions)
-                    pendek.githubProject._actions = this.gitActions
-                    pendek.githubProject._hasActions = true
-                    pendek.githubProject._signature = this.githubData._signature
-
-                }
-
-                console.log('Pendek: ', pendek);
-
-                axios.put('http://localhost:8080/projects/'+this.projectId, pendek).then(
+                axios.put('http://localhost:8080/projects/'+this.projectId, payload).then(
                     (response) => {
                         if(response.status === 200){
                             console.log('berhasil diganti')
@@ -298,9 +219,6 @@
                     console.log(error);
                 })
 
-
-
-
             },
             push: function () {
                 console.log('push to github')
@@ -313,6 +231,7 @@
                     .then((response) => {
                         this.commitResponse = response.data
                         console.log(this.commitResponse)
+                        this.fetchOas();
                     })
                     .catch((e) => {console.error(e)})
             },
@@ -353,29 +272,7 @@
                     console.log("this fetchoas githubapi still empty")
                 }
             },
-            /*
-            fetchFirstOas: function(){
-                this.oasLoading = true;
-                // this.$store.dispatch('github/fetchOas', {
-                //     owner: this.githubApi.owner,
-                //     repo: this.githubApi.repo,
-                //     branch: this.githubApi.branch,
-                //     path: this.githubApi.path
-                // })
 
-                axios.get(BASE_URL + 'github/api/repos/' + this.githubApi.owner + '/' + this.githubApi.repo + '/contents/' + this.githubApi.path,
-                    {params: {
-                            ref: this.githubApi.branch
-                        }}
-                )
-                    .then((response) => {
-                        this.oasLoading = false;
-                        // this.initialOas = response.data
-                        this.content = response.data
-                    })
-                    .catch((e) => {console.error(e)})
-            },
-            */
             fetchInitial: function(){
                 this.fetchBranchList();
                 this.fetchOas();
@@ -409,9 +306,6 @@
         },
         mounted() {
             this.loadData();
-
-            // this.fetchBranchList();
-            // if (this.githubApi !== undefined) this.fetchInitial();
         }
     }
 </script>
