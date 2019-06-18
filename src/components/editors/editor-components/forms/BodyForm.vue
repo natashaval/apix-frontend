@@ -20,7 +20,7 @@
                 <b-button v-b-modal.modal-importer>import from external json</b-button>
                 <button @click="showHighLevelEditor = !showHighLevelEditor">change editor</button>
             </div>
-            <DataTypeInput
+            <HighLvlJsonEditor
                     ref="root"
                            v-bind:style="{display : isShow(EDITOR_TYPE_HIGH_LEVEL)}"
                            :schema-data="schemaDataWrapper.data" :nameable="false"
@@ -52,7 +52,7 @@
 
 <script>
     import Vue from "vue";
-    import DataTypeInput from "../inputs/DataTypeInput";
+    import HighLvlJsonEditor from "../inputs/HighLvlJsonEditor";
     import { VueEditor } from 'vue2-editor'
     import ActionBuilderUtil from "@/utils/ActionBuilderUtil";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
@@ -63,7 +63,7 @@
 
     export default {
         name: "bodyForm",
-        components: {LowLvlJsonEditor, DataTypeInput,VueEditor},
+        components: {LowLvlJsonEditor, HighLvlJsonEditor,VueEditor},
         mixins : [ChangeObserverMixin],
         props : {
             editable : {

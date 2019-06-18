@@ -135,7 +135,7 @@
         </div>
         <!--tambahan view jika tipe datanya array-->
         <div class="w-100" v-if="type === 'array'">
-            <DataTypeInput ref="arrayItem" :schema-data="(schemaData !== undefined)?schemaData.items:undefined"
+            <HighLvlJsonEditor ref="arrayItem" :schema-data="(schemaData !== undefined)?schemaData.items:undefined"
                            :borderable="false"
                            :nameable="false" :deleteable="false" :editable="false"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
@@ -149,7 +149,7 @@
                     <div style="margin-top: -16px;margin-bottom: 16px">
                         <hr class="vline"/>
                     </div>
-                    <DataTypeInput :ref="'property-'+val.id" :parent-is-editing="val.isEditing"
+                    <HighLvlJsonEditor :ref="'property-'+val.id" :parent-is-editing="val.isEditing"
                                    :schema-data="val.schemaData" :component-id="i"
                                    :parent-functions="publicFunctions"
                                    :editable="editable"
@@ -177,7 +177,7 @@
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
 
     export default {
-        name: "DataTypeInput",
+        name: "HighLvlJsonEditor",
         components: {CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
         mixins : [ChangeObserverMixin],
         props : {

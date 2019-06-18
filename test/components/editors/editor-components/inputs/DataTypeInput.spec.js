@@ -1,5 +1,5 @@
 import {createLocalVue, mount} from "@vue/test-utils";
-import DataTypeInput from "@/components/editors/editor-components/inputs/DataTypeInput";
+import HighLvlJsonEditor from "@/components/editors/editor-components/inputs/HighLvlJsonEditor";
 import BootstrapVue from 'bootstrap-vue'
 import Vuex from 'vuex'
 import ProjectModule from "@/stores/modules/ProjectModule";
@@ -37,7 +37,7 @@ describe('create new tests',() => {
             }
         })
 
-        wrapper = mount(DataTypeInput,{
+        wrapper = mount(HighLvlJsonEditor,{
             propsData:{
                 parentIsEditing : true,
                 nameable : false,
@@ -197,7 +197,7 @@ describe('edit available data tests',() => {
             }
         })
 
-        wrapper = mount(DataTypeInput,{
+        wrapper = mount(HighLvlJsonEditor,{
             propsData:{
                 parentIsEditing : true,
                 nameable : false,
