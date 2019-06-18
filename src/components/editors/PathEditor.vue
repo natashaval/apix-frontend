@@ -27,6 +27,7 @@
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin"
     import DataTypeInput from "@/components/editors/editor-components/inputs/DataTypeInput"
     import * as axios from "axios";
+    import uuidv4 from 'uuid/v4';
     import { VueEditor } from 'vue2-editor'
     import TreeBuilder from "../../utils/DeepTreeBuilderUtil";
     import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
@@ -95,7 +96,8 @@
                         key : getPath(),
                         value : {
                             description : this.description,
-                            pathVariables : variableData
+                            pathVariables : variableData,
+                            _signature : uuidv4()
                         }
                     }]
                     tree.leaf._hasActions = true
