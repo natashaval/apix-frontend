@@ -1,7 +1,7 @@
 <template>
     <div>
         GithubEditor {{projectId}}
-        {{githubApi}}
+        {{githubData}}
 
         FetchOwner: <small>{{isOwner}}</small> {{ownerData}}
 
@@ -18,7 +18,7 @@
 
                 Owner: <span class="badge badge-secondary">{{owner}}</span>
                 Repo: <input class="input-group" v-model="repo" @input="searchRepo">
-                <button @click="dumpFilterRepo">Dump Filter!</button>
+                <button @click="dump">Dump!</button>
                 <ul v-show="isRepoSearch">
                     <li v-for="(repoList,r) in filteredRepos" :key="r" @click="setRepo(repoList)">
                         {{repoList.fullName}}
@@ -72,7 +72,6 @@
     import { VueEditor } from 'vue2-editor'
     import {BASE_URL} from "../../stores/actions/const";
     import ChangeObserverMixin from "../../mixins/ChangeObserverMixin";
-    import TreeBuilder from "@/utils/DeepTreeBuilderUtil";
     import uuidv4 from 'uuid/v4';
     import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
     import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
@@ -86,7 +85,7 @@
                 owner: '',
                 repo: '',
                 branch: '',
-                path: '',
+                path: 'README.md',
                 content: {}, // content tidak diganti, langsung dari executor export
                 message: '',
                 branchList: [],
@@ -120,9 +119,9 @@
                 }
                 return this.isEditing
             },
-            // githubData() {
-            //     return this.$store.getters['project/getGithubData']
-            // },
+            githubData() {
+                return this.$store.getters['project/getGithubData']
+            },
             projectData : function () {
                 return this.$store.getters['project/getProjectData']
             },
@@ -156,18 +155,18 @@
         },
         methods: {
             loadData: function(){
-              this.isEdited = false;
+              // this.isEdited = false;
               // this.fetchFirstOas();
               this.$_changeObserverMixin_unObserve();
-              console.log('mounted load data githubApi', this.githubApi)
+              console.log('mounted load data githubApi', this.githubData)
 
-              // if (this.githubApi !== null) {
-                if (this.githubApi.owner !== null && this.githubApi.repo !== null){
-                  console.log('this.githubApi defined')
-                  this.owner = this.githubApi.owner;
-                  this.repo = this.githubApi.repo;
-                  this.branch = this.githubApi.branch;
-                  this.path = this.githubApi.path;
+              if (this.githubData !== null) {
+              //   if (this.githubApi.owner !== null && this.githubApi.repo !== null){
+                  console.log('this.githubData COMPUTED defined')
+                  this.owner = this.githubData.owner;
+                  this.repo = this.githubData.repo;
+                  this.branch = this.githubData.branch;
+                  this.path = this.githubData.path;
                   this.isCreateNew = false;
               }
               // if (this.contentData !== undefined) {
@@ -177,18 +176,20 @@
               //
               // this.fetchBranchList();
               // this.fetchOas();
+                  /*
               else if (this.isOwner && (this.githubApi.owner == null || this.githubApi.repo == null)) {
                   console.log('this githubapi isnull and use owner inyytstead')
                   this.owner = this.ownerData.login
                   this.isCreateNew = true
               }
+              */
               else {
                   console.log('fallback else')
-                //     if (this.isOwner){
-                //         this.owner = this.ownerData.login
-                //         this.isCreateNew = true
-                //     }
-                // else {console.log('there nothing you can do')}
+                    if (this.isOwner){
+                        this.owner = this.ownerData.login
+                        this.isCreateNew = true
+                    }
+                    else {console.log('there nothing you can do')}
               }
 
               this.$_changeObserverMixin_initObserver(['owner','repo', 'branch', 'path', 'message'])
@@ -204,10 +205,10 @@
             loadApi: function(){
                 let p = this.$route.params
                 this.projectId = p.projectId
-                this.githubApi = p.githubApi
+                // this.githubApi = this.githubData
             },
             getActions: function(){
-                return ActionBuilderUtil.createActions(this.githubApi,this._data,this.attributesKey)
+                return ActionBuilderUtil.createActions(this.githubData,this._data,this.attributesKey)
             },
             // commitChange: function(){
             //     ActionExecutorUtil.executeActions(this.$store.getters['project/getGithubData'], this.gitRootActions)
@@ -222,7 +223,7 @@
             },
             submit: function(){
                 console.log('submit tree githubProject') // refer to DefinitionEditor & PathEditor
-                this.isEdited = false
+                // this.isEdited = false
 
                 let tree = undefined
                 let pendek = {
@@ -263,9 +264,12 @@
                     pendek._signature = signaturePointer._signature
 
                     callbacks.push(()=>{
+                        ActionExecutorUtil.executeActions(this.githubData, pendek._actions)
+                    })
+
+                    callbacks.push(()=>{
                         this.$router.push({
-                            name :'github-editor',
-                            params: {githubApi : data}
+                            name :'github-editor'
                         })
                     })
                 }
@@ -289,7 +293,6 @@
 
                 }*/
 
-                console.log('Tree: ', tree);
                 console.log('Pendek: ', pendek);
                 axios.put('http://localhost:8080/projects/'+this.projectId,pendek).then(
                     (response) => {
@@ -322,7 +325,7 @@
                     .catch((e) => {console.error(e)})
             },
             fetchBranchList: function () {
-                if (this.githubApi !== undefined) {
+                if (this.githubData !== undefined) {
                     axios.get(BASE_URL + 'github/api/repos/' + this.owner + '/' + this.repo + '/branches')
                         .then((response) => {
                             this.branchList = response.data
@@ -336,7 +339,7 @@
                 }
             },
             fetchOas: function() {
-                if (this.githubApi !== undefined) {
+                if (this.githubData !== undefined) {
                     this.oasLoading = true;
                     axios.get(BASE_URL + 'github/api/repos/' + this.owner + '/' + this.repo + '/contents/' + this.path,
                         {
@@ -396,10 +399,8 @@
             filterResults: function() {
                 this.filteredRepos = this.reposData.filter(rep => rep.name.toLowerCase().includes(this.repo.toLowerCase()));
             },
-            dumpFilterRepo: function () {
-                console.log('dump this repo:', this.repo);
-                console.log(this.reposData);
-                console.log(this.filteredRepos);
+            dump: function () {
+                console.log(this.githubData);
             },
             setRepo: function(result){
                 this.repo = result.name;
@@ -411,7 +412,7 @@
         },
         watch: {
             $route: function () {
-                if (this.githubApi !== undefined) this.loadData();
+                this.loadData();
             }
         },
         mounted() {

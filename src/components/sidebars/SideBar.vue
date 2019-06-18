@@ -18,7 +18,7 @@
 
             <hr />
             <!--<GithubBar :githubData="apiData.githubProject"></GithubBar>-->
-            <b-button :to="{name: 'github-editor', params: {githubApi: apiData.githubProject} }">Github</b-button>
+            <b-button :to="{name: 'github-editor' }">Github</b-button>
 
         </ul>
     </div>

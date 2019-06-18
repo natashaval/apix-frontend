@@ -106,7 +106,7 @@
 
                 const newProject = {
                     host: this.host.field,
-                    basepath: this.basepath.field,
+                    basePath: this.basepath.field,
                     info: {
                         title: this.title.field,
                         version: this.version.field
