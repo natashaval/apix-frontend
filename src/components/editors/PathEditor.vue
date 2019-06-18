@@ -62,7 +62,8 @@
             pathApi : undefined,//akses param
             path : undefined,//model edit path
             variables : [],
-            description : ''
+            description : '',
+            isCreateNew : false
         }),
         methods : {
             submit : function () {
@@ -70,51 +71,75 @@
                 let commitFunctions = []
 
                 let pathQuery = []
-
                 let tree = TreeBuilder.buildDeepTree(
                     ['sections',this.sectionApi]
                 )
                 tree.leaf._signature = this.sectionData._signature
                 tree.leaf = tree.leaf.paths = {}
-                if(this.pathApi !== this.path){
-                    tree.leaf._actions = [{
-                        action : 'rename',
-                        key : this.pathApi,
-                        newKey : this.path
-                    }]
-                    commitFunctions.push(()=>{
-                        ActionExecutorUtil.executeActions(this.sectionData.paths, tree.leaf._actions)
-                        this.pathApi = this.path
-                    })
-                    tree.leaf._hasActions = true
-                }
-                tree.leaf[this.path] = {
-                    _actions : pathQuery,
-                    _hasActions : true
-                }
-
 
                 let variableData = {}
                 this.$refs.variables.forEach(variable => {
-                        variableData[variable.name] = variable.getData().attributes
+                    variableData[variable.name] = variable.getData().attributes
                 })
 
-                pathQuery.push({
-                    action : 'put',
-                    key : 'pathVariables',
-                    value : variableData
-                })
+                let getPath = ()=>{
+                    if(this.path[0] !== '/'){
+                        return '/'+this.path
+                    }
+                    return this.path
+                }
 
-                if(this.description !== this.pathData.description){
-                    pathQuery.push({
+                if(this.isCreateNew){
+                    tree.leaf._actions = [{
                         action : 'put',
-                        key : 'description',
-                        value : this.description
+                        key : getPath(),
+                        value : {
+                            description : this.description,
+                            pathVariables : variableData
+                        }
+                    }]
+                    tree.leaf._hasActions = true
+                    commitFunctions.push(()=>{
+                        ActionExecutorUtil.executeActions(this.sectionData.paths, tree.leaf._actions)
                     })
                 }
-                commitFunctions.push(()=>{
-                    ActionExecutorUtil.executeActions(this.pathData, pathQuery)
-                })
+                else{
+                    if(this.pathApi !== this.path){
+                        tree.leaf._actions = [{
+                            action : 'rename',
+                            key : this.pathApi,
+                            newKey : getPath()
+                        }]
+                        commitFunctions.push(()=>{
+                            ActionExecutorUtil.executeActions(this.sectionData.paths, tree.leaf._actions)
+                            this.pathApi = getPath()
+                        })
+                        tree.leaf._hasActions = true
+                    }
+                    tree.leaf[this.path] = {
+                        _actions : pathQuery,
+                        _hasActions : true
+                    }
+
+
+                    pathQuery.push({
+                        action : 'put',
+                        key : 'pathVariables',
+                        value : variableData
+                    })
+
+                    if(this.description !== this.pathData.description){
+                        pathQuery.push({
+                            action : 'put',
+                            key : 'description',
+                            value : this.description
+                        })
+                    }
+                    commitFunctions.push(()=>{
+                        ActionExecutorUtil.executeActions(this.pathData, pathQuery)
+                    })
+
+                }
 
                 console.log(tree)
                 axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
@@ -138,6 +163,9 @@
                 this.loadData()
                 this.isEdited = false
             },
+            /**
+             * @returns list of variable name(list of string)
+             */
             getVars : function () {
                 let newVars = this.path.match(/\/\{\w+?(?=\})\}/g)
                 if(newVars === null)newVars = []
@@ -154,7 +182,12 @@
                 this.sectionApi = p.sectionApi
                 this.pathApi = p.pathApi
                 this.path = this.pathApi
-
+                if(p.pathApi === undefined){
+                    this.isCreateNew = true
+                }
+                else{
+                    this.isCreateNew = false
+                }
                 this.$_changeObserverMixin_initObserver(['path'])
             },
             //override
