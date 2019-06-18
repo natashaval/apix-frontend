@@ -94,9 +94,8 @@
 
                 isEditing: false,
                 isEdited: false,
-                isCreateNew: true,
+                isCreateNew: false,
                 gitActions: [],
-                gitRootActions: [],
                 attributesKey: [{key : 'owner'},{key : 'repo'}, {key : 'branch'},{key : 'path'}],
 
                 isRepoSearch: false,
@@ -151,17 +150,17 @@
             // if (this.githubData !== undefined) this.fetchFirstOas(); // untuk mendapatkan first content agar bisa di init observe
 
             this.$store.dispatch('github/fetchRepos');
-            this.loadApi();
         },
         methods: {
             loadData: function(){
               // this.isEdited = false;
               // this.fetchFirstOas();
               this.$_changeObserverMixin_unObserve();
+              this.projectId = this.$route.params.projectId;
               console.log('mounted load data githubApi', this.githubData)
 
-              if (this.githubData !== null) {
-              //   if (this.githubApi.owner !== null && this.githubApi.repo !== null){
+              // if (this.githubData !== null) {
+                if (this.githubData.owner !== '' && this.githubData.repo !== ''){
                   console.log('this.githubData COMPUTED defined')
                   this.owner = this.githubData.owner;
                   this.repo = this.githubData.repo;
@@ -176,18 +175,21 @@
               //
               // this.fetchBranchList();
               // this.fetchOas();
-                  /*
+
+                    /*
               else if (this.isOwner && (this.githubApi.owner == null || this.githubApi.repo == null)) {
                   console.log('this githubapi isnull and use owner inyytstead')
                   this.owner = this.ownerData.login
                   this.isCreateNew = true
               }
               */
+
               else {
                   console.log('fallback else')
                     if (this.isOwner){
                         this.owner = this.ownerData.login
-                        this.isCreateNew = true
+                        this.isCreateNew = false
+                        console.log('owner is available')
                     }
                     else {console.log('there nothing you can do')}
               }
@@ -202,38 +204,34 @@
               res.path = this.path;
               return res;
             },
-            loadApi: function(){
-                let p = this.$route.params
-                this.projectId = p.projectId
-                // this.githubApi = this.githubData
-            },
             getActions: function(){
                 return ActionBuilderUtil.createActions(this.githubData,this._data,this.attributesKey)
             },
-            // commitChange: function(){
-            //     ActionExecutorUtil.executeActions(this.$store.getters['project/getGithubData'], this.gitRootActions)
-            //     ActionExecutorUtil.executeActions(this.githubApi, this.gitActions)
-            // },
+            commitChange: function(){
+                ActionExecutorUtil.executeActions(this.githubData, this.gitActions)
+            },
             //override
             $_changeObserverMixin_onDataChanged : function (after,before) {
                 this.isEdited = true
             },
             cancel:function () {
                 this.loadData()
+                this.isEdited = false
             },
             submit: function(){
                 console.log('submit tree githubProject') // refer to DefinitionEditor & PathEditor
                 // this.isEdited = false
 
-                let tree = undefined
                 let pendek = {
-                    _hasActions: false,
-                    _actions: [],
-                    _signature: ''
+                    githubProject: {
+                        _actions: [],
+                        _hasActions: false,
+                        _signature: ''
+                    },
+                    // _signature: ''
                 }
                 let callbacks = []
                 this.gitActions = []
-                this.gitRootActions = []
                 let signaturePointer = undefined
 
                 if (this.isCreateNew){
@@ -273,33 +271,25 @@
                         })
                     })
                 }
-                /*else {
+                else {
                     console.log('Edit github link')
-                    tree = TreeBuilder.buildDeepTree(['githubProject', this.githubApi])
-                    signaturePointer = this.githubApi
-                    tree.leaf._signature = signaturePointer._signature
-                    tree.leaf._actions = this.gitActions = this.getActions()
-                    tree.leaf._hasActions = true
+                    this.gitActions = this.getActions()
 
-                    console.log('============ has Actions ============', this.gitActions)
+                    // console.log('============ has Actions ============', this.gitActions)
+                    pendek.githubProject._actions = this.gitActions
+                    pendek.githubProject._hasActions = true
+                    pendek.githubProject._signature = this.githubData._signature
 
-                    let callback = this.$refs.root.buildQuery(tree.leaf)
-                    if(callback !== undefined)callbacks.push(callback)
-
-                    if(tree.leaf._actions.length === 0){
-                        delete tree.leaf._hasActions
-                        delete tree.leaf._actions
-                    }
-
-                }*/
+                }
 
                 console.log('Pendek: ', pendek);
-                axios.put('http://localhost:8080/projects/'+this.projectId,pendek).then(
+
+                axios.put('http://localhost:8080/projects/'+this.projectId, pendek).then(
                     (response) => {
                         if(response.status === 200){
                             console.log('berhasil diganti')
-                            signaturePointer._signature = response.data.new_signature
-                            // this.commitChange()
+                            this.githubData._signature = response.data.new_signature
+                            this.commitChange()
                             this.loadData()
                             callbacks.forEach(fn => fn())
                         }
@@ -307,6 +297,8 @@
                 ).catch(function (error) {
                     console.log(error);
                 })
+
+
 
 
             },
@@ -400,7 +392,7 @@
                 this.filteredRepos = this.reposData.filter(rep => rep.name.toLowerCase().includes(this.repo.toLowerCase()));
             },
             dump: function () {
-                console.log(this.githubData);
+                console.log(this.getActions());
             },
             setRepo: function(result){
                 this.repo = result.name;
