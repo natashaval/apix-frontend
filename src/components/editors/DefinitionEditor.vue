@@ -97,7 +97,7 @@
                 let res = {}
                 res.description = this.description
                 res.name = this.name
-                res.schema = this.$refs.root.getData().attributes
+                res.schema = this.$refs.root.getData()
                 return res
             },
             getActions : function () {

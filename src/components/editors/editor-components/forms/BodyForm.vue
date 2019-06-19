@@ -128,7 +128,7 @@
                     description : this.description,
                     in : this.in,
                     name : this.name,
-                    schema : this.$refs.root.getData().attributes
+                    schema : this.$refs.root.getData()
                 }
             },
             buildQuery : function (requestPointer) {
@@ -156,7 +156,7 @@
                     requestPointer._actions.push({
                         action : 'put',
                         key : 'schema',
-                        value : this.$refs.root.getData().attributes
+                        value : this.$refs.root.getData()
                     })
                 }
                 else{
@@ -188,7 +188,7 @@
                 this.commitChangeCallback.forEach(fn => fn())
                 if(!this.$refs.lowLvlEditor.isEdited){
                     Vue.delete(this.bodyData.schema)
-                    Vue.set(this.bodyData, 'schema', this.$refs.root.getData().attributes)
+                    Vue.set(this.bodyData, 'schema', this.$refs.root.getData())
                 }
             },
             loadData : function () {
@@ -222,7 +222,7 @@
                     this.schemaDataWrapper.data = this.$refs.lowLvlEditor.getJson()
                 }
                 else{
-                    this.schemaDataWrapper.data = this.$refs.root.getData().attributes
+                    this.schemaDataWrapper.data = this.$refs.root.getData()
                 }
             }
         },

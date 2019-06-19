@@ -80,7 +80,7 @@
 
                 let variableData = {}
                 this.$refs.variables.forEach(variable => {
-                    variableData[variable.name] = variable.getData().attributes
+                    variableData[variable.name] = variable.getData()
                 })
 
                 let getPath = ()=>{

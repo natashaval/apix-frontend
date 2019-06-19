@@ -372,7 +372,7 @@
                     parentQuery._actions.push({
                         action : 'put',
                         key : name,
-                        value : this.getData().attributes
+                        value : this.getData()
                     })
                     return undefined
                 }
@@ -380,7 +380,7 @@
                     parentQuery._actions.push({
                         action : 'put',
                         key : name,
-                        value : this.getData().attributes
+                        value : this.getData()
                     })
                     return undefined
                 }
@@ -466,15 +466,13 @@
 
                 return (isEdited)?this.commitChange : undefined
             },
-            /*
-            * if ada perubahan, return {name,attributes}
-            * else, return undefined
-            * */
             getData : function () {
                 let res = this.$refs.curDataType.getAttributes()
+
                 if(this.nameable){
                     res.name = this.name
                 }
+
                 res.description = this.description
                 res.example = this.example
                 res.required = this.required
@@ -483,16 +481,13 @@
                     for(let i=0; i <  this.propertiesData.length; i++){
                         let id = this.propertiesData[i].id
                         let data = this.$refs['property-'+id][0].getData()
-                        res.properties[data.name] = data.attributes
+                        res.properties[data.name] = data
                     }
                 }
                 else if(this.type === 'array'){
-                    res.items = this.$refs['arrayItem'].getData().attributes
+                    res.items = this.$refs['arrayItem'].getData()
                 }
-                return {
-                    name : this.name,
-                    attributes : res
-                }
+                return res
             },
             addNewProperty : function() {
                 this.propertiesData.push({id : this.propertyId++,isEditing : true})

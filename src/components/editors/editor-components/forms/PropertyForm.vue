@@ -76,7 +76,7 @@
                 for(let i = 0; i < this.propertiesData.length; i++){
                     let id = this.propertiesData[i].id
                     let child = this.$refs['property-'+id][0].getData()
-                    res[child.name] = child.attributes
+                    res[child.name] = child
                 }
                 return res
             },
