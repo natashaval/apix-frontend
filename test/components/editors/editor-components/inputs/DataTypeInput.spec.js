@@ -1,5 +1,5 @@
 import {createLocalVue, mount} from "@vue/test-utils";
-import DataTypeInput from "@/components/editors/editor-components/inputs/DataTypeInput";
+import HighLvlJsonEditor from "@/components/editors/editor-components/inputs/HighLvlJsonEditor";
 import BootstrapVue from 'bootstrap-vue'
 import Vuex from 'vuex'
 import ProjectModule from "@/stores/modules/ProjectModule";
@@ -37,7 +37,7 @@ describe('create new tests',() => {
             }
         })
 
-        wrapper = mount(DataTypeInput,{
+        wrapper = mount(HighLvlJsonEditor,{
             propsData:{
                 parentIsEditing : true,
                 nameable : false,
@@ -76,31 +76,28 @@ describe('create new tests',() => {
     test('should render childs and getActions() should return 1 items ' +
         'that contain all data recursively', () => {
         let expected = {
-            "name": "schema",
-            "attributes": {
-                "type": "object",
-                "additionalProperties": true,
-                "description": "",
-                "example": "",
-                "required":false,
-                "properties": {
-                    "number-name": {
-                        "type": "number",
-                        "enum": [],
-                        "format": "",
-                        "name": "number-name",
-                        "description": "",
-                        "example": "",
-                        "required":false
-                    },
-                    "string-name": {
-                        "type": "string",
-                        "enum": [],
-                        "name": "string-name",
-                        "description": "",
-                        "example": "",
-                        "required":false
-                    }
+            "type": "object",
+            "additionalProperties": true,
+            "description": "",
+            "example": "",
+            "required":false,
+            "properties": {
+                "number-name": {
+                    "type": "number",
+                    "enum": [],
+                    "format": "",
+                    "name": "number-name",
+                    "description": "",
+                    "example": "",
+                    "required":false
+                },
+                "string-name": {
+                    "type": "string",
+                    "enum": [],
+                    "name": "string-name",
+                    "description": "",
+                    "example": "",
+                    "required":false
                 }
             }
         }
@@ -132,7 +129,7 @@ describe('create new tests',() => {
         let res = {}
         wrapper.vm.buildQuery(res)
         expect(res._actions.length).toEqual(1)
-        expect(res._actions[0].value).toEqual(expected.attributes)
+        expect(res._actions[0].value).toEqual(expected)
 
     })
 
@@ -197,7 +194,7 @@ describe('edit available data tests',() => {
             }
         })
 
-        wrapper = mount(DataTypeInput,{
+        wrapper = mount(HighLvlJsonEditor,{
             propsData:{
                 parentIsEditing : true,
                 nameable : false,
@@ -214,7 +211,7 @@ describe('edit available data tests',() => {
     })
 
     test('should return the same data as loaded data if it\'s not edited',() => {
-        expect(wrapper.vm.getData().attributes).toEqual(schemaData)
+        expect(wrapper.vm.getData()).toEqual(schemaData)
     })
 
     test('vm.buildQuery() should not build any query if there is no editing',() => {

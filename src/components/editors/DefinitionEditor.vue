@@ -13,7 +13,7 @@
             <vue-editor v-model="description"></vue-editor>
         </div>
         <div class="container" style="padding-left: 60px">
-            <DataTypeInput :schema-data="schemaData" ref="root"
+            <HighLvlJsonEditor :schema-data="schemaData" ref="root"
                            :nameable="false"
                            :deleteable="false"
                            :fixed-name="'schema'"
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-    import DataTypeInput from "./editor-components/inputs/DataTypeInput";
+    import HighLvlJsonEditor from "./editor-components/inputs/HighLvlJsonEditor";
     import { VueEditor } from 'vue2-editor'
     import ChangeObserverMixin from "../../mixins/ChangeObserverMixin";
     import DeepTreeBuilderUtil from "../../utils/DeepTreeBuilderUtil";
@@ -34,7 +34,7 @@
 
     export default {
         name: "DefinitionEditor",
-        components: {DataTypeInput,VueEditor},
+        components: {HighLvlJsonEditor,VueEditor},
         mixins : [ChangeObserverMixin],
         props: {
             definitionApi : {
@@ -97,7 +97,7 @@
                 let res = {}
                 res.description = this.description
                 res.name = this.name
-                res.schema = this.$refs.root.getData().attributes
+                res.schema = this.$refs.root.getData()
                 return res
             },
             getActions : function () {

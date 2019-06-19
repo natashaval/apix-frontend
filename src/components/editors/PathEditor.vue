@@ -10,7 +10,7 @@
         </div>
         <h2>Path Variables : </h2>
         <div v-for="(variable,idx) in variables" v-bind:key="variable.name">
-            <DataTypeInput :editable="true"
+            <HighLvlJsonEditor :editable="true"
                            :nameable="true"
                            :deleteable="false"
                            :schema-data="variable"
@@ -25,7 +25,7 @@
 
 <script>
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin"
-    import DataTypeInput from "@/components/editors/editor-components/inputs/DataTypeInput"
+    import HighLvlJsonEditor from "@/components/editors/editor-components/inputs/HighLvlJsonEditor"
     import * as axios from "axios";
     import uuidv4 from 'uuid/v4';
     import { VueEditor } from 'vue2-editor'
@@ -35,7 +35,7 @@
 
     export default {
         name: "PathEditor",
-        components: {VueEditor,DataTypeInput},
+        components: {VueEditor,HighLvlJsonEditor},
         mixins : [ChangeObserverMixin],
         computed : {
             editable : function () {
@@ -80,7 +80,7 @@
 
                 let variableData = {}
                 this.$refs.variables.forEach(variable => {
-                    variableData[variable.name] = variable.getData().attributes
+                    variableData[variable.name] = variable.getData()
                 })
 
                 let getPath = ()=>{

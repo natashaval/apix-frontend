@@ -20,7 +20,7 @@
                 <b-button v-b-modal.modal-importer>import from external json</b-button>
                 <button @click="showHighLevelEditor = !showHighLevelEditor">change editor</button>
             </div>
-            <DataTypeInput
+            <HighLvlJsonEditor
                     ref="root"
                            v-bind:style="{display : isShow(EDITOR_TYPE_HIGH_LEVEL)}"
                            :schema-data="schemaDataWrapper.data" :nameable="false"
@@ -52,7 +52,7 @@
 
 <script>
     import Vue from "vue";
-    import DataTypeInput from "../inputs/DataTypeInput";
+    import HighLvlJsonEditor from "../inputs/HighLvlJsonEditor";
     import { VueEditor } from 'vue2-editor'
     import ActionBuilderUtil from "@/utils/ActionBuilderUtil";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
@@ -63,7 +63,7 @@
 
     export default {
         name: "bodyForm",
-        components: {LowLvlJsonEditor, DataTypeInput,VueEditor},
+        components: {LowLvlJsonEditor, HighLvlJsonEditor,VueEditor},
         mixins : [ChangeObserverMixin],
         props : {
             editable : {
@@ -128,7 +128,7 @@
                     description : this.description,
                     in : this.in,
                     name : this.name,
-                    schema : this.$refs.root.getData().attributes
+                    schema : this.$refs.root.getData()
                 }
             },
             buildQuery : function (requestPointer) {
@@ -156,7 +156,7 @@
                     requestPointer._actions.push({
                         action : 'put',
                         key : 'schema',
-                        value : this.$refs.root.getData().attributes
+                        value : this.$refs.root.getData()
                     })
                 }
                 else{
@@ -188,7 +188,7 @@
                 this.commitChangeCallback.forEach(fn => fn())
                 if(!this.$refs.lowLvlEditor.isEdited){
                     Vue.delete(this.bodyData.schema)
-                    Vue.set(this.bodyData, 'schema', this.$refs.root.getData().attributes)
+                    Vue.set(this.bodyData, 'schema', this.$refs.root.getData())
                 }
             },
             loadData : function () {
@@ -222,7 +222,7 @@
                     this.schemaDataWrapper.data = this.$refs.lowLvlEditor.getJson()
                 }
                 else{
-                    this.schemaDataWrapper.data = this.$refs.root.getData().attributes
+                    this.schemaDataWrapper.data = this.$refs.root.getData()
                 }
             }
         },
