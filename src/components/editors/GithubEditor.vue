@@ -140,7 +140,6 @@
 
               // if (this.githubData !== null) {
                 if (this.githubData.owner !== '' && this.githubData.repo !== ''){
-                  console.log('this.githubData COMPUTED defined')
                   this.owner = this.githubData.owner;
                   this.repo = this.githubData.repo;
                   this.branch = this.githubData.branch;
@@ -151,7 +150,6 @@
                     if (this.isOwner){
                         this.owner = this.ownerData.login
                         this.isCreateNew = false
-                        console.log('owner is available')
                     }
                     else {console.log('there nothing you can do')}
               }

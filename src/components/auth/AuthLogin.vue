@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="col-md-6 offset-md-3">
         <form class="login" @submit.prevent="login">
             <h1>Login</h1>
             <div v-if="authStatus == 'loading' ">
@@ -20,7 +20,6 @@
 
 <script>
     import {AUTH_REQUEST, AUTH_LOGOUT} from "../../stores/actions/auth";
-    import {USER_REQUEST} from "../../stores/actions/user";
 
     export default {
         name: "AuthLogin",

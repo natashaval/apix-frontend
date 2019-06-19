@@ -12,6 +12,7 @@ import AuthLogin from "../components/auth/AuthLogin";
 import UserProfile from "../components/auth/UserProfile";
 import ProjectsUpload from "../components/projects/ProjectsUpload";
 import GithubEditor from "../components/editors/GithubEditor";
+import TeamCreate from "../components/auth/TeamCreate";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -109,6 +110,10 @@ export const router = new VueRouter({
             name: 'user-profile', path: '/user/profile',
             component: UserProfile
         },
+        {
+            name: 'team-create', path: '/team/new-team',
+            component: TeamCreate
+        }
 
 
     ]

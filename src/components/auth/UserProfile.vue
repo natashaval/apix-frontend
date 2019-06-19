@@ -12,7 +12,7 @@
         <div>
             <b-tabs>
                 <b-tab title="Team" active>
-                    <b-button variant="info">Create Team</b-button>
+                    <b-button variant="info" :to="{name: 'team-create'}">Create Team</b-button>
 
                     <div class="mt-3 mb-3">
                         <h3>Need Confirmation</h3>
