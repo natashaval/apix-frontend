@@ -67,7 +67,6 @@
     import { VueEditor } from 'vue2-editor'
     import {BASE_URL} from "../../stores/actions/const";
     import ChangeObserverMixin from "../../mixins/ChangeObserverMixin";
-    import uuidv4 from 'uuid/v4';
     import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
     import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
 
