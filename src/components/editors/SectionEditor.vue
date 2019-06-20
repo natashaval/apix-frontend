@@ -2,7 +2,9 @@
     <div>
         <h1>section name : {{sectionApi}}</h1>
 
-        {{sectionData.info}}
+        <!--<div v-show="sectionApi">-->
+            <!--{{sectionData.info}}-->
+        <!--</div>-->
 
         <ul v-show="isEdited">
             <li><button @click="submit">Save</button></li>
@@ -13,18 +15,20 @@
             <vue-editor v-model="description"></vue-editor>
 
         <hr />
-        <GeneralComponent :externalDocs="externalDocs" ref="external"></GeneralComponent>
+        <GeneralComponent :externalDocs="externalDocs" ref="external"
+                          :$_changeObserverMixin_parent="$_changeObserverMixin_this"
+         ></GeneralComponent>
     </div>
 </template>
 
 <script>
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin"
-    import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
     import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
     import DeepTreeBuilderUtil from "../../utils/DeepTreeBuilderUtil";
     import { VueEditor } from 'vue2-editor'
     import * as axios from "axios"
     import GeneralComponent from "./editor-components/GeneralComponent";
+    import uuidv4 from 'uuid/v4';
 
     export default {
         name: "SectionEditor",
@@ -64,13 +68,13 @@
                 this.projectId = p.projectId
                 this.sectionApi = p.sectionApi
 
-                if (p.sectionApi == undefined) this.isCreateNew = true
+                if (p.sectionApi === undefined) this.isCreateNew = true
 
-                else if (this.sectionData !== undefined && this.sectionData.info !== undefined){
+                else {
+                    this.isCreateNew = false
                     this.name = this.sectionData.info.name
                     this.description = this.sectionData.info.description
                     this.externalDocs = this.sectionData.info.externalDocs
-                    this.isCreateNew = false
                 }
 
                 this.isEdited = false
@@ -79,6 +83,13 @@
             //override
             $_changeObserverMixin_onDataChanged : function (after,before) {
                 this.isEdited = true
+            },
+            getData: function(){
+              let res = {}
+              res.name = this.name
+              res.description = this.description
+              res.externalDocs = this.$refs.external.getData()
+              return res
             },
             submit: function(){
                 console.log('submit')
@@ -97,8 +108,25 @@
 
                 if (this.isCreateNew){ // refer to Definition Editor create new Definitions
                     console.log('create new section')
+                    tree = DeepTreeBuilderUtil.buildDeepTree(['sections'])
+                    tree.root._signature = this.projectData._signature
+                    let data = this.getData()
+                    data._signature = uuidv4()
+                    console.log(data)
+                    console.log('is external docs undefined', this.$refs.external.getData() === undefined ? true : false)
+                    this.sectionRootActions = tree.leaf._actions = [{
+                        action: 'put',
+                        key: this.name,
+                        value: {
+                            info: data
+                        }
+                    }]
+                    tree.leaf._hasActions = true
 
-
+                    callbacks.push(() => {
+                        console.log('newnew', this.projectData.sections, this.sectionRootActions)
+                        ActionExecutorUtil.executeActions(this.projectData.sections, this.sectionRootActions)
+                    })
                 }
                 else { // refer to Path Editor edit path, because also change path name in Side Bar
                     console.log('edit section')
@@ -164,6 +192,7 @@
 
                 console.log('Tree: ', tree)
 
+
                 axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
                     (response) => {
                         if(response.status === 200){
@@ -185,6 +214,7 @@
                 ).catch(function (error) {
                     console.log(error);
                 })
+
 
             },
             cancel: function(){

@@ -34,6 +34,7 @@
         }),
         methods: {
             loadData: function(){
+                this.$_changeObserverMixin_unObserve()
                 this.name = this.externalDocs.name
                 this.email = this.externalDocs.email
                 this.url = this.externalDocs.url
