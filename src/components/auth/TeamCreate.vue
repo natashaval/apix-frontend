@@ -92,6 +92,11 @@
                 console.log(res)
 
                 let members = []
+                members.push({ // add creator as member
+                    grant: true,
+                    username: this.profile.username
+                })
+
                 if (this.access == 'public') {
                     for (let i=0; i < this.selectedMember.length; i++) {
                         let member = {
