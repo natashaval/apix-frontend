@@ -4,7 +4,7 @@
             <li><button @click="submit">Save</button></li>
             <li><button @click="cancel">Cancel</button></li>
         </ul>
-        <input class="input-group" v-model="path"/>
+        <input class="input-group" v-model="path" name="path-input"/>
         <div class="container">
             <vue-editor style="height: 100px;" v-model="description"></vue-editor>
         </div>
@@ -61,9 +61,9 @@
             projectId : undefined,
             sectionApi : undefined,
             pathApi : undefined,//akses param
-            path : undefined,//model edit path
+            path : '',//model edit path
             variables : [],
-            description : '',
+            description : '<p></p>',
             isCreateNew : false
         }),
         methods : {
@@ -77,7 +77,6 @@
                 )
                 tree.leaf._signature = this.sectionData._signature
                 tree.leaf = tree.leaf.paths = {}
-
                 let variableData = {}
                 this.$refs.variables.forEach(variable => {
                     variableData[variable.name] = variable.getData()
@@ -159,7 +158,7 @@
                     console.log(error);
                 })
 
-
+                return tree.root
             },
             cancel : function () {
                 this.loadData()
@@ -190,7 +189,7 @@
                 else{
                     this.isCreateNew = false
                 }
-                this.$_changeObserverMixin_initObserver(['path'])
+                this.$_changeObserverMixin_initObserver(['path','description'])
             },
             //override
             $_changeObserverMixin_onDataChanged : function () {
@@ -215,7 +214,6 @@
             path : function (after, before) {
                 let newVars = this.getVars()
                 let newLen = newVars.length
-
                 //jika menghapus
                 if(newLen < this.variables.length){
                     this.variables.forEach((variable,i) => {
@@ -228,26 +226,16 @@
                     this.variables = this.variables.filter(val => val !== undefined)
                 }
                 else if(newLen > this.variables.length){
-                    let curLen = this.variables.length
-                    let hasInserted = false
-                    for(let i = 0; i < curLen; ++i){
-                        let key = this.variables[i].name
-                        if(key !== newVars[i]){
+                    for(let i = 0; i < newLen; i++){
+                        let notExist = this.variables.find(variable => variable.name === newVars[i]) === undefined
+                        if(notExist){
                             this.variables.splice(i,0,{
                                 name : newVars[i],
-                                type : 'string'
-                            })
-                            hasInserted = true
-                            break
+                                    type : 'string'
+                                }
+                            )
                         }
                     }
-                    if(!hasInserted){
-                        this.variables.push({
-                            name : newVars[newLen-1],
-                            type : 'string'
-                        })
-                    }
-
                 }
                 else{
                     for(let i = 0; i < newLen; ++i){
@@ -256,7 +244,6 @@
                             this.variables[i].name = newVars[i]
                         }
                     }
-
                 }
             }
         },
