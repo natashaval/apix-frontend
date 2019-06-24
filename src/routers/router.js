@@ -13,6 +13,7 @@ import UserProfile from "../components/auth/UserProfile";
 import ProjectsUpload from "../components/projects/ProjectsUpload";
 import GithubEditor from "../components/editors/GithubEditor";
 import TeamCreate from "../components/auth/TeamCreate";
+import TeamViewer from "../components/auth/TeamViewer";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -113,6 +114,10 @@ export const router = new VueRouter({
         {
             name: 'team-create', path: '/team/new-team',
             component: TeamCreate
+        },
+        {
+            name: 'team-viewer', path: '/team/:name',
+            component: TeamViewer
         }
 
 
