@@ -111,6 +111,10 @@
                                          :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                          :is-editing="showEdit"
                                          :schema-data="schemaData"/>
+                            <FileData ref="curDataType" v-else-if="type === 'file'"
+                                         :$_changeObserverMixin_parent="$_changeObserverMixin_this"
+                                         :is-editing="showEdit"
+                                         :schema-data="schemaData"/>
                             <CustomData ref="curDataType" v-else-if="ref !== undefined"
                                         :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                         :schema-data="schemaData" :current-ref="ref"/>
@@ -175,10 +179,11 @@
     import CustomData from "./typedatas/CustomData";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
+    import FileData from "./typedatas/FileData";
 
     export default {
         name: "HighLvlJsonEditor",
-        components: {CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
+        components: {FileData, CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
         mixins : [ChangeObserverMixin],
         props : {
             parentFunctions : {//wrapper function dari parent yang bisa diakses child
@@ -266,7 +271,8 @@
                 {text : 'String', val : 'string'},
                 {text : 'Number', val : 'number'},
                 {text : 'Integer', val : 'integer'},
-                {text : 'Boolean', val : 'boolean'}
+                {text : 'Boolean', val : 'boolean'},
+                {text : 'File', val : 'file'}
             ]
         }),
         computed : {

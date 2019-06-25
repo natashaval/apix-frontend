@@ -10,10 +10,8 @@
         </ul>
         Name: <input class="form-control" v-model="name"/>
         Description:
-            <vue-editor v-model="description"></vue-editor>
+        <vue-editor v-model="description"></vue-editor>
 
-        <hr />
-        <GeneralComponent :externalDocs="externalDocs" ref="external"></GeneralComponent>
     </div>
 </template>
 
@@ -29,7 +27,7 @@
     export default {
         name: "SectionEditor",
         props : ['sectionApi','projectId'],
-        components: {GeneralComponent, VueEditor},
+        components: {VueEditor},
         mixins : [ChangeObserverMixin],
         data: function(){
             return {
@@ -61,7 +59,7 @@
 
                 if (p.sectionApi == undefined) this.isCreateNew = true
 
-                else if (this.sectionData !== undefined && this.sectionData.info !== undefined){
+                else if (this.sectionData && this.sectionData.info){
                     this.name = this.sectionData.info.name
                     this.description = this.sectionData.info.description
                     this.externalDocs = this.sectionData.info.externalDocs
