@@ -71,6 +71,11 @@
                 })
             }
         },
+        watch : {
+            jsonInput : function () {
+                this.loadData()
+            }
+        },
         created() {
             this.loadData()
         }

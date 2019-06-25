@@ -256,6 +256,8 @@
 
                             let tmp = tree.root.sections[this.sectionApi].paths[this.pathApi].methods
                             tmp._hasActions = true
+                            let data = this.getData()
+                            data._signature = uuidv4()
                             tmp._actions = [
                                 {
                                     action : 'delete',
@@ -264,7 +266,7 @@
                                 {
                                     action : 'put',
                                     key : this.method,
-                                    value : this.getData()
+                                    value : data
                                 }
                             ]
                             callbacks.push(()=>{
@@ -284,12 +286,8 @@
 
                             this.operationActionQuery = this.getActions()
 
-                            // if(this.operationActionQuery.length > 0){
                             pointer._hasActions = true
                             pointer._actions = this.operationActionQuery
-                            // }else{
-                            //     point
-                            // }
 
                             let callback = this.$refs.request.buildQuery(tree.leaf,pointer.request = {})
                             if(callback === undefined){

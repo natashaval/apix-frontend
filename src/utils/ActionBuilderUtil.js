@@ -28,14 +28,18 @@ export default {
     // ]
     createActions(objBefore, objAfter, keyList) {
         let actions = []
-
         if(objBefore === undefined){
             objBefore = {}
         }
 
         for(let keys of keyList){
             let before,after
-            if(keys.key  === undefined){
+            if(typeof keys === 'string'){
+                before = objBefore[keys]
+                after = objAfter[keys]
+                keys = {key : keys}
+            }
+            else if(keys.key  === undefined){
                 before = objBefore[keys.keyBefore]
                 after = objAfter[keys.keyAfter]
             }
@@ -43,6 +47,7 @@ export default {
                 before = objBefore[keys.key]
                 after = objAfter[keys.key]
             }
+
             if(before === undefined){
                 if(!this.isEqual(after, keys.default)){
                     actions.push({
