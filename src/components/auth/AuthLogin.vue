@@ -1,19 +1,26 @@
 <template>
-    <div class="col-md-6 offset-md-3">
+    <div class="col-md-6 offset-md-3 login bg-light shadow">
         <form class="login" @submit.prevent="login">
-            <h1>Login</h1>
-            <div v-if="authStatus == 'loading' ">
-                <b-spinner small label="Small Spinner"></b-spinner>
+            <!--<h3 style="text-align: center">Login</h3>-->
+            <h4 style="text-align: center">
+                <!--<i class="fas fa-fire-alt"></i> -->
+                <i class="fas fa-sign-in-alt"></i> Sign In
+                <!--<b-spinner v-if="authStatus == 'loading'" small label="Small Spinner"></b-spinner>-->
+            </h4>
+            <br />
+            <div v-if="authStatus == 'loading'" class="text-center">
+                <b-spinner v-if="authStatus == 'loading' " small label="Small Spinner"></b-spinner>
             </div>
             <div v-if="authStatus == 'error' ">
                 <div class="alert alert-danger">Invalid Username or Password</div>
             </div>
             <label>Username</label>
-            <input type="text" v-model="username" class="form-control" required/>
+            <input type="text" v-model="username" class="form-control border-top-0 border-left-0 border-right-0" required/>
+            <br />
             <label>Password</label>
             <input type="password" v-model="password" class="form-control" required/>
-            <hr />
-            <button type="submit">Login</button>
+            <br />
+            <button type="submit" class="btn btn-dark btn-lg btn-block">Login</button>
         </form>
     </div>
 </template>
@@ -64,5 +71,20 @@
 </script>
 
 <style scoped>
+.login {
+    padding-left: 2em;
+    padding-right: 2em;
+    padding-top: 5px;
+    padding-bottom: 0.1em;
+    text-align: justify;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
 
+input {
+    border: 0;
+    outline: 0;
+    background: transparent;
+    border-bottom: 1px solid black;
+}
 </style>
