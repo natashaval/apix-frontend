@@ -4,13 +4,13 @@
             <li><button @click="submit">Save</button></li>
             <li><button @click="cancel">Cancel</button></li>
         </ul>
-        <input class="input-group" v-model="path"/>
+        <input class="input-group" v-model="path" name="path-input"/>
         <div class="container">
             <vue-editor style="height: 100px;" v-model="description"></vue-editor>
         </div>
         <h2>Path Variables : </h2>
         <div v-for="(variable,idx) in variables" v-bind:key="variable.name">
-            <DataTypeInput :editable="true"
+            <HighLvlJsonEditor :editable="true"
                            :nameable="true"
                            :deleteable="false"
                            :schema-data="variable"
@@ -25,8 +25,9 @@
 
 <script>
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin"
-    import DataTypeInput from "@/components/editors/editor-components/inputs/DataTypeInput"
+    import HighLvlJsonEditor from "@/components/editors/editor-components/inputs/HighLvlJsonEditor"
     import * as axios from "axios";
+    import uuidv4 from 'uuid/v4';
     import { VueEditor } from 'vue2-editor'
     import TreeBuilder from "../../utils/DeepTreeBuilderUtil";
     import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
@@ -34,7 +35,7 @@
 
     export default {
         name: "PathEditor",
-        components: {VueEditor,DataTypeInput},
+        components: {VueEditor,HighLvlJsonEditor},
         mixins : [ChangeObserverMixin],
         computed : {
             editable : function () {
@@ -60,9 +61,10 @@
             projectId : undefined,
             sectionApi : undefined,
             pathApi : undefined,//akses param
-            path : undefined,//model edit path
+            path : '',//model edit path
             variables : [],
-            description : ''
+            description : '<p></p>',
+            isCreateNew : false
         }),
         methods : {
             submit : function () {
@@ -70,51 +72,75 @@
                 let commitFunctions = []
 
                 let pathQuery = []
-
                 let tree = TreeBuilder.buildDeepTree(
                     ['sections',this.sectionApi]
                 )
                 tree.leaf._signature = this.sectionData._signature
                 tree.leaf = tree.leaf.paths = {}
-                if(this.pathApi !== this.path){
-                    tree.leaf._actions = [{
-                        action : 'rename',
-                        key : this.pathApi,
-                        newKey : this.path
-                    }]
-                    commitFunctions.push(()=>{
-                        ActionExecutorUtil.executeActions(this.sectionData.paths, tree.leaf._actions)
-                        this.pathApi = this.path
-                    })
-                    tree.leaf._hasActions = true
-                }
-                tree.leaf[this.path] = {
-                    _actions : pathQuery,
-                    _hasActions : true
-                }
-
-
                 let variableData = {}
                 this.$refs.variables.forEach(variable => {
-                        variableData[variable.name] = variable.getData().attributes
+                    variableData[variable.name] = variable.getData()
                 })
 
-                pathQuery.push({
-                    action : 'put',
-                    key : 'pathVariables',
-                    value : variableData
-                })
+                let getPath = ()=>{
+                    if(this.path[0] !== '/'){
+                        return '/'+this.path
+                    }
+                    return this.path
+                }
 
-                if(this.description !== this.pathData.description){
-                    pathQuery.push({
+                if(this.isCreateNew){
+                    tree.leaf._actions = [{
                         action : 'put',
-                        key : 'description',
-                        value : this.description
+                        key : getPath(),
+                        value : {
+                            description : this.description,
+                            pathVariables : variableData,
+                            _signature : uuidv4()
+                        }
+                    }]
+                    tree.leaf._hasActions = true
+                    commitFunctions.push(()=>{
+                        ActionExecutorUtil.executeActions(this.sectionData.paths, tree.leaf._actions)
                     })
                 }
-                commitFunctions.push(()=>{
-                    ActionExecutorUtil.executeActions(this.pathData, pathQuery)
-                })
+                else{
+                    if(this.pathApi !== this.path){
+                        tree.leaf._actions = [{
+                            action : 'rename',
+                            key : this.pathApi,
+                            newKey : getPath()
+                        }]
+                        commitFunctions.push(()=>{
+                            ActionExecutorUtil.executeActions(this.sectionData.paths, tree.leaf._actions)
+                            this.pathApi = getPath()
+                        })
+                        tree.leaf._hasActions = true
+                    }
+                    tree.leaf[this.path] = {
+                        _actions : pathQuery,
+                        _hasActions : true
+                    }
+
+
+                    pathQuery.push({
+                        action : 'put',
+                        key : 'pathVariables',
+                        value : variableData
+                    })
+
+                    if(this.description !== this.pathData.description){
+                        pathQuery.push({
+                            action : 'put',
+                            key : 'description',
+                            value : this.description
+                        })
+                    }
+                    commitFunctions.push(()=>{
+                        ActionExecutorUtil.executeActions(this.pathData, pathQuery)
+                    })
+
+                }
 
                 console.log(tree)
                 axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
@@ -132,12 +158,15 @@
                     console.log(error);
                 })
 
-
+                return tree.root
             },
             cancel : function () {
                 this.loadData()
                 this.isEdited = false
             },
+            /**
+             * @returns list of variable name(list of string)
+             */
             getVars : function () {
                 let newVars = this.path.match(/\/\{\w+?(?=\})\}/g)
                 if(newVars === null)newVars = []
@@ -154,8 +183,13 @@
                 this.sectionApi = p.sectionApi
                 this.pathApi = p.pathApi
                 this.path = this.pathApi
-
-                this.$_changeObserverMixin_initObserver(['path'])
+                if(p.pathApi === undefined){
+                    this.isCreateNew = true
+                }
+                else{
+                    this.isCreateNew = false
+                }
+                this.$_changeObserverMixin_initObserver(['path','description'])
             },
             //override
             $_changeObserverMixin_onDataChanged : function () {
@@ -180,7 +214,6 @@
             path : function (after, before) {
                 let newVars = this.getVars()
                 let newLen = newVars.length
-
                 //jika menghapus
                 if(newLen < this.variables.length){
                     this.variables.forEach((variable,i) => {
@@ -193,26 +226,16 @@
                     this.variables = this.variables.filter(val => val !== undefined)
                 }
                 else if(newLen > this.variables.length){
-                    let curLen = this.variables.length
-                    let hasInserted = false
-                    for(let i = 0; i < curLen; ++i){
-                        let key = this.variables[i].name
-                        if(key !== newVars[i]){
+                    for(let i = 0; i < newLen; i++){
+                        let notExist = this.variables.find(variable => variable.name === newVars[i]) === undefined
+                        if(notExist){
                             this.variables.splice(i,0,{
                                 name : newVars[i],
-                                type : 'string'
-                            })
-                            hasInserted = true
-                            break
+                                    type : 'string'
+                                }
+                            )
                         }
                     }
-                    if(!hasInserted){
-                        this.variables.push({
-                            name : newVars[newLen-1],
-                            type : 'string'
-                        })
-                    }
-
                 }
                 else{
                     for(let i = 0; i < newLen; ++i){
@@ -221,7 +244,6 @@
                             this.variables[i].name = newVars[i]
                         }
                     }
-
                 }
             }
         },

@@ -2,7 +2,7 @@
     <div>
         <button v-if="editable" @click="addProperty">Add</button>
         <div v-for="(property,idx) in propertiesData" v-bind:key="property.id">
-            <DataTypeInput :parent-is-editing="property.isEditing"
+            <HighLvlJsonEditor :parent-is-editing="property.isEditing"
                            :project-id="projectId"
                            :editable="editable"
                            :deleteable="editable"
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-    import DataTypeInput from "../inputs/DataTypeInput";
+    import HighLvlJsonEditor from "../inputs/HighLvlJsonEditor";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
     export default {
@@ -32,7 +32,7 @@
                 default : true
             }
         },
-        components: {DataTypeInput},
+        components: {HighLvlJsonEditor},
         data : () => ({
             propertiesData : [],
             propertyId : 0,
@@ -76,7 +76,7 @@
                 for(let i = 0; i < this.propertiesData.length; i++){
                     let id = this.propertiesData[i].id
                     let child = this.$refs['property-'+id][0].getData()
-                    res[child.name] = child.attributes
+                    res[child.name] = child
                 }
                 return res
             },

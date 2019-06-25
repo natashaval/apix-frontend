@@ -12,12 +12,12 @@
         <div>
             <b-tabs>
                 <b-tab title="Team" active>
-                    <b-button variant="info">Create Team</b-button>
+                    <b-button variant="info" :to="{name: 'team-create'}">Create Team</b-button>
 
                     <div class="mt-3 mb-3">
                         <h3>Need Confirmation</h3>
                         <b-card-group columns class="mb-3">
-                            <TeamCard :teams="ungrantUser" :isGrant="false"></TeamCard>
+                            <TeamCard :teams="ungrantUser" :isGrant="false" @update="loadTeam"></TeamCard>
                         </b-card-group>
                     </div>
 
@@ -87,6 +87,13 @@
             },
             dumpTeam(){
                 this.dump = !this.dump;
+            },
+            loadTeam(){
+                axios.get(BASE_URL + "teams/my-team").then((response) => {
+                    this.teams = response.data
+                }).catch((e) => {
+                    console.error(e)
+                })
             }
         },
         mounted: function() {
@@ -95,14 +102,7 @@
             });
         },
         created() {
-            const self = this;
-
-            axios.get(BASE_URL + "teams/my-team").then((response) => {
-                self.teams = response.data
-            }).catch((e) => {
-                console.error(e)
-            })
-
+            this.loadTeam();
         }
     }
 </script>

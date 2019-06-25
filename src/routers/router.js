@@ -11,6 +11,9 @@ import DefinitionEditor from "../components/editors/DefinitionEditor";
 import AuthLogin from "../components/auth/AuthLogin";
 import UserProfile from "../components/auth/UserProfile";
 import ProjectsUpload from "../components/projects/ProjectsUpload";
+import GithubEditor from "../components/editors/GithubEditor";
+import TeamCreate from "../components/auth/TeamCreate";
+import TeamViewer from "../components/auth/TeamViewer";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -62,6 +65,11 @@ export const router = new VueRouter({
             beforeEnter : initProject
         },
         {
+            name : 'path-create', path : '/projects/:projectId/sections/:sectionApi/new-path',
+            component : PathEditor, props : true,
+            beforeEnter : initProject
+        },
+        {
             name : 'operation-editor', path : '/projects/:projectId/sections/:sectionApi/paths/:pathApi/operations/:operationApi',
             component : OperationEditor, props : true,
             beforeEnter : initProject
@@ -81,6 +89,11 @@ export const router = new VueRouter({
             component: DefinitionEditor, props: true,
             beforeEnter: initProject
         },
+        {
+            name: 'github-editor', path: '/projects/:projectId/github',
+            component: GithubEditor, props: true,
+            beforeEnter: initProject
+        },
         {// List of Projects available
             name: 'project-repo', path: '/projects',
             component: ProjectRepo, props: true,
@@ -97,7 +110,16 @@ export const router = new VueRouter({
         {
             name: 'user-profile', path: '/user/profile',
             component: UserProfile
+        },
+        {
+            name: 'team-create', path: '/team/new-team',
+            component: TeamCreate
+        },
+        {
+            name: 'team-viewer', path: '/team/:name',
+            component: TeamViewer
         }
+
 
     ]
 })

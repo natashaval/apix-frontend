@@ -4,6 +4,7 @@ import ProjectModule from "./modules/ProjectModule";
 import LayoutModule from "./modules/LayoutModule";
 import AuthModule from "./modules/AuthModule";
 import UserModule from "./modules/UserModule";
+import GithubModule from "./modules/GithubModule";
 
 Vue.use(Vuex)
 
@@ -14,6 +15,7 @@ export const store = new Vuex.Store({
         project : ProjectModule,
         layout: LayoutModule,
         auth: AuthModule,
-        user: UserModule
+        user: UserModule,
+        github: GithubModule
     }
 })
