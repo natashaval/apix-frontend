@@ -14,6 +14,7 @@ import ProjectsUpload from "../components/projects/ProjectsUpload";
 import GithubEditor from "../components/editors/GithubEditor";
 import TeamCreate from "../components/auth/TeamCreate";
 import TeamViewer from "../components/auth/TeamViewer";
+import ProjectsList from "../components/projects/ProjectsList";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -101,7 +102,8 @@ export const router = new VueRouter({
         },
         {// List of Projects available
             name: 'project-repo', path: '/projects',
-            component: ProjectRepo, props: true,
+            // component: ProjectRepo, props: true,
+            component: ProjectsList
             // beforeEnter: listProjects
         },
         {

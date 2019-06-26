@@ -27,6 +27,7 @@
     import DeepTreeBuilderUtil from "../../utils/DeepTreeBuilderUtil";
     import { VueEditor } from 'vue2-editor'
     import * as axios from "axios"
+    import {BASE_URL} from "../../stores/actions/const";
     import GeneralComponent from "./editor-components/GeneralComponent";
     import uuidv4 from 'uuid/v4';
 
@@ -193,7 +194,7 @@
                 console.log('Tree: ', tree)
 
 
-                axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
+                axios.put(BASE_URL + 'projects/'+this.projectId,tree.root).then(
                     (response) => {
                         if(response.status === 200){
                             if (tree.root._signature !== undefined) {
