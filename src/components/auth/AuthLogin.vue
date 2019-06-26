@@ -1,5 +1,5 @@
 <template>
-    <div class="col-md-6 offset-md-3 login bg-light shadow">
+    <div class="col-md-6 offset-md-3 login bg-light shadow-lg">
         <form class="login" @submit.prevent="login">
             <!--<h3 style="text-align: center">Login</h3>-->
             <h4 style="text-align: center">
@@ -74,11 +74,11 @@
 .login {
     padding-left: 2em;
     padding-right: 2em;
-    padding-top: 5px;
+    padding-top: 0.01em;
     padding-bottom: 0.1em;
+    margin-top: 5em;
+    margin-bottom: 5em;
     text-align: justify;
-    margin-top: 2em;
-    margin-bottom: 2em;
 }
 
 input {
