@@ -5,9 +5,11 @@
 
         <b-button variant="secondary" :to="{name: 'project-import'}">Import Projects</b-button>
 
-        <div v-for="project in projectsData" v-bind:key="project.id">
-            <ProjectsCard :project="project" />
-        </div>
+        <b-card-group deck>
+            <div v-for="project in projectsData" v-bind:key="project.id">
+                <ProjectsCard :project="project" />
+            </div>
+        </b-card-group>
     </div>
 </template>
 

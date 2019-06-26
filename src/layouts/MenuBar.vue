@@ -1,10 +1,9 @@
 <template>
-    <div>
-        Is Profile Loaded: {{isProfile}}
-        is Authenticated: {{isAuthenticated}}
-
-        <b-navbar toggleable="lg" type="light" variant="light">
-            <b-navbar-brand href="#">APIX</b-navbar-brand>
+    <div class="d-block">
+<!--        Is Profile Loaded: {{isProfile}}-->
+<!--        is Authenticated: {{isAuthenticated}}-->
+        <b-navbar toggleable="lg" type="dark" variant="dark" fixed="top">
+            <b-navbar-brand href="#"><i class="fas fa-fire-alt"></i> APIX</b-navbar-brand>
 
             <b-navbar-toggle target="nav-collapse" class="justify-content-between"></b-navbar-toggle>
 
@@ -14,7 +13,7 @@
                     <b-nav-item href="#" v-if="isAdmin">User Management</b-nav-item>
                 </b-navbar-nav>
 
-                <b-navbar-nav v-if="isAuthenticated" class="ml-auto">
+                <b-navbar-nav v-if="isAuthenticated" class="ml-auto px-2">
                     <b-nav-item :to="{name: 'user-profile'}">{{profile.username}}</b-nav-item>
                     <b-nav-item @click="logout">Logout</b-nav-item>
                 </b-navbar-nav>
@@ -24,6 +23,32 @@
                 </b-navbar-nav>
             </b-collapse>
         </b-navbar>
+
+<!--        <nav class="nav navbar-expand-lg navbar-light bg-dark">-->
+<!--            <a class="navbar-brand" href="#"><i class="fas fa-fire-alt"></i> APIX</a>-->
+
+<!--            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"-->
+<!--                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">-->
+<!--                <span class="navbar-toggler-icon"></span>-->
+<!--            </button>-->
+<!--            <div class="collapse navbar-collapse" id="navbarNav">-->
+<!--                <ul class="navbar-nav mr-auto text-white" v-if="isAuthenticated">-->
+<!--                    <li class="nav-item">-->
+
+<!--                    </li>-->
+<!--                    <li class="nav-item my-2 my-lg-0">-->
+<!--                        <a class="nav-link" href="/user/profile">{{profile.username}}</a>-->
+<!--                    </li>-->
+
+<!--                </ul>-->
+
+<!--                <ul class="navbar-nav ml-auto" v-else>-->
+<!--                    <li class="nav-item">-->
+<!--                        <a class="nav-link" href="/login"> Login</a>-->
+<!--                    </li>-->
+<!--                </ul>-->
+<!--            </div>-->
+<!--        </nav>-->
     </div>
 </template>
 

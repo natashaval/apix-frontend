@@ -1,7 +1,7 @@
 <template>
     <div class="all-layout">
         <h2>All Layout</h2>
-        <MenuBar></MenuBar>
+        <MenuBar class="m-4"></MenuBar>
         <router-view></router-view>
     </div>
 </template>
