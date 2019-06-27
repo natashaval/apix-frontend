@@ -7,12 +7,14 @@ export default {
     namespaced: true,
     state: {
         status: '',
-        profile: {}
+        profile: {},
+        users: []
     },
     getters: {
         getProfile: state => state.profile,
         isProfileLoaded: state => !!state.profile.username,
-        hasEditingPrivilege : () => true
+        hasEditingPrivilege : () => true,
+        getUsers: state => state.users
     },
     actions: {
         [USER_REQUEST]: ({commit, dispatch}) => {
@@ -25,6 +27,13 @@ export default {
                     commit(USER_ERROR)
                     dispatch('auth/' + AUTH_LOGOUT, null, {root: true})
                 })
+        },
+        fetchAllUsersData({ commit }){
+            let fetchUsers = () => axios.get(BASE_URL + 'admin/users')
+                .then((response) => {
+                    commit('LIST_DATA', response.data)
+                })
+            fetchUsers()
         }
     },
     mutations: {
@@ -40,6 +49,9 @@ export default {
         },
         [AUTH_LOGOUT]: (state) => {
             state.profile = {}
+        },
+        LIST_DATA (state, newData) {
+            state.users = newData
         }
 
     }

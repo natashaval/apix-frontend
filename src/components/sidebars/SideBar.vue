@@ -48,8 +48,8 @@
                 <hr />
                 <!--<GithubBar :githubData="apiData.githubProject"></GithubBar>-->
                 <b-button :to="{name: 'github-editor' }">Github</b-button>
-            </ul class="list-unstyled components">
-        </nav>
+        </ul>
+
     </div>
 
 </template>

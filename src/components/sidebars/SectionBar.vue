@@ -9,7 +9,7 @@
                          :apiData="value" :sectionApi="sectionApi" :pathApi="key" style="font-size: 20px"/>
             </ul>
         </b-collapse>
-    </li>
+    </div>
 </template>
 
 <script>

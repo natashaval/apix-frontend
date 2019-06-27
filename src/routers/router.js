@@ -15,6 +15,8 @@ import GithubEditor from "../components/editors/GithubEditor";
 import TeamCreate from "../components/auth/TeamCreate";
 import TeamViewer from "../components/auth/TeamViewer";
 import ProjectsList from "../components/projects/ProjectsList";
+import UserCreate from "../components/auth/admin-components/UserCreate";
+import UserViewer from "../components/auth/admin-components/UserViewer";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -125,6 +127,10 @@ export const router = new VueRouter({
         {
             name: 'team-viewer', path: '/team/:name',
             component: TeamViewer
+        },
+        {
+            name: 'user-viewer', path: '/admin/users',
+            component: UserViewer
         }
 
 
