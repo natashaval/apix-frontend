@@ -1,7 +1,7 @@
 <template>
     <div class="container-fluid">
         <b-row>
-            <b-col cols="3" class="sidebar">
+            <b-col cols="3" class="sidebar" style="background: rgb(0,0,15)">
                 <router-link to="/projects"> Back to Projects</router-link>
                 <SideBar :apiData="apiData" />
             </b-col>

@@ -1,26 +1,26 @@
 <template>
     <div>
-        <ProjectBar :apiData="apiData"/>
-        <ul>
-            <Section v-for="(value,key) in apiData.sections"
-                     v-bind:key="key"
-                     :apiData="value"
-                     :sectionApi="key"/>
+        <nav>
+            <ProjectBar :apiData="apiData"/>
+            <ul class="list-unstyled">
+                <Section v-for="(value,key) in apiData.sections"
+                         v-bind:key="key"
+                         :apiData="value"
+                         :sectionApi="key" class="section-bar"/>
 
-            <hr />
-            <b-button :to="{name: 'definition-create'}"><i class="fa fa-plus-circle"></i> </b-button>
+                <b-button :to="{name: 'definition-create'}"><i class="fa fa-plus-circle"></i> </b-button>
 
-            <b-button v-b-toggle.model class="m-1">Models</b-button>
-            <b-collapse visible id="model">
-                <ModelBar v-for="(value, key) in apiData.definitions"
-                      v-bind:key="key" :apiData="value" :definition-api="value.name" />
-            </b-collapse>
+                <b-button v-b-toggle.model class="m-1">Models</b-button>
+                <b-collapse visible id="model">
+                    <ModelBar v-for="(value, key) in apiData.definitions"
+                              v-bind:key="key" :apiData="value" :definition-api="value.name" />
+                </b-collapse>
 
-            <hr />
-            <!--<GithubBar :githubData="apiData.githubProject"></GithubBar>-->
-            <b-button :to="{name: 'github-editor' }">Github</b-button>
-
-        </ul>
+                <hr />
+                <!--<GithubBar :githubData="apiData.githubProject"></GithubBar>-->
+                <b-button :to="{name: 'github-editor' }">Github</b-button>
+            </ul class="list-unstyled components">
+        </nav>
     </div>
 
 </template>
@@ -42,9 +42,4 @@
 </script>
 
 <style>
-    ul,li {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-    }
 </style>

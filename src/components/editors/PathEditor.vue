@@ -78,9 +78,11 @@
                 tree.leaf._signature = this.sectionData._signature
                 tree.leaf = tree.leaf.paths = {}
                 let variableData = {}
-                this.$refs.variables.forEach(variable => {
-                    variableData[variable.name] = variable.getData()
-                })
+                if(this.$refs.variables){
+                    this.$refs.variables.forEach(variable => {
+                        variableData[variable.name] = variable.getData()
+                    })
+                }
 
                 let getPath = ()=>{
                     if(this.path[0] !== '/'){
