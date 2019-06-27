@@ -3,9 +3,9 @@
     <div>
         <b-container fluid>
             <!--User Interface Controls-->
-            <b-row no-gutters>
-                <b-col md="5" class="my-1 mx-0">
-                    <b-form-group label-cols-sm="3" label="Filter" class="mb-0">
+            <b-row>
+                <b-col md="5" class="my-1">
+                    <b-form-group label-cols-sm="2" label="Filter" class="mb-0">
                         <b-input-group>
                             <b-form-input v-model="filter" placeholder="Type to search"></b-form-input>
                             <b-input-group-append>

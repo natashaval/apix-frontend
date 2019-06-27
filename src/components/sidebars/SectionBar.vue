@@ -1,7 +1,7 @@
 <template>
     <div>
         <li @click="sectionClick">
-            <i v-b-toggle="'section-'+sectionApi" class="fa fa-angle-right"></i>{{sectionApi}}
+            <i v-b-toggle="'section-'+sectionApi" class="fas fa-angle-right"></i>{{sectionApi}}
         </li>
         <b-collapse :id="'section-'+sectionApi" class="mt-2">
             <ul>
@@ -22,8 +22,16 @@
             PathBar
         },
         props : ['sectionApi','apiData'],
+        data: function() {
+            return {
+                // hover: false,
+                // isClick: false
+            }
+        },
         methods : {
             sectionClick : function(){
+                // this.isClick = !this.isClick
+                this.hover = true;
                 this.$router.push({
                     name :'section-editor',
                     params: {sectionApi : this.sectionApi}
@@ -36,5 +44,8 @@
 <style scoped>
     .fa {
         float: left;
+    }
+    .active {
+        background-color: green;
     }
 </style>

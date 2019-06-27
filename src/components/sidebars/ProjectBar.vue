@@ -1,6 +1,6 @@
 <template>
-    <div v-if="apiData.info !== undefined">
-        <h3 @click="projectClick">{{apiData.info.title}}</h3>
+    <div v-if="apiData.info !== undefined" class="my-1">
+        <h3 @click="projectClick" class="text-center">{{apiData.info.title}}</h3>
     </div>
 </template>
 
