@@ -45,11 +45,11 @@
                       v-bind:key="key" :apiData="value" :definition-api="value.name" />
             </b-collapse>
 
-            <hr />
-            <!--<GithubBar :githubData="apiData.githubProject"></GithubBar>-->
-            <b-button :to="{name: 'github-editor' }">Github</b-button>
-
-        </ul>
+                <hr />
+                <!--<GithubBar :githubData="apiData.githubProject"></GithubBar>-->
+                <b-button :to="{name: 'github-editor' }">Github</b-button>
+            </ul class="list-unstyled components">
+        </nav>
     </div>
 
 </template>
@@ -76,9 +76,4 @@
 </script>
 
 <style>
-    ul,li {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-    }
 </style>

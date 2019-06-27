@@ -6,10 +6,10 @@
         <b-collapse :id="'section-'+sectionApi" class="mt-2">
             <ul>
                 <PathBar v-for="(value,key) in apiData.paths" v-bind:key="key"
-                         :apiData="value" :sectionApi="sectionApi" :pathApi="key"/>
+                         :apiData="value" :sectionApi="sectionApi" :pathApi="key" style="font-size: 20px"/>
             </ul>
         </b-collapse>
-    </div>
+    </li>
 </template>
 
 <script>

@@ -1,15 +1,15 @@
 <template>
-    <div>
-        <li @click="pathClick">
-            &nbsp;&nbsp;&nbsp;<i v-b-toggle="'link-'+pathApi" class="fa fa-angle-right"></i>
+    <li>
+        <a @click="pathClick" style="color: white;" class="path-bar">
+            <i v-b-toggle="'link-'+pathApi" class="fa fa-angle-right"></i>
             {{pathApi}}
-        </li>
+        </a>
         <b-collapse :id="'link-'+pathApi" class="mt-2">
             <OperationBar v-for="(value,key) in apiData.methods" v-bind:key="key" :apiData="value"
                           :sectionApi="sectionApi" :pathApi="pathApi"
                           :operationApi="key"/>
         </b-collapse>
-    </div>
+    </li>
 </template>
 
 <script>
@@ -30,8 +30,13 @@
 </script>
 
 <style scoped>
-    .fa {
+
+    .path-bar{
         float: left;
+        width: 100%;
+    }
+    .path-bar:hover{
+        background: white;
     }
 
 </style>

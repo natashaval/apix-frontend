@@ -1,6 +1,6 @@
 <template>
     <div>
-        <li @click="methodClick">{{operationApi}}</li>
+        <li @click="methodClick" style="color: white">{{operationApi}}</li>
     </div>
 </template>
 
