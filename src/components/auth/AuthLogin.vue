@@ -75,9 +75,9 @@
     padding-left: 2em;
     padding-right: 2em;
     padding-top: 0.01em;
-    padding-bottom: 0.1em;
-    margin-top: 5em;
-    margin-bottom: 5em;
+    padding-bottom: 0.01em;
+    margin-top: 3em;
+    margin-bottom: 3em;
     text-align: justify;
 }
 

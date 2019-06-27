@@ -29,6 +29,8 @@
             </form>
 
         </b-modal>
+
+<!--        <b-button @click="makeToast('success', true, 'ini message')">Default</b-button>-->
     </div>
 </template>
 
@@ -57,7 +59,7 @@
                 },
                 newProject: {
                     id: '',
-                    project: {}
+                    // project: {}
                 }
             }
         },
@@ -119,18 +121,24 @@
                         console.log('diterima modal', response)
 
                         if (response.data.success && response.status == 201){
-                            alert(response.data.message)
-                            this.newProject.id = response.data.newProject.id
-                            this.newProject.project = response.data.newProject
+                            // alert(response.data.message)
+                            // this.newProject.id = response.data.newProject.id
+                            this.newProject.id = response.data.new_project
+                            // this.newProject.project = response.data.newProject
                             console.log('newProject Id', this.newProject.id)
+                            this.makeToast('success', response.data.success, response.data.message)
 
-                            this.$router.push({
-                                name :'project-editor',
-                                params: {projectId : this.newProject.id}
-                            })
+                            setTimeout(() => {
+                                this.$router.push({
+                                    name :'project-editor',
+                                    params: {projectId : this.newProject.id}
+                                })
+                            }, 1500);
+
 
                         } else {
-                            alert('Error! '  + response.data.message)
+                            // alert('Error! '  + response.data.message)
+                            this.makeToast('danger', response.data.success, response.data.message)
                         }
 
                     })
@@ -138,6 +146,14 @@
                 this.$nextTick(() => {
                     this.$refs.modal.hide()
 
+                })
+            },
+            makeToast(variant, success, message){
+                this.$bvToast.toast(message, {
+                    title: (success) ? 'Success' : 'Failed',
+                    variant: variant,
+                    // solid: true
+                    autoHideDelay: 1000
                 })
             }
         }
