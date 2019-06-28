@@ -1,18 +1,13 @@
 <template>
     <div>
-<!--        <ul v-if="isEdited">-->
-<!--        <ul>-->
-<!--            <li><button @click="submit">Save</button></li>-->
-<!--            <li><button @click="cancel">Cancel</button></li>-->
-            <SaveComponent :isEdited="isEdited"
-                           :submit="submit" :cancel="cancel"></SaveComponent>
-<!--        </ul>-->
-        <div class="row">
-            <label class="col-2">Name :</label>
-            <b-input v-model="name" class="col"></b-input>
+        <SaveComponent :isEdited="isEdited"
+                       :submit="submit" :cancel="cancel"></SaveComponent>
+        <div class="form-group">
+            <label class="font-weight-bold">Name :</label>
+            <input v-model="name" class="form-control"/>
         </div>
-        <div class="row">
-            <label>Description:</label>
+        <div class="form-group">
+            <label class="font-weight-bold">Description:</label>
             <vue-editor v-model="description"></vue-editor>
         </div>
         <div class="container" style="padding-left: 60px">
@@ -153,6 +148,16 @@
                         delete tree.leaf._hasActions
                         delete tree.leaf._actions
                     }
+                    if(this.name !== this.definitionData.name){
+                        callbacks.push(()=>{
+                            this.$router.push({
+                                name :'definition-editor',
+                                params: {
+                                    definitionApi : this.name
+                                }
+                            })
+                        })
+                    }
                 }
                 console.log(tree)
                 axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
@@ -160,8 +165,8 @@
                         if(response.status === 200){
                             signaturePointer._signature = response.data.new_signature
                             this.commitChange()
-                            this.reloadData()
                             callbacks.forEach(fn => fn())
+                            this.reloadData()
                         }
                     }
                 ).catch(function (error) {

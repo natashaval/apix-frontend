@@ -15,33 +15,37 @@
                 </button>
                 <div class="w-100"></div>
             </div>
-            <div class="col-10 justify-content-end">
+            <div class="col-10">
                 <div class="container row">
                     <!--kolom kiri-->
                     <div class="col-6">
-                        <div v-if="showEdit" class="form-inline">
+                        <div v-if="showEdit" class="form-row">
                             <slot v-if="nameable">
-                                <label class="col-4">Name :</label>
-                                <slot v-if="disableName">
-                                    <input class="col-8 form-control" disabled v-model="name" :name="_uid+'-name'"/>
-                                </slot>
-                                <slot v-else>
-                                    <input class="col-8 form-control" v-model="name" :name="_uid+'-name'"/>
-                                </slot>
+                                <div class="form-group form-row">
+                                    <label class="col-4 align-items-center">Name :</label>
+                                    <slot v-if="disableName">
+                                        <input class="col-8 form-control" disabled v-model="name" :name="_uid+'-name'"/>
+                                    </slot>
+                                    <slot v-else>
+                                        <input class="col-8 form-control" v-model="name" :name="_uid+'-name'"/>
+                                    </slot>
+                                    <p v-for="(error,i) in $_changeObserverMixin_getErrors('name')"
+                                       v-bind:key="i"
+                                       class="error-message">{{error}}</p>
+                                </div>
                             </slot>
-                            <p v-for="(error,i) in $_changeObserverMixin_getErrors('name')"
-                               v-bind:key="i"
-                               class="error-message">{{error}}</p>
-                            <label class="col-4">{{(isSubArray)?'Of :':'Type :'}}</label>
-                            <select class="col-8 form-control" :name="_uid+'-select-type'" v-model="selectedType">
-                                <option v-for="dataType in dataTypes"
-                                        v-bind:key="dataType.val"
-                                        :value="dataType.val">{{dataType.text}}</option>
-                                <hr/>
-                                <option v-for="dataType in customDataTypes"
-                                        v-bind:key="dataType.value"
-                                        :value="dataType.value">{{dataType.name}}</option>
-                            </select>
+                            <div class="form-group form-row">
+                                <label>{{(isSubArray)?'Of :':'Type :'}}</label>
+                                <select class="form-control" :name="_uid+'-select-type'" v-model="selectedType">
+                                    <option v-for="dataType in dataTypes"
+                                            v-bind:key="dataType.val"
+                                            :value="dataType.val">{{dataType.text}}</option>
+                                    <hr/>
+                                    <option v-for="dataType in customDataTypes"
+                                            v-bind:key="dataType.value"
+                                            :value="dataType.value">{{dataType.name}}</option>
+                                </select>
+                            </div>
                             <label>Required : </label>
                             <input type="checkbox" class="form-check" v-model="required" :name="_uid+'-is-required'"/>
                         </div>
@@ -63,11 +67,11 @@
                         <div v-if="showEdit">
                             <div class="row">
                                 <label class="col-4">Description :</label>
-                                <input class="col-8" v-model="description" :name="_uid+'-description'"/>
+                                <input class="col-8 form-control" v-model="description" :name="_uid+'-description'"/>
                             </div>
                             <div class="row">
                                 <label class="col-4">Example :</label>
-                                <input class="col-8" v-model="example"/>
+                                <input class="col-8 form-control" v-model="example"/>
                             </div>
                             <div class="form-inline float-right w-100">
                                 <a style="float: right;color: #4493e2;cursor: pointer;" v-bind:id="_uid+'-more-attribute'"
@@ -117,10 +121,6 @@
                         </div>
                     </div>
                 </div>
-
-
-                <button @click="dump">Dump!</button>
-
             </div>
             <div class="col-1 " style="padding: 10px 25px;">
                 <button v-if="editable" @click="isEditing = !isEditing"

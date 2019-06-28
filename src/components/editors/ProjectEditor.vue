@@ -6,26 +6,47 @@
         </ul>
         <div class="row" v-if="isEditing">
             <div class="col-11">
-                <div class="form-group">
-                    <label>Title:</label>
-                    <input name="title" v-model="title">
+                <div class="form-row">
+                    <div class="col-8 mb-2 form-group">
+                        <label class="font-weight-bold">Title:</label>
+                        <input name="title" v-model="title" class="form-control" type="text" placeholder="Project Title">
+                    </div>
+                    <div class="col-4 mb-2 form-group">
+                        <label class="font-weight-bold">Version:</label>
+                        <input name="version" v-model="version" class="form-control">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Version:</label>
-                    <input name="version" v-model="version">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="font-weight-bold">Description:</label>
+                        <vue-editor name="description" v-model="description"></vue-editor>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Host:</label>
-                    <input name="host" v-model="host">
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label class="font-weight-bold">Host:</label>
+                        <input name="host" v-model="host" class="form-control">
+                    </div>
+                    <div class="form-group col-6">
+                        <label class="font-weight-bold">Base Url:</label>
+                        <input name="baseUrl" v-model="basePath" class="form-control">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Base Url:</label>
-                    <input name="baseUrl" v-model="basePath">
+                <div class="form-row mb-4">
+                    <div class="col-4 form-group">
+                        <label class="font-weight-bold">Contact Name:</label>
+                        <input name="contactName" v-model="contactName" class="form-control">
+                    </div>
+                    <div class="col-4 form-group">
+                        <label class="font-weight-bold">Contact Email:</label>
+                        <input name="contactEmail" v-model="contactEmail" class="form-control">
+                    </div>
+                    <div class="col-4 form-group">
+                        <label class="font-weight-bold">Contact Url:</label>
+                        <input name="contactUrl" v-model="contactUrl" class="form-control">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Description:</label>
-                    <vue-editor name="description" v-model="description"></vue-editor>
-                </div>
+
             </div>
             <div class="col-1">
                 <button v-if="editable" @click="isEditing = !isEditing"
@@ -33,14 +54,13 @@
                     <i class="fa fa-pencil-alt"></i>
                 </button>
             </div>
-
         </div>
         <div class="row" v-else>
             <div class="col-11">
-                <h1>{{title}}</h1>
-                <h3>v {{version}}</h3>
-                <h3>Host: {{host}}</h3>
-                <h3>Base Url: {{basePath}}</h3>
+                <h1 class="text-center font-weight-bold">{{title}}</h1>
+                <h3 class="text-center">v {{version}}</h3>
+                <h3 class="text-center">Host: {{host}}</h3>
+                <h3 class="text-center">Base Url: {{basePath}}</h3>
                 <div v-html="description"></div>
             </div>
             <div class="col-1">
@@ -71,6 +91,9 @@
             host: '',
             basePath: '',
             version: '',
+            contactName: '',
+            contactEmail: '',
+            contactUrl: '',
             isEdited : false,
             isEditing : false
         }),

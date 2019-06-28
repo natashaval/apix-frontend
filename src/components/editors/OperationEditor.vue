@@ -6,38 +6,39 @@
         </ul>
         <div class="row">
         <div v-if="showEdit" class="col-11">
-            <div class="row">
-                <label class="col-2">Summary :</label>
+            <div class="form-group">
+                <label class="font-weight-bold">Summary :</label>
                 <b-input v-model="summary" class="col"></b-input>
             </div>
-            <div class="row">
-                <div class="col-4">
-                    <label class="col-4">Method :</label>
-                    <b-select class="col-8" v-model="method" :options="selectMethodOptions"></b-select>
+            <div class="form-row">
+                <div class="form-group col-8">
+                    <label class="font-weight-bold">Method :</label>
+                    <b-select class="form-control" v-model="method" :options="selectMethodOptions"></b-select>
                     <p v-for="(error,i) in $_changeObserverMixin_getErrors('method')"
                        v-bind:key="i"
                        class="error-message">{{error}}</p>
                 </div>
-                <div class="col-8">
-                    <label class="col-5 float-left">Path :</label>
-                    <b-input class="col-7" v-model="pathApi" disabled></b-input>
+                <div class="form-group col-4">
+                    <label class="font-weight-bold">Path :</label>
+                    <b-input class="form-control" v-model="pathApi" disabled></b-input>
                 </div>
             </div>
-            <div class="row">
-                <label class="col-2">Operation Id :</label>
-                <b-input v-model="operationId" class="col"></b-input>
+            <div class="form-group">
+                <label class="font-weight-bold">Operation Id :</label>
+                <b-input v-model="operationId" class="form-control"></b-input>
             </div>
-            <div class="row">
-                <label>Description:</label>
-                <vue-editor v-model="description"></vue-editor>
+            <div class="form-group">
+                <div class="form-group">
+                    <label class="font-weight-bold">Description:</label>
+                    <vue-editor v-model="description"></vue-editor>
+                </div>
             </div>
-            <div class="row">
-                <label>Consumes :</label>
-                <v-select multiple v-model="consumes" class="w-100" :options="options">
-                </v-select>
+            <div class="form-group">
+                <label class="font-weight-bold">Consumes :</label>
+                <v-select multiple v-model="consumes" class="w-100" :options="options"></v-select>
             </div>
-            <div class="row">
-                <label>Produces :</label>
+            <div class="form-group">
+                <label class="font-weight-bold">Produces :</label>
                 <v-select multiple v-model="produces" class="w-100" :options="options">
                 </v-select>
             </div>
@@ -69,9 +70,9 @@
                 </div>
             </div>
             <button v-if="editable" @click="isEditing = !isEditing"
-                class="col-1 float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
-            <i class="fa fa-pencil-alt"></i>
-        </button>
+                    class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
+                <i class="fa fa-pencil-alt"></i>
+            </button>
         </div>
 
         <RequestComponent ref="request"
@@ -110,7 +111,7 @@
             operationApi : 'get',
             dataUpdated : false,
             isEdited : false,
-            isEditing : false,
+            isEditing : true,
             aceModel : '{}',
             testModel : {
                 name : 'alfian'

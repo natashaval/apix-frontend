@@ -1,20 +1,33 @@
 <template>
     <div>
-        <h1>section name : {{sectionApi}}</h1>
-
-        <!--<div v-show="sectionApi">-->
-            <!--{{sectionData.info}}-->
-        <!--</div>-->
-
         <ul v-show="isEdited">
             <li><button @click="submit">Save</button></li>
             <li><button @click="cancel">Cancel</button></li>
         </ul>
-        Name: <input class="form-control" v-model="name"/>
-        Description:
-            <vue-editor v-model="description"></vue-editor>
+        <div class="form-row">
+            <div v-if="isEditing" class="col-11">
+                <div class="form-group">
+                    <label class="font-weight-bold">Name:</label>
+                    <input class="form-control" v-model="name"/>
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold">Description:</label>
+                    <vue-editor v-model="description"></vue-editor>
+                </div>
+            </div>
+            <div v-else class="col-11">
+                <h4 class="font-weight-bold">{{name}}</h4>
+                <div v-html="description"></div>
+            </div>
+            <div class="col-1">
+                <button v-if="editable" @click="isEditing = !isEditing"
+                        class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
+                    <i class="fa fa-pencil-alt"></i>
+                </button>
+            </div>
 
-        <hr />
+        </div>
+
     </div>
 </template>
 
@@ -39,14 +52,19 @@
                 externalDocs: {},
                 sectionApi: '',
                 isEdited: false,
+                isEditing: false,
                 isCreateNew: false,
-
                 sectionActions: [],
                 sectionRootActions: [],
                 attributesKey: [{key : 'name'},{key : 'description'}],
             }
         },
         computed : {
+            editable : function () {
+                let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
+                if(hasEditingPrivilege === undefined)return false
+                return hasEditingPrivilege
+            },
             sectionData(){
                 if(this.sectionApi){
                     return this.$store.getters['project/getSectionData'](this.sectionApi)

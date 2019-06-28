@@ -1,52 +1,55 @@
 <template>
     <div>
         <div class="dot-border">
-            <h1>Body</h1>
-            <b-button v-if="editable" @click="isEditing = !isEditing" class="float-right round-button">
-                <i class="fa fa-pencil-alt"></i>
-            </b-button>
-            <div class="row" v-if="isEditing">
-                <div style="margin-left: 15px">
-                    <label>Description:</label>
+            <div class="form-row">
+                <div class="col-11" v-if="isEditing">
+                    <div class="form-group">
+                        <label class="font-weight-bold">Description:</label>
+                        <vue-editor v-model="description"></vue-editor>
+                    </div>
                 </div>
-                <div class="col">
-                    <vue-editor style="height: 100px;" v-model="description"></vue-editor>
+                <div class="col-11" v-else>
+                    <label class="font-weight-bold">Description:</label>
+                    <div v-html="description"></div>
+                </div>
+                <div class="col-1">
+                    <button v-if="editable" @click="isEditing = !isEditing"
+                            class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
+                        <i class="fa fa-pencil-alt"></i>
+                    </button>
                 </div>
             </div>
-            <div v-else>
-                <div v-html="description"></div>
-            </div>
-            <div style="margin-top: 30px" class="container">
-                <b-button v-b-modal.modal-importer>import from external json</b-button>
-                <button @click="showHighLevelEditor = !showHighLevelEditor">change editor</button>
-            </div>
-            <HighLvlJsonEditor
-                    ref="root"
-                           v-bind:style="{display : isShow(EDITOR_TYPE_HIGH_LEVEL)}"
-                           :schema-data="schemaDataWrapper.data" :nameable="false"
-                           :deleteable="false"
-                           :editable="editable"
-                           fixed-name="schema"
-                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                           style="margin-top: 130px"/>
-            <LowLvlJsonEditor
-                    v-if="schemaDataWrapper.data !== undefined"
-                    v-bind:style="{
-                        display : isShow(EDITOR_TYPE_LOW_LEVEL),
-                        width:'600px',height: '1000px'
-                    }"
-                    :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                    ref="lowLvlEditor" :json-input="schemaDataWrapper.data"/>
-
-            <b-modal id="modal-importer" title="Import From External Json" hide-footer>
-                <p>select json file or paste to here</p>
-                <input type="file" v-on:change="jsonFileLoaded">
-                <LowLvlJsonEditor
-                        ref="modalJsonInput"
-                        v-bind:style="{display: 'block',width:'400px',height: '400px'}"/>
-                <b-button class="mt-3" @click="()=>{doImport();$bvModal.hide('modal-importer');}">import</b-button>
-            </b-modal>
         </div>
+        <div class="form-group mt-3">
+            <button v-b-modal.modal-importer>import from external json</button>
+            <button @click="showHighLevelEditor = !showHighLevelEditor">change editor</button>
+        </div>
+        <HighLvlJsonEditor ref="root"
+            v-bind:style="{display : isShow(EDITOR_TYPE_HIGH_LEVEL)}"
+            :schema-data="schemaDataWrapper.data" :nameable="false"
+            :deleteable="false"
+            :editable="editable"
+            fixed-name="schema"
+            :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
+        <LowLvlJsonEditor ref="lowLvlEditor"
+            v-if="schemaDataWrapper.data !== undefined"
+            v-bind:style="{
+                display : isShow(EDITOR_TYPE_LOW_LEVEL),
+                height: '1000px'
+            }"
+            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
+            :json-input="schemaDataWrapper.data" class="form-control"/>
+
+        <b-modal id="modal-importer" title="Import From External Json" hide-footer>
+            <div class="form-group">
+                <label class="font-weight-bold">select json file or paste to here</label>
+                <input type="file" v-on:change="jsonFileLoaded">
+            </div>
+            <LowLvlJsonEditor class="form-control"
+                    ref="modalJsonInput"
+                    v-bind:style="{display: 'block',height: '400px'}"/>
+            <button class="mt-3 btn btn-success" @click="()=>{doImport();$bvModal.hide('modal-importer');}">import</button>
+        </b-modal>
     </div>
 </template>
 

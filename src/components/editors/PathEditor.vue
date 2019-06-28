@@ -4,21 +4,55 @@
             <li><button @click="submit">Save</button></li>
             <li><button @click="cancel">Cancel</button></li>
         </ul>
-        <input class="input-group" v-model="path" name="path-input"/>
-        <div class="container">
-            <vue-editor style="height: 100px;" v-model="description"></vue-editor>
+        <div class="form-row">
+            <div v-if="isEditing" class="col-11">
+                <div class="form-group">
+                    <label class="font-weight-bold">Name:</label>
+                    <input class="input-group" v-model="path" name="path-input"/>
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold">Description:</label>
+                    <vue-editor v-model="description"></vue-editor>
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold">Path Variables : </label>
+                    <div class="form-group" v-for="(variable,idx) in variables" v-bind:key="variable.name">
+                        <HighLvlJsonEditor :editable="true"
+                                           :nameable="true"
+                                           :deleteable="false"
+                                           :schema-data="variable"
+                                           :disable-name="true"
+                                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
+                                           ref="variables"
+                                           :component-id="idx"/>
+                    </div>
+                </div>
+            </div>
+            <div v-else class="col-11">
+                <h4 class="font-weight-bold">Path:</h4>
+                <h5>{{path}}</h5>
+                <h4 class="font-weight-bold">Description:</h4>
+                <div v-html="description"></div>
+                <div class="form-group" v-for="(variable,idx) in variables" v-bind:key="variable.name">
+                    <HighLvlJsonEditor :editable="true"
+                                       :parent-is-editing="false"
+                                       :nameable="true"
+                                       :deleteable="false"
+                                       :schema-data="variable"
+                                       :disable-name="true"
+                                       :$_changeObserverMixin_parent="$_changeObserverMixin_this"
+                                       ref="variables"
+                                       :component-id="idx"/>
+                </div>
+            </div>
+            <div class="col-1">
+                <button v-if="editable" @click="isEditing = !isEditing"
+                        class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
+                    <i class="fa fa-pencil-alt"></i>
+                </button>
+            </div>
         </div>
-        <h2>Path Variables : </h2>
-        <div v-for="(variable,idx) in variables" v-bind:key="variable.name">
-            <HighLvlJsonEditor :editable="true"
-                           :nameable="true"
-                           :deleteable="false"
-                           :schema-data="variable"
-                           :disable-name="true"
-                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                           ref="variables"
-                           :component-id="idx"/>
-        </div>
+
 
     </div>
 </template>
@@ -58,6 +92,7 @@
         },
         data : () => ({
             isEdited : false,
+            isEditing : false,
             projectId : undefined,
             sectionApi : undefined,
             pathApi : undefined,//akses param
