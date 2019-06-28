@@ -1,9 +1,12 @@
 <template>
     <div>
-        <ul v-if="isEdited">
-            <li><button @click="submit">Save</button></li>
-            <li><button @click="cancel">Cancel</button></li>
-        </ul>
+<!--        <ul v-if="isEdited">-->
+<!--        <ul>-->
+<!--            <li><button @click="submit">Save</button></li>-->
+<!--            <li><button @click="cancel">Cancel</button></li>-->
+            <SaveComponent :isEdited="isEdited"
+                           :submit="submit" :cancel="cancel"></SaveComponent>
+<!--        </ul>-->
         <div class="row">
             <label class="col-2">Name :</label>
             <b-input v-model="name" class="col"></b-input>
@@ -31,10 +34,11 @@
     import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
     import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
     import * as axios from "axios";
+    import SaveComponent from "./editor-components/SaveComponent";
 
     export default {
         name: "DefinitionEditor",
-        components: {HighLvlJsonEditor,VueEditor},
+        components: {SaveComponent, HighLvlJsonEditor,VueEditor},
         mixins : [ChangeObserverMixin],
         props: {
             definitionApi : {
