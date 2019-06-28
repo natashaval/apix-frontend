@@ -1,6 +1,8 @@
 <template>
     <div>
-        <li @click="methodClick" style="color: white">{{operationApi}}</li>
+        <li @click="methodClick" class="px-4">
+            <div v-html="operationBadge"></div>
+        </li>
     </div>
 </template>
 
@@ -10,6 +12,21 @@
         props : [
             'apiData','operationApi','pathApi','sectionApi'
         ],
+        computed: {
+          operationBadge() {
+              switch (this.operationApi) {
+                  case "get":
+                      return '<a class="badge badge-success">GET</a>'
+                  case "post":
+                      return '<a class="badge badge-warning">POST</a>'
+                  case "put":
+                      return '<a class="badge badge-info">PUT</a>'
+                  case "delete":
+                      return '<a class="badge badge-danger">DELETE</a>'
+              }
+              return null
+          }
+        },
         methods : {
             methodClick : function () {
                 this.$router.push({

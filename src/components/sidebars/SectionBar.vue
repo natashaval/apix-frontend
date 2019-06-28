@@ -1,13 +1,19 @@
 <template>
     <div>
-        <li @click="sectionClick">
-            <i v-b-toggle="'section-'+sectionApi" class="fas fa-angle-right"></i>{{sectionApi}}
-        </li>
-        <b-collapse :id="'section-'+sectionApi" class="mt-2">
-            <ul>
+        <b-button pill size="sm" class="mb-sm-1" variant="outline-secondary"
+                  :class="isArrow ? 'collapsed' : null"
+                  :aria-expanded="isArrow ? 'true' : 'false'"
+                  :aria-controls="'section-'+sectionApi"
+                  @click = "isArrow = !isArrow"
+        > <i class="fas fa-angle-right" v-show="!isArrow"></i>
+            <i class="fas fa-angle-down" v-show="isArrow"></i>
+        </b-button>
+
+        <span @click="sectionClick" class="p-1" style="font-size: large;">{{ sectionApi }}</span>
+
+        <b-collapse :id="'section-'+sectionApi" v-model="isArrow">
                 <PathBar v-for="(value,key) in apiData.paths" v-bind:key="key"
-                         :apiData="value" :sectionApi="sectionApi" :pathApi="key" style="font-size: 20px"/>
-            </ul>
+                         :apiData="value" :sectionApi="sectionApi" :pathApi="key" />
         </b-collapse>
     </div>
 </template>
@@ -24,8 +30,7 @@
         props : ['sectionApi','apiData'],
         data: function() {
             return {
-                // hover: false,
-                // isClick: false
+                isArrow: false
             }
         },
         methods : {
@@ -42,10 +47,7 @@
 </script>
 
 <style scoped>
-    .fa {
-        float: left;
-    }
-    .active {
-        background-color: green;
+    li {
+        list-style-type: none;
     }
 </style>

@@ -62,7 +62,7 @@
     #app{
         border: aqua 1px solid;
         height: 100%;
-        overflow: hidden;
+        width: 100%;
     }
 
     .sidebar{

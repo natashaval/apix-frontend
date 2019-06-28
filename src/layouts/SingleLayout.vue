@@ -1,19 +1,23 @@
 <template>
     <div class="container-fluid">
-        <b-row>
-            <b-col cols="3" class="bg-dark text-white">
-                <nav id="sidebar">
+<!--        <b-row>-->
+<!--            <b-col cols="3">-->
+                <aside class="sidebar bg-dark text-white">
+                <nav>
                     <b-button href="/projects" squared variant="outline-info" block>
                         <i class="fas fa-chevron-left"></i> Back to Projects
                     </b-button>
                     <SideBar :apiData="apiData" />
                 </nav>
-            </b-col>
-            <b-col cols="9" class="main-view">
-            <h2>Single Layout</h2>
-            <router-view></router-view>
-            </b-col>
-        </b-row>
+                </aside>
+<!--            </b-col>-->
+<!--            <b-col cols="9">-->
+        <section class="main">
+                <h2>Single Layout</h2>
+                <router-view></router-view>
+        </section>
+<!--            </b-col>-->
+<!--        </b-row>-->
     </div>
 </template>
 
@@ -33,4 +37,30 @@
 </script>
 
 <style scoped>
+    /*https://codepen.io/peruvianidol/pen/oeFDd*/
+
+    .sidebar, .main {
+        top: 0;
+        bottom: 0;
+        position: absolute;
+        /*overflow: scroll;*/
+        /*overflow-y: scroll;*/
+        /*overflow-x: hidden;*/
+    }
+    .sidebar {
+        width: 25vw;
+        max-width: 30vw;
+        left: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 0.25em 0.5em;
+    }
+    .main {
+        position: absolute;
+        left: 25vw;
+        right: 0;
+        padding-left: 1em;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
 </style>
