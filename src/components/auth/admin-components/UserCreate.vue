@@ -47,6 +47,9 @@
 </template>
 
 <script>
+    import {BASE_URL} from "../../../stores/actions/const";
+    import axios from 'axios';
+
     export default {
         name: "UserCreate",
         data: function () {
@@ -65,11 +68,33 @@
           }
         },
         methods: {
-            onSubmit: function () {
+            onSubmit: function (evt) {
+                evt.preventDefault()
+                // let payload = JSON.stringify(this.user)
+                // console.log(payload)
+                let payload = Object.assign({}, this.user);
+
+                // this.makeToast('success', true, 'ini toast benar')
+
+                axios.post(BASE_URL + 'admin/users', payload).then((response) => {
+                    this.makeToast('success', response.data.success, response.data.message)
+                    this.$store.dispatch('user/addUser', payload)
+                }).catch((e) => {
+                    console.error(e);
+                })
 
             },
-            onReset: function(){
-
+            onReset: function(evt){
+                evt.preventDefault()
+                this.user.username = ''
+                this.user.password = ''
+                this.user.roles = []
+            },
+            makeToast(variant = null, success, message) {
+                this.$bvToast.toast(message, {
+                    title: (success) ? 'Success' : 'Failed',
+                    variant: variant,
+                })
             }
         }
     }

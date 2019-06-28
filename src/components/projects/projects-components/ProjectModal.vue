@@ -1,6 +1,7 @@
 <template>
     <div>
-        <b-button v-b-modal="'project-modal'" variant="primary">New Project</b-button>
+        <b-button v-b-modal="'project-modal'" variant="primary" class="mr-2">New Project</b-button>
+        <b-button variant="secondary" :to="{name: 'project-import'}">Import Projects</b-button>
 
         <b-modal id="project-modal" ref="modal" size="lg"
                  title="Create New Project"

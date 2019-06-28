@@ -34,6 +34,9 @@ export default {
                     commit('LIST_DATA', response.data)
                 })
             fetchUsers()
+        },
+        addUser: ({ commit }, payload) => {
+            commit('PUSH_DATA', payload)
         }
     },
     mutations: {
@@ -52,6 +55,9 @@ export default {
         },
         LIST_DATA (state, newData) {
             state.users = newData
+        },
+        PUSH_DATA (state, newData) {
+            state.users.push(newData)
         }
 
     }
