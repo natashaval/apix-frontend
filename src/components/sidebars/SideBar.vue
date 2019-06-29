@@ -1,11 +1,14 @@
 <template>
     <div>
         <b-row class="my-2">
-            <b-col md="8">
+            <b-col md="10">
                 <ProjectBar :apiData="apiData"/>
             </b-col>
-            <b-col offset-md="2" offset-sm="0">
-                <b-button :to="{name: 'definition-create'}" pill variant="outline-secondary" size="sm">
+            <b-col md="2">
+                <b-button :to="{name: 'definition-create'}"
+                          pill variant="outline-secondary" size="sm"
+                          class="float-right"
+                >
                     <i class="fa fa-plus-circle"></i>
                 </b-button>
             </b-col>
@@ -23,20 +26,23 @@
         <hr />
 
         <b-row>
-            <b-col md="8">
+            <b-col md="10">
                 <b-button
                         :class = "collapseModel ? 'collapsed' : null"
                         :aria-expanded="collapseModel ? 'true' : 'false' "
                         aria-controls="collapse-model"
-                        @click="collapseModel = !collapseModel">
+                        @click="collapseModel = !collapseModel"
+                >
                     <i class="fas fa-caret-down" v-show="collapseModel"></i>
                     <i class="fas fa-caret-right" v-show="!collapseModel"></i>
                     Models
                 </b-button>
             </b-col>
-            <b-col offset-md="2" offset-sm="0">
+            <b-col md="2">
                 <b-button :to="{name: 'definition-create'}" pill size="sm" variant="outline-secondary"
-                          v-b-tooltip.hover title="new definition">
+                          v-b-tooltip.hover title="new definition"
+                          class="float-right"
+                >
                     <i class="fa fa-plus-circle"></i>
                 </b-button>
             </b-col>

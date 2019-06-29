@@ -1,48 +1,79 @@
 <template>
     <div>
-        <form class="create-team" @submit.prevent="submit">
-        <div class="row">
-            <div class="col-md col-sm-1">
-                <button type="submit" class="btn btn-outline-info">Submit</button>
+        <div class="row mb-3">
+            <div class="col-md-1 ">
+                <b-button variant="outline-info" :to="{name: 'user-profile'}">
+                    <i class="fas fa-angle-left"></i> Back
+                </b-button>
             </div>
-        </div>
-        <div class="row" v-show="response.show">
-            <div v-if="response.success">
-                <div class="alert alert-primary">{{response.message}}</div>
-            </div>
-            <div v-else>
-                <div class="alert alert-danger">{{response.message}}</div>
-                <small v-for="(error, i) in response.errors" :key="i">{{error}}</small>
-            </div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col-md-12">
-                Name: <input type="text" v-model="name" required />
-                Division: <input type="text" v-model="division" />
-                Access:
-                <select v-model="access">
-                    <option value="public">Public</option>
-                    <option value="private">Private</option>
-                </select>
+            <div class="col-md-4 mx-0">
+                <h3>Create Team</h3>
             </div>
         </div>
 
-        <div class="row">
-            Member List:
-            <input class="form-control" v-model="searchUser" placeholder="Search member name ..."/>
-            <div class="col-12">
-                <ul class="ul-user">
-                    <li v-for="(user, i) in filterUser" :key="i">
-                        <input type="checkbox" :id="user.username" :value="user.username" v-model="selectedMember"/>
-                        <label :for="user.username">{{user.username}}</label>
-                    </li>
-                    <!--<input type="checkbox" id="user.username" value="user.username" v-model="selectedMember" />-->
-                </ul>
+        <form id="create-team" @submit.prevent="submit" @reset="reset" v-if="show">
+            <!--div class="row" v-show="response.show">
+                <div v-if="response.success">
+                    <div class="alert alert-primary">{{response.message}}</div>
+                </div>
+                <div v-else>
+                    <div class="alert alert-danger">{{response.message}}</div>
+                    <small v-for="(error, i) in response.errors" :key="i">{{error}}</small>
+                </div>
             </div>
-        </div>
+            <br /-->
+            <div class="form-row">
+                <div class="form-group col-md-5 mb-2">
+                    <label for="create-name">Name: </label>
+                    <input type="text" v-model="name" id="create-name" class="form-control" required />
+                </div>
+                <div class="form-group col-md-3 mb-2">
+                    <label for="create-division">Division: </label>
+                    <input type="text" v-model="division" id="create-division" class="form-control" />
+                </div>
+                <div class="form-group col-md-2 mb-2">
+                    <label for="create-access">Access: </label>
+                    <select v-model="access" id="create-access" class="form-control">
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-1 mb-2">
+                    <label for="create-submit" class="invisible">Submit</label>
+                    <button type="submit" id="create-submit"
+                            class="btn btn-info btn-block">Submit</button>
+                </div>
+                <div class="form-group col-md-1 mb-2">
+                    <label for="create-submit" class="invisible">Reset</label>
+                    <button type="reset" id="create-reset"
+                            class="btn btn-outline-danger btn-block">Reset</button>
+                </div>
 
-        <span>Selected Members: {{selectedMember}}</span>
+            </div>
+
+            <div class="form-row">
+                <label>Member List: </label>
+                <div class="input-group mb-2">
+                    <input class="form-control" type="text"
+                       v-model="searchUser" placeholder="Search member name ..."/>
+                    <div class="input-group-append">
+                        <span class="input-group-text"><i class="fa fa-search"></i> </span>
+                    </div>
+                </div>
+                <div class="col-md-12 custom-control custom-checkbox">
+                    <ul class="ul-user">
+                        <li v-for="(user, i) in filterUser" :key="i">
+                            <input type="checkbox" class="custom-control-input"
+                                   :id="user.username" :value="user.username"
+                                   v-model="selectedMember" />
+                            <label class="custom-control-label"
+                                    :for="user.username">{{user.username}}</label>
+                        </li>
+                        <!--<input type="checkbox" id="user.username" value="user.username" v-model="selectedMember" />-->
+                    </ul>
+                </div>
+            </div>
+            <!--<span>Selected Members: {{selectedMember}}</span>-->
         </form>
     </div>
 </template>
@@ -66,7 +97,8 @@
                     success: false,
                     message: '',
                     errors: []
-                }
+                },
+                show: true
             }
         },
         created(){
@@ -123,10 +155,34 @@
                 let payload = this.dump()
                 axios.post(BASE_URL + 'teams', payload).then((res) => {
                     console.log('finish axios post create team')
-                    this.response.show = true
-                    this.response.success = res.data.success
-                    this.response.message = res.data.message
-                    if (res.data.errors && res.data.errors.length > 0) this.response.errors = res.data.errors
+                    // this.response.show = true
+                    // this.response.success = res.data.success
+                    // this.response.message = res.data.message
+                    // if (res.data.errors && res.data.errors.length > 0) this.response.errors = res.data.errors
+                    this.makeToast('success', res.data.success, res.data.message)
+                }).catch((e) => {
+                    console.error(e)
+                    this.makeToast('danger', res.data.success, res.data.message)
+                })
+            },
+            reset: function(evt){
+                evt.preventDefault();
+                this.name = ''
+                this.division = ''
+                this.access = 'public'
+                this.searchUser = ''
+                this.selectedMember = []
+
+                this.show = false
+                // reset validation state
+                this.$nextTick(() => {
+                    this.show = true
+                })
+            },
+            makeToast(variant, success, message){
+                this.$bvToast.toast(message, {
+                    title: (success) ? 'Success' : 'Failed',
+                    variant: variant
                 })
             }
         },
@@ -148,10 +204,10 @@
 </script>
 
 <style scoped>
-ul.ul-user {
-    column-count: 3;
-    column-gap: 2rem;
-    list-style: none;
-    text-align: left;
-}
+    ul.ul-user {
+        column-count: 3;
+        column-gap: 2rem;
+        list-style: none;
+        text-align: left;
+    }
 </style>

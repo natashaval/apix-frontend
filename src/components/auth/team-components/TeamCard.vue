@@ -4,7 +4,10 @@
                 v-for="team in teams" :key="team.id"
                 >
             <b-card-body>
-                <b-card-title><b-link :to="{name: 'team-viewer', params: {name: team.name }}">{{team.name}}</b-link> </b-card-title>
+                <b-card-title>
+                    <b-link :to="{name: 'team-viewer', params: {name: team.name }}">{{team.name}}</b-link>
+                </b-card-title>
+                <b-card-sub-title>Creator: {{team.creator}}</b-card-sub-title>
             </b-card-body>
             <b-card-footer v-if="!isGrant">
                 <button class="btn btn-primary" @click="confirm(team.name)">Confirm</button>

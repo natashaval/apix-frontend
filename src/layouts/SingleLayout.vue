@@ -60,6 +60,7 @@
         left: 25vw;
         right: 0;
         padding-left: 1em;
+        padding-right: 10px;
         overflow-y: auto;
         overflow-x: hidden;
     }

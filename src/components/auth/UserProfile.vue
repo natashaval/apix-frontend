@@ -1,30 +1,47 @@
 <template>
     <div>
-        {{ profile }}
+        <!--{{ profile }}-->
 
         <div>
             <b-media right-align>
-                <b-img slot="aside" blank blank-color="#ccc" width="70" alt="profile picture"></b-img>
-                <h4 class="mt-0 mb-1">Hello, {{profile.username}}</h4>
+                <b-img slot="aside" blank blank-color="#ccc" width="70" rounded="circle" alt="profile picture"></b-img>
+                <h4 class="mt-0 mb-1">Hello, </h4>
+                <h4 class="font-weight-bold font-italic">{{profile.username}}
+                    <span class="badge badge-pill badge-primary mr-2" v-if="profile.roles.includes('ROLE_ADMIN')">Admin</span>
+                    <span class="badge badge-pill badge-secondary mr-2" v-if="profile.roles.includes('ROLE_USER')">User</span>
+                </h4>
+
             </b-media>
         </div>
 
         <div>
             <b-tabs>
                 <b-tab title="Team" active>
-                    <b-button variant="info" :to="{name: 'team-create'}">Create Team</b-button>
+                    <b-button variant="info" :to="{name: 'team-create'}"
+                              class="my-2 float-right"
+                    >Create Team</b-button>
 
-                    <div class="mt-3 mb-3">
-                        <h3>Need Confirmation</h3>
-                        <b-card-group columns class="mb-3">
+                    <div class="my-2">
+                        <h4>Need Confirmation</h4>
+                        <b-card-group columns class="mb-2">
                             <TeamCard :teams="ungrantUser" :isGrant="false" @update="loadTeam"></TeamCard>
                         </b-card-group>
                     </div>
 
-                    <div class="mt-3">
-                        <h3>My Teams</h3>
-                        <b-card-group columns class="mb-3">
-                            <TeamCard :teams="grantUser" :isGrant="true"></TeamCard>
+                    <div class="my-2">
+                        <h4>My Teams</h4>
+                        <div class="input-group mb-2">
+                            <input class="form-control" type="text"
+                                   v-model="searchTeam" placeholder="Search team name ..."/>
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fa fa-search"></i> </span>
+                            </div>
+                        </div>
+
+                        <!--{{grantUser}}-->
+
+                        <b-card-group columns class="mb-2">
+                            <TeamCard :teams="filterTeam" :isGrant="true"></TeamCard>
                         </b-card-group>
                     </div>
                 </b-tab>
@@ -49,7 +66,8 @@
         data: function(){
             return {
                 teams: null,
-                dump: false
+                dump: false,
+                searchTeam: ''
             }
         },
         computed: {
@@ -72,6 +90,14 @@
                     u.members.some((members) => !members.grant && members.username.includes(this.profile.username))
                 );
             },
+            filterTeam: function(){
+                if (this.searchTeam === '') return this.grantUser
+                else {
+                    return this.grantUser.filter((u) => u.name.toLowerCase().includes(
+                        this.searchTeam.toLowerCase()
+                    ))
+                }
+            }
 
         },
         methods: {
