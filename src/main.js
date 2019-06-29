@@ -7,7 +7,7 @@ import axios from 'axios'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import BootstrapVue from 'bootstrap-vue'
-import { BToast } from 'bootstrap-vue'
+import { makeToast } from "./assets/toast";
 
 Vue.use(BootstrapVue)
 
@@ -34,6 +34,10 @@ axios.interceptors.response.use(response => {
   console.log(error.response.status)
   console.log(error.response.headers)
   alert(error.response.data.message)
+  // Vue.prototype.$toast.error(error.response.data.message, 'Whoops!');
+  // makeToast('danger', error.response.data.success, error.response.data.message)
+  // Vue.prototype.$toaster.error(error.response.data.message)
+
   return Promise.reject(error)
 })
 

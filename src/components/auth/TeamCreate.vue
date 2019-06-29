@@ -8,6 +8,7 @@
             </div>
             <div class="col-md-4 mx-0">
                 <h3>Create Team</h3>
+                <button @click="toast">Toast</button>
             </div>
         </div>
 
@@ -81,6 +82,7 @@
 <script>
     import axios from 'axios'
     import {BASE_URL} from "../../stores/actions/const";
+    import {makeToast} from "../../assets/toast.js"
 
     export default {
         name: "TeamCreate",
@@ -107,6 +109,10 @@
         methods: {
             setLayout (layout) {
                 this.$store.commit('layout/SET_LAYOUT', layout);
+            },
+            makeToast,
+            toast: function(){
+                this.makeToast('danger', false, 'mboh')
             },
             loadUsers: function(){
                 axios.get(BASE_URL + 'admin/users').then((response) => {
@@ -162,7 +168,6 @@
                     this.makeToast('success', res.data.success, res.data.message)
                 }).catch((e) => {
                     console.error(e)
-                    this.makeToast('danger', res.data.success, res.data.message)
                 })
             },
             reset: function(evt){
@@ -177,12 +182,6 @@
                 // reset validation state
                 this.$nextTick(() => {
                     this.show = true
-                })
-            },
-            makeToast(variant, success, message){
-                this.$bvToast.toast(message, {
-                    title: (success) ? 'Success' : 'Failed',
-                    variant: variant
                 })
             }
         },

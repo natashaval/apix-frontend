@@ -49,6 +49,7 @@
 <script>
     import {BASE_URL} from "../../../stores/actions/const";
     import axios from 'axios';
+    import {makeToast} from '../../../assets/toast.js'
 
     export default {
         name: "UserCreate",
@@ -68,6 +69,7 @@
           }
         },
         methods: {
+            makeToast,
             onSubmit: function (evt) {
                 evt.preventDefault()
                 // let payload = JSON.stringify(this.user)
@@ -89,12 +91,6 @@
                 this.user.username = ''
                 this.user.password = ''
                 this.user.roles = []
-            },
-            makeToast(variant = null, success, message) {
-                this.$bvToast.toast(message, {
-                    title: (success) ? 'Success' : 'Failed',
-                    variant: variant,
-                })
             }
         }
     }
