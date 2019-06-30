@@ -6,7 +6,6 @@ import SectionEditor from "../components/editors/SectionEditor";
 import {store} from '../stores'
 import PathEditor from "../components/editors/PathEditor";
 import OperationEditor from "../components/editors/OperationEditor";
-import ProjectRepo from "../components/projects/ProjectRepo";
 import DefinitionEditor from "../components/editors/DefinitionEditor";
 import AuthLogin from "../components/auth/AuthLogin";
 import UserProfile from "../components/auth/UserProfile";
@@ -15,8 +14,8 @@ import GithubEditor from "../components/editors/GithubEditor";
 import TeamCreate from "../components/auth/TeamCreate";
 import TeamViewer from "../components/auth/TeamViewer";
 import ProjectsList from "../components/projects/ProjectsList";
-import UserCreate from "../components/auth/admin-components/UserCreate";
 import UserViewer from "../components/auth/admin-components/UserViewer";
+import ErrorNotFound from "../ErrorNotFound";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -104,9 +103,7 @@ export const router = new VueRouter({
         },
         {// List of Projects available
             name: 'project-repo', path: '/projects',
-            // component: ProjectRepo, props: true,
             component: ProjectsList
-            // beforeEnter: listProjects
         },
         {
           name: 'project-import', path: '/projects/import',
@@ -131,9 +128,11 @@ export const router = new VueRouter({
         {
             name: 'user-viewer', path: '/admin/users',
             component: UserViewer
+        },
+        {
+            name: 'error-not-found', path: '*',
+            component: ErrorNotFound
         }
-
-
     ]
 })
 
@@ -146,7 +145,6 @@ router.beforeEach((to, from, next) => {
     const loggedIn = localStorage.getItem('apix-token');
 
     if (authRequired && !loggedIn) {
-        // return next('/login');
         router.push('/login');
     }
 

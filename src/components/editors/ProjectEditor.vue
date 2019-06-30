@@ -79,6 +79,7 @@
     import ActionBuilder from "@/utils/ActionBuilderUtil"
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
+    import {NOT_FOUND} from "@/stores/consts/FetchStatus"
 
     export default {
         name: "ProjectEditor",
@@ -98,6 +99,9 @@
             isEditing : false
         }),
         computed : {
+            projectState : function (){
+                return this.$store.getters['project/getState']
+            },
             apiData : function () {
                 return this.$store.getters['project/getProjectData']
             },
@@ -174,6 +178,13 @@
         watch : {
             apiData : function () {
                 this.loadData()
+            },
+            projectState : function () {
+                if(this.projectState === NOT_FOUND){
+                    this.$router.push({
+                        name :'project-repo'
+                    })
+                }
             }
         },
         mounted: function () {

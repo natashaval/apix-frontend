@@ -30,6 +30,7 @@
     import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
     import * as axios from "axios";
     import SaveComponent from "./editor-components/SaveComponent";
+    import {COMPLETE, NOT_FOUND} from "../../stores/consts/FetchStatus";
 
     export default {
         name: "DefinitionEditor",
@@ -50,6 +51,9 @@
             definitionActions : []
         }),
         computed: {
+            projectState : function (){
+                return this.$store.getters['project/getState']
+            },
             projectData : function () {
                 return this.$store.getters['project/getProjectData']
             },
@@ -184,6 +188,19 @@
             },
             definitionData : function () {
                 this.loadData()
+            },
+            projectState : function () {
+                if(
+                    (this.projectState === NOT_FOUND) ||
+                    (this.projectState === COMPLETE && this.definitionData === undefined)
+                ){
+                    this.$router.push({
+                        name :'project-editor',
+                        params : {
+                            projectId : this.$route.params.projectId
+                        }
+                    })
+                }
             }
         },
         mounted() {

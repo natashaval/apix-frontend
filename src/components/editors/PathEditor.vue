@@ -63,8 +63,9 @@
     import * as axios from "axios";
     import uuidv4 from 'uuid/v4';
     import { VueEditor } from 'vue2-editor'
-    import TreeBuilder from "../../utils/DeepTreeBuilderUtil";
-    import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
+    import TreeBuilder from "@/utils/DeepTreeBuilderUtil";
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
+    import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
 
 
     export default {
@@ -72,6 +73,9 @@
         components: {VueEditor,HighLvlJsonEditor},
         mixins : [ChangeObserverMixin],
         computed : {
+            projectState : function (){
+                return this.$store.getters['project/getState']
+            },
             editable : function () {
                 let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
                 if(hasEditingPrivilege === undefined)return false
@@ -281,6 +285,19 @@
                             this.variables[i].name = newVars[i]
                         }
                     }
+                }
+            },
+            projectState : function () {
+                if(
+                    (this.projectState === NOT_FOUND) ||
+                    (this.projectState === COMPLETE && this.pathData === undefined)
+                ){
+                    this.$router.push({
+                        name :'project-editor',
+                        params : {
+                            projectId : this.$route.params.projectId
+                        }
+                    })
                 }
             }
         },

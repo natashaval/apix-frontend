@@ -98,6 +98,7 @@
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import ActionBuilder from "@/utils/ActionBuilderUtil";
     import vSelect from 'vue-select';
+    import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
 
     export default {
         name: "OperationEditor",
@@ -149,6 +150,9 @@
             pathActionQuery : [],
         }),
         computed : {
+            projectState : function (){
+                return this.$store.getters['project/getState']
+            },
             modelName : function (){
                 return this.testModel.name
             },
@@ -400,7 +404,19 @@
             operationData : function (after,before) {
                 this.loadData()
             },
-
+            projectState : function () {
+                if(
+                    (this.projectState === NOT_FOUND) ||
+                    (this.projectState === COMPLETE && this.operationData === undefined)
+                ){
+                    this.$router.push({
+                        name :'project-editor',
+                        params : {
+                            projectId : this.$route.params.projectId
+                        }
+                    })
+                }
+            }
         },
         mounted() {
             this.loadData()

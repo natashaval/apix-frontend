@@ -39,14 +39,15 @@
     import * as axios from "axios"
     import {BASE_URL} from "../../stores/actions/const";
     import uuidv4 from 'uuid/v4';
+    import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
 
     export default {
         name: "SectionEditor",
-        props : ['projectId'],
         components: {VueEditor},
         mixins : [ChangeObserverMixin],
         data: function(){
             return {
+                projectId: undefined,
                 name: '',
                 description: '',
                 externalDocs: {},
@@ -60,6 +61,9 @@
             }
         },
         computed : {
+            projectState : function (){
+                return this.$store.getters['project/getState']
+            },
             editable : function () {
                 let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
                 if(hasEditingPrivilege === undefined)return false
@@ -199,8 +203,6 @@
                 ).catch(function (error) {
                     console.log(error);
                 })
-
-
             },
             cancel: function(){
                 console.log('cancel')
@@ -217,6 +219,19 @@
             },
             sectionData: function () {
                 this.loadData()
+            },
+            projectState : function () {
+                if(
+                    (this.projectState === NOT_FOUND) ||
+                    (this.projectState === COMPLETE && this.sectionData === undefined)
+                ){
+                    this.$router.push({
+                        name :'project-editor',
+                        params : {
+                            projectId : this.$route.params.projectId
+                        }
+                    })
+                }
             }
         }
     }

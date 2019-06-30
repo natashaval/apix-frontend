@@ -1,11 +1,14 @@
 import axios from 'axios'
-import {BASE_URL} from "../actions/const";
+import {BASE_URL} from "@/stores/actions/const";
+import {IN_PROCESS,COMPLETE,NOT_FOUND} from "@/stores/consts/FetchStatus";
+import {NOT_START} from "@/stores/consts/FetchStatus";
 
 export default{
     namespaced : true,
     state : {
         projects : [],//list project lain, cuma data sederhana (id,nama,...dll)
-        project : {}//menyimpan data detail dari suatu project
+        project : {},//menyimpan data detail dari suatu project
+        fetchStatus : NOT_START
     },
     getters : {
         getProjectList(state){
@@ -47,6 +50,9 @@ export default{
         },
         getGithubData(state) {
             return state.project.githubProject
+        },
+        getState(state){
+            return state.fetchStatus
         }
     },
     mutations: {
@@ -65,18 +71,27 @@ export default{
 
         ADD_DATA(state, newData) {
             state.projects.push(newData)
+        },
+        CHANGE_STATE(state, processState){
+            state.fetchStatus = processState
         }
     },
     actions : {
         fetchProjectData({ commit }, idProject) {
+            commit('CHANGE_STATE', IN_PROCESS)
             let fetchData = () => axios.get(BASE_URL + 'projects/'+idProject).then(
                 (response) => {
-                    commit('ASSIGN_DATA', response.data)
+                    if(response.status === 200){
+                        commit('ASSIGN_DATA', response.data)
+                        commit('CHANGE_STATE', COMPLETE)
+                    }
                 }
-            )
+            ).catch(() => {
+                commit('CHANGE_STATE', NOT_FOUND)
+            })
             fetchData()
         },
-        
+
         fetchAllProjectsData({ commit }) {
             let fetchProjects = () => axios.get(BASE_URL + 'projects/all/info')
                 .then((response) => {
@@ -95,7 +110,6 @@ export default{
             })
             deleteProject()
         },
-
         createProjectData({commit}, newProjectForm) {
             return new Promise((resolve, reject) => {
                 axios.post(BASE_URL + 'projects', newProjectForm)
