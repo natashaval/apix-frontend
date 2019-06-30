@@ -2,7 +2,7 @@
     <div class="container-fluid">
 <!--        <b-row>-->
 <!--            <b-col cols="3">-->
-                <aside class="sidebar bg-dark text-white">
+                <aside class="sidebar text-white" style="background: #1d2225">
                 <nav>
                     <b-button href="/projects" squared variant="outline-info" block>
                         <i class="fas fa-chevron-left"></i> Back to Projects

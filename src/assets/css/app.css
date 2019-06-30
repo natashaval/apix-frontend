@@ -1,0 +1,33 @@
+li {
+    list-style-type: none;
+}
+
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    text-align: center;
+    line-height: 1.42857;
+    background-color: rgba(237,237,255,0);
+    border-color: rgba(237,237,255,0);
+}
+
+.btn-circle .fas{
+    color: #ffffff;
+    font-size: 15px;
+}
+
+.btn-circle:active { border-style: outset;}
+
+.btn-circle:hover{
+    background-color: rgba(74, 186, 255, 0.24);
+}
+
+.shrinkable-text{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.sidebar-content:hover{
+    background-color: #204154;
+}

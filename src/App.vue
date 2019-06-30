@@ -66,7 +66,6 @@
     }
 
     .sidebar{
-        border: red 1px solid;
         position: fixed;
         overflow: auto;
         height: 100vh;
@@ -99,7 +98,6 @@
         box-shadow: 0px 0px 2px #888;
         padding: 0.5em 0.6em;
     }
-
 
 </style>
 

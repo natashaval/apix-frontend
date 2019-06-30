@@ -1,21 +1,27 @@
 <template>
-    <li class="px-3">
-<!--        <a @click="pathClick">-->
-<!--            <i v-b-toggle="'link-'+pathApi" class="fa fa-angle-right"></i>-->
-<!--            {{pathApi}}-->
-<!--        </a>-->
-        <span class="mb-sm-1"
-                  :class="isArrow ? 'collapsed' : null"
-                  :aria-expanded="isArrow ? 'true' : 'false'"
-                  :aria-controls="'link-'+pathApi"
-                  @click = "isArrow = !isArrow"
-        > <i class="fas fa-angle-right" v-show="!isArrow"></i>
-            <i class="fas fa-angle-down" v-show="isArrow"></i>
-        </span>
+    <li>
+        <div class="row sidebar-content" style="padding-left: 2.5em;height: 2em;"
+             @mouseover="onHover=true" @mouseleave="onHover=false">
+            <button class="btn-circle"
+                    :class="isArrow ? 'collapsed' : null"
+                    :aria-controls="'link-'+pathApi"
+                    @click = "isArrow = !isArrow">
+                <i class="fas fa-caret-right" v-show="!isArrow"></i>
+                <i class="fas fa-caret-down" v-show="isArrow"></i>
+            </button>
 
-        <span @click="pathClick"> {{ pathApi }}</span>
-
-        <b-collapse :id="'link-'+pathApi" class="mt-2" v-model="isArrow">
+            <p @click="pathClick" class="shrinkable-text col-9"
+               style="font-size: 0.9em;margin-left: -1em;margin-top: 0.3em;"> {{ pathApi }}</p>
+            <div v-if="onHover" class="row">
+                <button class="btn-circle">
+                    <i style="font-size: 13px;" class="fas fa-trash"></i>
+                </button>
+                <button class="btn-circle" @click="createOperation">
+                    <i style="font-size: 14px;" class="fas fa-plus-circle"></i>
+                </button>
+            </div>
+        </div>
+        <b-collapse :id="'link-'+pathApi" v-model="isArrow">
             <OperationBar v-for="(value,key) in apiData.methods" v-bind:key="key" :apiData="value"
                           :sectionApi="sectionApi" :pathApi="pathApi"
                           :operationApi="key"/>
@@ -31,7 +37,8 @@
         props : ['apiData','pathApi','sectionApi'],
         data: function(){
             return {
-                isArrow: false
+                isArrow: false,
+                onHover : false,
             }
         },
         methods : {
@@ -40,18 +47,18 @@
                     name :'path-editor',
                     params: {sectionApi : this.sectionApi, pathApi : this.pathApi}
                 })
+            },
+            createOperation : function () {
+                this.$router.push({
+                    name :'operation-create',
+                    params: {sectionApi : this.sectionApi, pathApi : this.pathApi, operationApi : this.method}
+                })
             }
         }
     }
 </script>
 
 <style scoped>
-    .path-bar{
-        float: left;
-        width: 100%;
-    }
-    .path-bar:hover{
-        background: white;
-    }
+    @import "../../assets/css/app.css";
 
 </style>

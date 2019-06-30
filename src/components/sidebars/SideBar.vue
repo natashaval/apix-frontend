@@ -6,16 +6,15 @@
             </b-col>
             <b-col md="2">
                 <b-button :to="{name: 'definition-create'}"
-                          pill variant="outline-secondary" size="sm"
-                          class="float-right"
-                >
+                          size="sm"
+                          class="float-right">
                     <i class="fa fa-plus-circle"></i>
                 </b-button>
             </b-col>
         </b-row>
 
         <b-row>
-            <b-col>
+            <b-col style="padding-left: 0em;padding-right: 0">
                 <Section v-for="(value,key) in apiData.sections"
                          v-bind:key="key"
                          :apiData="value"
@@ -84,5 +83,6 @@
     }
 </script>
 
-<style>
+<style scoped>
+    @import "../../assets/css/app.css";
 </style>

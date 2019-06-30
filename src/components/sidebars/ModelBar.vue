@@ -57,8 +57,8 @@ li.router-link-exact-active {
 
 li:hover {
     background-color: #17a2b8;
-    opacity: 0.5;
-    color: ghostwhite;
+    opacity: 1;
+    color: white;
     cursor: pointer;
 }
 </style>
