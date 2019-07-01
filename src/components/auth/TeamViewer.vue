@@ -75,7 +75,7 @@
         </div>
 
         <div class="row">
-            <div class="col-md-12 bg-light mb-2">
+            <div class="col-md-12 mb-2">
                 <p class="font-weight-bold" style="font-size: 1.5em;">
                     <i class="fas fa-book"></i>
                     Projects</p>
@@ -83,25 +83,12 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                <ProjectsTable></ProjectsTable>
+                <ProjectsTable :team="team.name"></ProjectsTable>
             </div>
         </div>
 
     </div>
 
-    <!--<div class="col-md-6 ml-auto" style="background-color: ghostwhite;">-->
-
-    <!--<div class="row">-->
-    <!--<div class="col-md-12 bg-primary text-light">-->
-    <!--&lt;!&ndash;<input type="text" readonly v-model="team.name" id="create-name" class="form-control-plaintext" />&ndash;&gt;-->
-    <!--<p class="font-weight-bold" style="font-size: 1.5em;">-->
-    <!--<i class="fas fa-book"></i>-->
-    <!--Projects</p>-->
-    <!--</div>-->
-    <!--</div>-->
-    <!--</div>-->
-    <!--</div>-->
-    <!--</div>-->
 </template>
 
 <script>
@@ -159,6 +146,7 @@
                     this.loadTeam();
                 }).catch((e) => {
                     console.error(e);
+                    this.makeToast('danger', e.response.data.success, e.response.data.message)
                 })
             },
             setLayout (layout) {

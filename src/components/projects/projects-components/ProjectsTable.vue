@@ -29,7 +29,7 @@
             </b-row>
 
 
-        <b-table :items="projects"
+        <b-table :items="projectFilterByTeam"
                  :fields="fields"
                  :busy="isBusy"
                  :current-page="currentPage"
@@ -81,6 +81,12 @@
 
     export default {
         name: "ProjectsTable",
+        props: {
+          team: {
+              type: String,
+              required: false
+          }
+        },
         data: function () {
             return {
                 projects: [],
@@ -97,7 +103,8 @@
                         formatter: value => {
                             var d = new Date(value);
                             return d.toLocaleString();
-                        }
+                        },
+                        sortable: true
                     }
                     // {
                     //     key: 'id',
@@ -145,8 +152,16 @@
         computed: {
             totalRows(){
                 return this.projects.length;
+            },
+            projectFilterByTeam(){
+                if (this.team == undefined) return this.projects
+                else {
+                    return this.projects.filter(u => {
+                        return u.teams.includes(this.team)
+                    })
+                }
             }
-        }
+        },
     }
 </script>
 

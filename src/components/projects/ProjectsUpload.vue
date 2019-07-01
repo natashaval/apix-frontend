@@ -5,10 +5,11 @@
             <label>Files Upload</label>
             <input type="file" id="file" ref="file" multiple @change="handleFileUpload()"/>
 
-            <div v-for="(existFile,key) in files" :key="key">
+            <div v-for="(existFile,i) in files" :key="i">
                 {{ existFile.file.name }}
                 <p>Validation: {{existFile.message}}</p>
-                <span class="remove-file" @click="removeFile(idx)">Remove</span>
+<!--                <progress max="100" :value.prop="uploadPercentage[key]"></progress>-->
+                <span class="remove-file" @click="removeFile(i)">Remove</span>
             </div>
 
             <button @click="addFile()">Add Files</button>
@@ -29,6 +30,7 @@
         data: function() {
             return {
                 files: {},
+                uploadPercentage: []
             }
         },
         methods: {
@@ -43,15 +45,15 @@
             },
             submitFile(){
                 const self = this;
+                // console.log(self.files);
 
                 for (var key in self.files) {
 
+                    // self.files.forEach(function(value, i) {
                     let formData = new FormData();
                     const postFile = self.files[key];
                     formData.append('type', 'oas-swagger2');
                     formData.append('file', postFile['file']);
-
-                    console.log(postFile);
 
                     // Validation if file exists and file type is application/json
                     if (typeof postFile['file'].name === 'undefined') {
@@ -63,28 +65,38 @@
                         postFile.message = 'File type should be application/json';
 
                     } else {
+
                         axios.post(BASE_URL + 'projects/import', formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data'
-                            }
-                        }).then(function () {
+                            },
+                            // https://serversideup.net/file-upload-progress-indicator-with-axios-and-vuejs/
+                            // onUploadProgress: function (progressEvent) {
+                            //     this.uploadPercentage[key] = parseInt( Math.round( ( progressEvent.loaded * 100 ) / progressEvent.total ) );
+                            // }
+                        }).then((response) => {
                             console.log('SUCCESS!');
                             postFile.status = true;
-                            postFile.message = 'OAS has been imported!';
+                            postFile.message = 'OAS has been imported';
                         })
                             .catch(function (e) {
                                 console.log('ERROR!', e);
+                                postFile.status = false;
+                                postFile.message = e.response.data.message;
                             })
 
                     }
-
                 }
+
+                // });
+
 
             },
             addFile(){
                 this.$refs.file.click();
             },
             removeFile(idx){
+                console.log('remove clicked', idx)
                 delete this.files[idx];
             },
             dumpFile(){

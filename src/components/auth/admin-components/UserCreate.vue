@@ -16,7 +16,8 @@
                                       trim
                         ></b-form-input>
 
-                        <b-input-group prepend="$">
+                        <b-input-group>
+                            <b-input-group-text slot="prepend"><i class="fas fa-key"></i></b-input-group-text>
                             <b-input id="input-password"
                                      placeholder="Password"
                                      v-model="user.password"
@@ -83,6 +84,7 @@
                     this.$store.dispatch('user/addUser', payload)
                 }).catch((e) => {
                     console.error(e);
+                    this.makeToast('danger', e.response.data.success, e.response.data.message)
                 })
 
             },
