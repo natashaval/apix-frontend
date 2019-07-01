@@ -65,6 +65,13 @@ export default {
             }
         }
         return true
+    },
+
+    isEqualObjectByKeys : function (obj1, obj2, keys) {
+        for(let key of keys){
+            if(obj1[key] !== obj2[key])return false
+        }
+        return true
     }
 
 }

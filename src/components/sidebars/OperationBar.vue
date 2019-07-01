@@ -1,5 +1,6 @@
 <template>
-    <div class="sidebar-content" @mouseover="onHover=true" @mouseleave="onHover=false" style="height: 2em;">
+    <div class="sidebar-content" @mouseover="onHover=true" @mouseleave="onHover=false" style="height: 2em;"
+         :class="{'active-bar':isActive}">
         <li style="padding-left: 4em;font-size: 14px" class="row">
             <div class="col-2" style="margin-top: 0.3em" v-html="operationBadge" @click="methodClick" ></div>
             <span class="shrinkable-text col-8" style="margin-top: 0.35em;" @click="methodClick">
@@ -16,6 +17,8 @@
     import DeepTreeBuilderUtil from "@/utils/DeepTreeBuilderUtil"
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
+    import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
+    import ApixUtil from "../../utils/ApixUtil";
 
     export default {
         name: "OperationBar",
@@ -51,6 +54,10 @@
             },
             pathData : function () {
                 return this.$store.getters['project/getPathData'](this.sectionApi,this.pathApi)
+            },
+            isActive : function () {
+                return this.$route.name === 'operation-editor' &&
+                    ApixUtil.isEqualObjectByKeys(this.$route.params, this.$props, ['sectionApi','pathApi','operationApi'])
             }
         },
         methods : {

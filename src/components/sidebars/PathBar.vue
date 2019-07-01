@@ -1,6 +1,7 @@
 <template>
     <li>
         <div class="row sidebar-content" style="padding-left: 2.5em;height: 2em;"
+             :class="{'active-bar':isActive}"
              @mouseover="onHover=true" @mouseleave="onHover=false">
             <button class="btn-circle"
                     :class="isArrow ? 'collapsed' : null"
@@ -21,8 +22,11 @@
                 </button>
             </div>
         </div>
-        <b-collapse :id="'link-'+pathApi" v-model="isArrow" v-if="pathData !== undefined">
-            <OperationBar v-for="(value,key) in pathData.methods" v-bind:key="key"
+        <b-collapse :id="'link-'+pathApi" v-model="isArrow" v-if="pathData !== undefined" :style="{
+            display : (hasActiveChild)?'block':'hidden'
+        }">
+            <OperationBar ref="operationBars"
+                    v-for="(value,key) in pathData.methods" v-bind:key="key"
                           :project-api="projectApi"
                           :section-api="sectionApi" :path-api="pathApi"
                           :operation-data="value"
@@ -49,6 +53,7 @@
             return {
                 isArrow: false,
                 onHover : false,
+                operationBarRef : null
             }
         },
         computed : {
@@ -57,6 +62,19 @@
                     return this.$store.getters['project/getSectionData'](this.sectionApi)
                 }
                 return undefined
+            },
+            isActive : function () {
+                return this.$route.name === 'path-editor' && this.$route.params.pathApi === this.pathApi
+            },
+            hasActiveChild : function () {
+                if(this.operationBarRef){
+                    return this.operationBarRef.find(bar => {
+                        if(bar.isActive){
+                            return true
+                        }
+                    }) !== undefined
+                }
+                return false
             }
         },
         methods : {
@@ -119,6 +137,9 @@
                         ]
                     })
             }
+        },
+        mounted() {
+            this.operationBarRef = this.$refs['operationBars']
         }
     }
 </script>

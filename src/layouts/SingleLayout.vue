@@ -48,8 +48,8 @@
         /*overflow-x: hidden;*/
     }
     .sidebar {
-        width: 25vw;
-        max-width: 30vw;
+        width: 25%;
+        min-width: 20%;
         left: 0;
         overflow-y: auto;
         overflow-x: hidden;

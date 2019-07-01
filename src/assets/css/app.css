@@ -31,3 +31,7 @@ li {
 .sidebar-content:hover{
     background-color: #204154;
 }
+
+.active-bar{
+    background-color: #356c8c !important;
+}

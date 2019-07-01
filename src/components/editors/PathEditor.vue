@@ -239,6 +239,9 @@
                 else{
                     this.isCreateNew = false
                     this.path = this.pathApi
+                }
+
+                if(this.pathData){
                     this.description = this.pathData.description
                 }
                 this.$_changeObserverMixin_initObserver(['path','description'])
@@ -250,6 +253,9 @@
         },
         watch : {
             $route : function () {
+                this.loadData()
+            },
+            pathData : function(){
                 this.loadData()
             },
             //watch computed

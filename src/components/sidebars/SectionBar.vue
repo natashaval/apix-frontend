@@ -1,6 +1,6 @@
 <template>
-    <div class="pr-0">
-        <div class="sidebar-content pl-4 row" style="height: 2em;"
+    <li class="pr-0">
+        <div class="sidebar-content pl-4 row" style="height: 2em;" :class="{'active-bar':isActive}"
              @mouseover="onHover=true" @mouseleave="onHover=false">
             <button class="btn-circle"
                     :class="isArrow ? 'collapsed' : null"
@@ -9,7 +9,7 @@
                 <i class="fas fa-caret-right" v-show="!isArrow"></i>
                 <i class="fas fa-caret-down" v-show="isArrow"></i>
             </button>
-            <span @click="sectionClick" style="font-size: 1.3em;width: 68%;">{{ sectionApi }}</span>
+            <span @click="gotoRoute" style="font-size: 1.3em;width: 68%;">{{ sectionApi }}</span>
             <div v-if="onHover">
                 <button class="btn-circle" @click="deleteSection">
                     <i style="font-size: 13px;" class="fas fa-trash"></i>
@@ -21,13 +21,16 @@
 
         </div>
 
-        <b-collapse :id="'section-'+sectionApi" v-model="isArrow">
-                <PathBar v-for="(value,key) in sectionData.paths" v-bind:key="key"
+        <b-collapse :id="'section-'+sectionApi" v-model="isArrow" :style="{
+            display : (hasActiveChild)?'block':'hidden'
+        }">
+                <PathBar ref="pathBars"
+                        v-for="(value,key) in sectionData.paths" v-bind:key="key"
                          :path-data="value"
                          :project-api="projectApi"
                          :section-api="sectionApi" :pathApi="key"/>
         </b-collapse>
-    </div>
+    </li>
 </template>
 
 <script>
@@ -49,18 +52,30 @@
         data: function() {
             return {
                 onHover: false,
-                isArrow: false
+                isArrow: false,
+                pathBarRef: null
             }
         },
         computed : {
             projectData : function () {
                 return this.$store.getters['project/getProjectData']
+            },
+            isActive : function () {
+                return this.$route.name === 'section-editor' && this.$route.params.sectionApi === this.sectionApi
+            },
+            hasActiveChild : function () {
+                if(this.pathBarRef){
+                    return this.pathBarRef.find(bar => {
+                        if(bar.isActive || bar.hasActiveChild){
+                            return true
+                        }
+                    }) !== undefined
+                }
+                return false
             }
         },
         methods : {
-            sectionClick : function(){
-                // this.isClick = !this.isClick
-                this.hover = true;
+            gotoRoute : function(){
                 this.$router.push({
                     name :'section-editor',
                     params: {sectionApi : this.sectionApi}
@@ -117,6 +132,9 @@
                         ]
                     })
             }
+        },
+        mounted() {
+            this.pathBarRef = this.$refs.pathBars
         }
     }
 </script>
