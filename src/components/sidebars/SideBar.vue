@@ -2,10 +2,10 @@
     <div>
         <b-row class="my-2">
             <b-col md="10">
-                <ProjectBar :apiData="apiData"/>
+                <ProjectBar :apiData="projectData"/>
             </b-col>
             <b-col md="2">
-                <b-button :to="{name: 'definition-create'}"
+                <b-button :to="{name: 'section-create'}"
                           size="sm"
                           class="float-right">
                     <i class="fa fa-plus-circle"></i>
@@ -14,11 +14,12 @@
         </b-row>
 
         <b-row>
-            <b-col style="padding-left: 0em;padding-right: 0">
-                <Section v-for="(value,key) in apiData.sections"
+            <b-col style="padding-left: 0em;padding-right: 0" v-if="projectData">
+                <Section v-for="(value,key) in projectData.sections"
                          v-bind:key="key"
-                         :apiData="value"
-                         :sectionApi="key"/>
+                         :section-data="value"
+                         :project-api="projectApi"
+                         :section-api="key"/>
             </b-col>
         </b-row>
 
@@ -49,8 +50,8 @@
 
         <b-collapse id="collapse-model" v-model="collapseModel" class="mt-2">
 
-            <ModelBar v-for="(value, key) in apiData.definitions"
-                      v-bind:key="key" :apiData="value" :definition-api="value.name" />
+            <ModelBar v-for="(value, key) in projectData.definitions"
+                      v-bind:key="key" :projectData="value" :definition-api="value.name" />
 
         </b-collapse>
 
@@ -71,10 +72,18 @@
     export default {
         name: "SideBar",
         components: {ModelBar, ProjectBar, Section},
-        props : ['apiData'],
         data: function(){
             return {
-                collapseModel: true
+                collapseModel: true,
+            }
+        },
+        computed : {
+            projectApi : function () {
+                return this.$route.params.projectId
+            },
+            projectData : function () {
+                if(this.projectApi)return this.$store.getters['project/getProjectData']
+                return undefined
             }
         },
         methods : {

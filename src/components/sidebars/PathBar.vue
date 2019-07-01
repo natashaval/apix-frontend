@@ -13,7 +13,7 @@
             <p @click="pathClick" class="shrinkable-text col-9"
                style="font-size: 0.9em;margin-left: -1em;margin-top: 0.3em;"> {{ pathApi }}</p>
             <div v-if="onHover" class="row">
-                <button class="btn-circle">
+                <button class="btn-circle" @click="deletePath" style="z-index: 90">
                     <i style="font-size: 13px;" class="fas fa-trash"></i>
                 </button>
                 <button class="btn-circle" @click="createOperation">
@@ -21,24 +21,42 @@
                 </button>
             </div>
         </div>
-        <b-collapse :id="'link-'+pathApi" v-model="isArrow">
-            <OperationBar v-for="(value,key) in apiData.methods" v-bind:key="key" :apiData="value"
-                          :sectionApi="sectionApi" :pathApi="pathApi"
-                          :operationApi="key"/>
+        <b-collapse :id="'link-'+pathApi" v-model="isArrow" v-if="pathData !== undefined">
+            <OperationBar v-for="(value,key) in pathData.methods" v-bind:key="key"
+                          :project-api="projectApi"
+                          :section-api="sectionApi" :path-api="pathApi"
+                          :operation-data="value"
+                          :operation-api="key"/>
         </b-collapse>
     </li>
 </template>
 
 <script>
-    import OperationBar from "./OperationBar";
+    import OperationBar from "./OperationBar"
+    import DeepTreeBuilderUtil from "@/utils/DeepTreeBuilderUtil"
+    import * as axios from "axios"
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
     export default {
         name: "PathBar",
         components: {OperationBar},
-        props : ['apiData','pathApi','sectionApi'],
+        props : {
+            projectApi : String,
+            sectionApi : String,
+            pathApi : String,
+            pathData : Object
+        },
         data: function(){
             return {
                 isArrow: false,
                 onHover : false,
+            }
+        },
+        computed : {
+            sectionData(){
+                if(this.sectionApi){
+                    return this.$store.getters['project/getSectionData'](this.sectionApi)
+                }
+                return undefined
             }
         },
         methods : {
@@ -53,6 +71,53 @@
                     name :'operation-create',
                     params: {sectionApi : this.sectionApi, pathApi : this.pathApi, operationApi : this.method}
                 })
+            },
+            deletePath : function () {
+                this.$toast.question('Are you sure to delete path \''+this.pathApi+'\' ?',
+                    'Confirmation', {
+                        timeout: 20000,
+                        close: false,
+                        overlay: true,
+                        toastOnce: true,
+                        id: 'question',
+                        zindex: 999,
+                        position: 'center',
+                        buttons: [
+                            ['<button><b>YES</b></button>', (instance, toast) => {
+                                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                                let tree = DeepTreeBuilderUtil.buildDeepTree(['sections',this.sectionApi])
+                                tree.leaf._signature = this.sectionData._signature
+                                tree.leaf = tree.leaf.paths = {}
+                                tree.leaf._actions = [{
+                                    action: 'delete',
+                                    key: this.pathApi
+                                }]
+                                tree.leaf._hasActions = true
+                                axios.put('http://localhost:8080/projects/'+this.projectApi, tree.root).then(
+                                    (response) => {
+                                        if(response.status === 200){
+                                            this.sectionData._signature = response.data.new_signature
+                                            ActionExecutorUtil.executeActions(this.sectionData.paths, tree.leaf._actions)
+                                            if(this.$route.params.operationApi === this.operationApi){
+                                                this.$router.push({
+                                                    name :'project-editor',
+                                                    params : {
+                                                        projectId : this.$route.params.projectId
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    }
+                                ).catch(function (error) {
+                                    console.log(error);
+                                })
+
+                            }, true],
+                            ['<button>NO</button>', function (instance, toast) {
+                                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                            }]
+                        ]
+                    })
             }
         }
     }

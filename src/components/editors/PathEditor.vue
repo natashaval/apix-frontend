@@ -85,7 +85,10 @@
                 return this.$store.getters['project/getSectionData'](this.sectionApi)
             },
             pathData() {
-                return this.$store.getters['project/getPathData'](this.sectionApi,this.pathApi)
+                if(this.sectionApi && this.pathApi){
+                    return this.$store.getters['project/getPathData'](this.sectionApi,this.pathApi)
+                }
+                return undefined
             },
             pathVariables() {
                 if(this.pathData !== undefined) {
@@ -193,6 +196,7 @@
                                 name :'path-editor',
                                 params: {sectionApi : this.sectionApi, pathApi : this.path}
                             })
+                            this.loadData()
                         }
                     }
                 ).catch(function (error) {
@@ -219,16 +223,23 @@
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
+                this.isEdited = false
+                this.isEditing = false
                 let p = this.$route.params
                 this.projectId = p.projectId
                 this.sectionApi = p.sectionApi
                 this.pathApi = p.pathApi
-                this.path = this.pathApi
                 if(p.pathApi === undefined){
                     this.isCreateNew = true
+                    this.path = ''
+                    this.description = '<p></p>'
+                    this.isEdited = true
+                    this.isEditing = true
                 }
                 else{
                     this.isCreateNew = false
+                    this.path = this.pathApi
+                    this.description = this.pathData.description
                 }
                 this.$_changeObserverMixin_initObserver(['path','description'])
             },
@@ -290,7 +301,7 @@
             projectState : function () {
                 if(
                     (this.projectState === NOT_FOUND) ||
-                    (this.projectState === COMPLETE && this.pathData === undefined)
+                    (this.projectState === COMPLETE && this.pathData === undefined && !this.isCreateNew)
                 ){
                     this.$router.push({
                         name :'project-editor',

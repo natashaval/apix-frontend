@@ -11,7 +11,7 @@
             </button>
             <span @click="sectionClick" style="font-size: 1.3em;width: 68%;">{{ sectionApi }}</span>
             <div v-if="onHover">
-                <button class="btn-circle">
+                <button class="btn-circle" @click="deleteSection">
                     <i style="font-size: 13px;" class="fas fa-trash"></i>
                 </button>
                 <button class="btn-circle" @click="createPath">
@@ -22,8 +22,10 @@
         </div>
 
         <b-collapse :id="'section-'+sectionApi" v-model="isArrow">
-                <PathBar v-for="(value,key) in apiData.paths" v-bind:key="key"
-                         :apiData="value" :sectionApi="sectionApi" :pathApi="key"/>
+                <PathBar v-for="(value,key) in sectionData.paths" v-bind:key="key"
+                         :path-data="value"
+                         :project-api="projectApi"
+                         :section-api="sectionApi" :pathApi="key"/>
         </b-collapse>
     </div>
 </template>
@@ -31,17 +33,28 @@
 <script>
 
     import PathBar from './PathBar'
+    import * as axios from "axios"
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
 
     export default {
         name: "SectionBar",
         components : {
             PathBar
         },
-        props : ['sectionApi','apiData'],
+        props : {
+            projectApi : String,
+            sectionApi : String,
+            sectionData : Object
+        },
         data: function() {
             return {
                 onHover: false,
                 isArrow: false
+            }
+        },
+        computed : {
+            projectData : function () {
+                return this.$store.getters['project/getProjectData']
             }
         },
         methods : {
@@ -58,6 +71,51 @@
                     name :'path-create',
                     params: {sectionApi : this.sectionApi}
                 })
+            },
+            deleteSection : function () {
+                this.$toast.question('Are you sure to delete section \''+this.sectionApi+'\' ?',
+                    'Confirmation', {
+                        timeout: 20000,
+                        close: false,
+                        overlay: true,
+                        toastOnce: true,
+                        id: 'question',
+                        zindex: 999,
+                        position: 'center',
+                        buttons: [
+                            ['<button><b>YES</b></button>', (instance, toast) => {
+                                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                                let tree = {_signature: this.projectData._signature, sections : {}}
+                                tree.sections._actions = [{
+                                    action: 'delete',
+                                    key: this.sectionApi
+                                }]
+                                tree.sections._hasActions = true
+                                axios.put('http://localhost:8080/projects/'+this.projectApi, tree).then(
+                                    (response) => {
+                                        if(response.status === 200){
+                                            this.projectData._signature = response.data.new_signature
+                                            ActionExecutorUtil.executeActions(this.projectData.sections, tree.sections._actions)
+                                            if(this.$route.params.sectionApi === this.sectionApi){
+                                                this.$router.push({
+                                                    name :'project-editor',
+                                                    params : {
+                                                        projectId : this.$route.params.projectId
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    }
+                                ).catch(function (error) {
+                                    console.log(error);
+                                })
+
+                            }, true],
+                            ['<button>NO</button>', function (instance, toast) {
+                                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                            }]
+                        ]
+                    })
             }
         }
     }

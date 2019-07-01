@@ -16,7 +16,9 @@
                 </div>
             </div>
             <div v-else class="col-11">
-                <h4 class="font-weight-bold">{{name}}</h4>
+                <h4 class="font-weight-bold">Section:</h4>
+                <h5>{{name}}</h5>
+                <h4 class="font-weight-bold">Description:</h4>
                 <div v-html="description"></div>
             </div>
             <div class="col-1">
@@ -50,7 +52,6 @@
                 projectId: undefined,
                 name: '',
                 description: '',
-                externalDocs: {},
                 sectionApi: '',
                 isEdited: false,
                 isEditing: false,
@@ -81,21 +82,23 @@
         },
         methods: {
             loadData: function() {
-                this.isEdited = false
                 this.$_changeObserverMixin_unObserve()
+                this.isEdited = false
+                this.isEditing = false
                 let p = this.$route.params
                 this.projectId = p.projectId
                 this.sectionApi = p.sectionApi
 
-                if (p.sectionApi === undefined) this.isCreateNew = true
+                if (p.sectionApi === undefined){
+                    this.isCreateNew = true
+                    this.isEdited = true
+                    this.isEditing = true
+                }
                 else if(this.sectionData){
                     this.isCreateNew = false
                     this.name = this.sectionData.info.name
                     this.description = this.sectionData.info.description
-                    this.externalDocs = this.sectionData.info.externalDocs
                 }
-
-                this.isEdited = false
                 this.$_changeObserverMixin_initObserver(['name', 'description'])
             },
             //override
@@ -106,7 +109,6 @@
               let res = {}
               res.name = this.name
               res.description = this.description
-              res.externalDocs = this.$refs.external.getData()
               return res
             },
             submit: function(){
@@ -126,7 +128,9 @@
                         action: 'put',
                         key: this.name,
                         value: {
-                            info: data
+                            info: data,
+                            _signature : uuidv4(),
+                            paths:{}
                         }
                     }]
                     tree.leaf._hasActions = true
@@ -223,7 +227,7 @@
             projectState : function () {
                 if(
                     (this.projectState === NOT_FOUND) ||
-                    (this.projectState === COMPLETE && this.sectionData === undefined)
+                    (this.projectState === COMPLETE && this.sectionData === undefined && !this.isCreateNew)
                 ){
                     this.$router.push({
                         name :'project-editor',

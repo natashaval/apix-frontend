@@ -204,6 +204,11 @@
                     this.schemaDataWrapper.data = Object.assign({},this.bodyData.schema)
                     this.bodyData.schema.original = true
                 }
+                else{
+                    this.in = ''
+                    this.schemaDataWrapper.data = {}
+                    this.description = ''
+                }
 
                 if(this.parentIsEditing !== undefined){
                     this.isEditing = this.parentIsEditing
@@ -213,7 +218,9 @@
             reloadData : function () {
                 this.loadData()
                 this.$refs.root.reloadData()
-                this.$refs.lowLvlEditor.reloadData()
+                if(this.$refs.lowLvlEditor){
+                    this.$refs.lowLvlEditor.reloadData()
+                }
             }
         },
         watch : {

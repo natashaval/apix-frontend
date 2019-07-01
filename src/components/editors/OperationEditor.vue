@@ -364,6 +364,7 @@
                 }
                 else{
                     this.isCreateNew = true
+                    this.isEdited = true
                 }
                 let od = this.operationData
                 if(od !== undefined){
@@ -375,6 +376,14 @@
                     if(this.description !== undefined && this.description[0] !== '<'){
                         this.description = '<p>'+this.description+'</p>'
                     }
+                }
+                else{
+                    this.summary = ''
+                    this.description = ''
+                    this.operationId = ''
+                    this.consumes = ''
+                    this.produces = ''
+                    this.description = '<p></p>'
                 }
                 this.$_changeObserverMixin_initObserver([
                     'summary',
@@ -400,6 +409,7 @@
         watch : {
             $route : function () {
                 this.loadData()
+                console.log(this.operationData)
             },
             operationData : function (after,before) {
                 this.loadData()
