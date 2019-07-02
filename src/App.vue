@@ -60,7 +60,7 @@
     }
 
     #app{
-        border: aqua 1px solid;
+        /*border: aqua 1px solid;*/
         height: 100%;
         width: 100%;
     }

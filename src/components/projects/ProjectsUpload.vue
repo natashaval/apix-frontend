@@ -1,22 +1,41 @@
 <template>
     <!--https://serversideup.net/uploading-files-vuejs-axios/-->
-    <div class="container">
-        <div class="col-12">
-            <label>Files Upload</label>
-            <input type="file" id="file" ref="file" multiple @change="handleFileUpload()"/>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h3>Files Upload</h3>
+                <input type="file" id="file" ref="file" multiple @change="handleFileUpload()"/>
 
-            <div v-for="(existFile,i) in files" :key="i">
-                {{ existFile.file.name }}
-                <p>Validation: {{existFile.message}}</p>
-<!--                <progress max="100" :value.prop="uploadPercentage[key]"></progress>-->
-                <span class="remove-file" @click="removeFile(i)">Remove</span>
+                <div class="btn-group mb-2" role="group" aria-label="files upload">
+                    <button class="btn btn-primary" @click="addFile()">Add Files</button>
+                    <button class="btn btn-success" @click="submitFile()">Submit</button>
+                    <!--                    <button class="btn btn-dark" @click="dumpFile()">Dump!</button>-->
+                    <button class="btn btn-danger" @click="resetFile()">Reset</button>
+                </div>
+
+                <div v-for="(existFile,i) in files" :key="i">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p class="font-weight-bold">{{ existFile.file.name }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="remove-file" @click="removeFile(i)"><i class="fas fa-times"></i> Remove</span>
+                        </div>
+                    </div>
+                    <!--                                <progress max="100" :value.prop="existFile.uploadPercentage"></progress>-->
+                    <div class="row">
+                        <div class="col-md-1">
+                            <p>Validation: </p>
+                        </div>
+                        <div class="col-md-6">
+                            <span
+                                    :class="{'text-danger': !existFile.status, 'text-success': existFile.status}"
+                            >
+                                {{existFile.message}}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <button @click="addFile()">Add Files</button>
-            <button @click="submitFile()">Submit</button>
-            <button @click="dumpFile()">Dump!</button>
-            <button @click="resetFile()">Reset</button>
-
         </div>
     </div>
 </template>
@@ -39,7 +58,13 @@
                 for (var i = 0; i< uploadedFile.length; i++) {
                     // https://github.com/vuejs/vue/issues/4443
                     // -- error if file is declared in array should be an object
-                    this.$set(this.files, i, {file: uploadedFile[i], status: true, message: ''})
+                    this.$set(this.files, i,
+                        {
+                            file: uploadedFile[i],
+                            status: true,
+                            message: '',
+                            // uploadPercentage: 0
+                        })
                 }
 
             },
@@ -71,8 +96,10 @@
                                 'Content-Type': 'multipart/form-data'
                             },
                             // https://serversideup.net/file-upload-progress-indicator-with-axios-and-vuejs/
+                            // SUDAH BISA JALAN
                             // onUploadProgress: function (progressEvent) {
-                            //     this.uploadPercentage[key] = parseInt( Math.round( ( progressEvent.loaded * 100 ) / progressEvent.total ) );
+                            //     console.log('progressEvent', progressEvent.loaded, progressEvent.total)
+                            //     postFile.uploadPercentage = parseInt( Math.round( ( progressEvent.loaded * 100 ) / progressEvent.total ) );
                             // }
                         }).then((response) => {
                             console.log('SUCCESS!');
@@ -83,6 +110,7 @@
                                 console.log('ERROR!', e);
                                 postFile.status = false;
                                 postFile.message = e.response.data.message;
+                                // postFile.uploadPercentage = 0;
                             })
 
                     }
@@ -97,7 +125,9 @@
             },
             removeFile(idx){
                 console.log('remove clicked', idx)
-                delete this.files[idx];
+                // delete this.files[idx];
+                this.$delete(this.files, idx);
+                console.log(this.files)
             },
             dumpFile(){
                 console.log(this.files);
@@ -118,10 +148,10 @@
 </script>
 
 <style scoped>
-input[type="file"]{
-    position: absolute;
-    top: -500px;
-}
+    input[type="file"]{
+        position: absolute;
+        top: -500px;
+    }
 
     span.remove-file {
         color: red;
