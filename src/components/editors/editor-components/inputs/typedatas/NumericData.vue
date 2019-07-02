@@ -1,31 +1,31 @@
 <template>
     <div>
-        <div v-if="isEditing">
-            <div class="form-inline float-right" v-for="(key,i) in enumCount" v-bind:key="i">
-                <label class="col-4">Enum :</label>
-                <input class="col-8" type="number" name="enum" @keyup="onEnumTyped(i)" v-model="enums[i]"/>
+        <slot v-if="isEditing">
+            <div class="form-row float-right mb-2 w-100" v-for="(key,i) in enumCount" v-bind:key="i">
+                <label class="col-3 text-left shrinkable-text mt-auto">Enum :</label>
+                <input class="col-9 form-control" type="number" name="enum" @keyup="onEnumTyped(i)" v-model="enums[i]"/>
             </div>
-            <div class="form-inline float-right">
-                <label class="col-4">Format :</label>
-                <select class="col-8 custom-select" v-model="format" name="format">
+            <div class="form-row float-right mb-2 w-100">
+                <label class="col-3 text-left shrinkable-text mt-auto">Format :</label>
+                <select class="col-9 form-control" v-model="format" name="format">
                     <option v-for="format in formats" v-bind:key="format" :value="format">{{format}}</option>
                 </select>
             </div>
-            <div class="form-inline row float-right">
-                <div class="form-inline col-6 row">
-                    <label class="col-6">Mininum :</label>
-                    <input type="number" name="minimum" class="col-6" v-model="minimum"/>
+            <div class="form-row float-right mb-2 w-100">
+                <div class="form-row col-6">
+                    <label class="col-3 text-left shrinkable-text mt-auto">Min:</label>
+                    <input class="col-9 form-control" type="number" name="minimum" v-model="minimum"/>
                 </div>
-                <div class="form-inline col-6 row">
-                    <label class="col-6">Maximum :</label>
-                    <input type="number" name="maximum" class="col-6" v-model="maximum"/>
+                <div class="form-row col-6 ml-auto">
+                    <label class="col-3 text-left mt-auto">Max:</label>
+                    <input class="col-9 form-control" type="number" name="maximum" v-model="maximum"/>
                 </div>
             </div>
-            <div class="form-inline float-right">
-                <label class="col-4">default :</label>
-                <input class="col-8" name="default-val" v-model="defaultVal"/>
+            <div class="form-row float-right w-100">
+                <label class="col-3 text-left shrinkable-text mt-auto">Default :</label>
+                <input class="col-9 form-control" name="default-val" v-model="defaultVal"/>
             </div>
-        </div>
+        </slot>
         <div v-else class="float-right">
             <div class="row" v-if="enums.length !== 1">
                 <p class="col-5">Enum</p>

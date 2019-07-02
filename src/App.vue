@@ -33,15 +33,21 @@
 
         },
         created: function () {
-            axios.interceptors.response.use(undefined, function (err) {
-                return new Promise (function (resolve, reject) {
-                    if(err.status === 401 && err.config && !err.config.__isRetryRequest) {
-                        // if get 401 unauthorized, logout user
+            axios.interceptors.response.use(response => response
+            , error => {
+                console.log('dari axios interceptor', error.response.data)
+                if(error.response.status === 401){
+                    return new Promise(((resolve, reject) => {
                         this.$store.dispatch('auth/AUTH_LOGOUT')
-                    }
-                    throw err;
-                })
+                        this.$router.push({name: 'auth-login'})
+                    }))
+                }
+
+
+                return Promise.reject(error)
+
             })
+
         }
     }
 </script>

@@ -4,39 +4,26 @@
 
         </div>
         <div class="row justify-content-end" style="margin-left: -10%">
-            <div class="col-1 ">
-                <button class="round-button btn"
-                        style="margin: 10px"
-                        v-if="type === 'object'"
-                        @click="showChild = (showChild === 'down')?'':'down'"
-                        v-b-toggle="_uid+'-child-collapse'">
-                    <i class="fa fa-angle-right rotate"
-                       v-bind:class="showChild"></i>
-                </button>
-                <div class="w-100"></div>
-            </div>
-            <div class="col-10">
+            <div class="col-10 mt-3">
                 <div class="container row">
                     <!--kolom kiri-->
                     <div class="col-6">
                         <div v-if="showEdit" class="form-row">
-                            <slot v-if="nameable">
-                                <div class="form-group form-row">
-                                    <label class="col-4 align-items-center">Name :</label>
-                                    <slot v-if="disableName">
-                                        <input class="col-8 form-control" disabled v-model="name" :name="_uid+'-name'"/>
-                                    </slot>
-                                    <slot v-else>
-                                        <input class="col-8 form-control" v-model="name" :name="_uid+'-name'"/>
-                                    </slot>
-                                    <p v-for="(error,i) in $_changeObserverMixin_getErrors('name')"
-                                       v-bind:key="i"
-                                       class="error-message">{{error}}</p>
-                                </div>
-                            </slot>
-                            <div class="form-group form-row">
-                                <label>{{(isSubArray)?'Of :':'Type :'}}</label>
-                                <select class="form-control" :name="_uid+'-select-type'" v-model="selectedType">
+                            <div v-if="nameable" class="form-row mb-2 w-100">
+                                <label class="shrinkable-text col-2 mt-auto">Name :</label>
+                                <slot v-if="disableName">
+                                    <input class="col-10 form-control" disabled v-model="name" :name="_uid+'-name'"/>
+                                </slot>
+                                <slot v-else>
+                                    <input class="col-10 form-control" v-model="name" :name="_uid+'-name'"/>
+                                </slot>
+                                <p v-for="(error,i) in $_changeObserverMixin_getErrors('name')"
+                                   v-bind:key="i"
+                                   class="error-message" style="margin-bottom: -0.3em;margin-top: 0.3em;margin-left: 4.2em;">{{error}}</p>
+                            </div>
+                            <div class="form-row w-100 mb-2">
+                                <label class="shrinkable-text col-2 mt-auto">{{(isSubArray)?'Of :':'Type :'}}</label>
+                                <select class="form-control col-10" :name="_uid+'-select-type'" v-model="selectedType">
                                     <option v-for="dataType in dataTypes"
                                             v-bind:key="dataType.val"
                                             :value="dataType.val">{{dataType.text}}</option>
@@ -46,8 +33,10 @@
                                             :value="dataType.value">{{dataType.name}}</option>
                                 </select>
                             </div>
-                            <label>Required : </label>
-                            <input type="checkbox" class="form-check" v-model="required" :name="_uid+'-is-required'"/>
+                            <div class="form-row w-100">
+                                <label class="shrinkable-text col-3 mt-auto">Required : </label>
+                                <input type="checkbox" style="margin-top: 0.3em;margin-left: -2.2em" v-model="required" :name="_uid+'-is-required'"/>
+                            </div>
                         </div>
                         <div v-else class="row">
                             <p v-if="isSubArray">Of: </p>
@@ -65,19 +54,18 @@
                     <!--kolom kanan-->
                     <div class="col-6">
                         <div v-if="showEdit">
-                            <div class="row">
-                                <label class="col-4">Description :</label>
-                                <input class="col-8 form-control" v-model="description" :name="_uid+'-description'"/>
+                            <div class="form-row mb-2">
+                                <label class="shrinkable-text col-3 mt-auto">Description :</label>
+                                <input class="col-9 form-control" v-model="description" :name="_uid+'-description'"/>
                             </div>
-                            <div class="row">
-                                <label class="col-4">Example :</label>
-                                <input class="col-8 form-control" v-model="example"/>
+                            <div class="form-row">
+                                <label class="shrinkable-text col-3 mt-auto">Example :</label>
+                                <input class="col-9 form-control" v-model="example"/>
                             </div>
-                            <div class="form-inline float-right w-100">
-                                <a style="float: right;color: #4493e2;cursor: pointer;" v-bind:id="_uid+'-more-attribute'"
-                                   class="more-attribute btn-link" @click="clickMoreDisplay">more attributes</a>
+                            <div class="form-row mt-2 mb-2">
+                                <a style="color: #4493e2;cursor: pointer;" v-bind:id="_uid+'-more-attribute'"
+                                   class="more-attribute btn-link text-right w-100" @click="clickMoreDisplay">more attributes</a>
                             </div>
-                            <br/>
                         </div>
                         <div v-else class="container">
                             <div class="row" style="text-align: right;display: block;">
@@ -89,8 +77,6 @@
                         </div>
                         <div v-bind:style="{display: (showEdit)?moreDisplay:'block'}"
                             v-bind:id="_uid+'-more-attr-form'">
-                            <!--more attributes of selected datatype-->
-                            <div class="w-100"></div>
                             <StringData ref="curDataType" v-if="type === 'string'"
                                         :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                         :is-editing="showEdit" :schema-data="schemaData"/>
@@ -141,11 +127,22 @@
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                            :is-sub-array="true" :parent-is-editing="showEdit"/>
         </div>
+        <div>
+            <button class="round-button btn"
+                    style="margin: 10px"
+                    v-if="type === 'object'"
+                    @click="showChild = (showChild === 'down')?'':'down'"
+                    v-b-toggle="_uid+'-child-collapse'">
+                <i class="fa fa-angle-right rotate"
+                   v-bind:class="showChild"></i>
+            </button>
+            <div class="w-100"></div>
+        </div>
 
         <b-collapse v-bind:id="_uid+'-child-collapse'" visible>
-            <div v-if="type === 'object'">
+            <div v-if="type === 'object'" style="padding-right: 0">
                 <!--child object-->
-                <div v-for="(val,i) in propertiesData" v-bind:key="val.id" class="row justify-content-end">
+                <div v-for="(val,i) in propertiesData" v-bind:key="val.id" class="row justify-content-end" style="">
                     <div style="margin-top: -16px;margin-bottom: 16px">
                         <hr class="vline"/>
                     </div>
