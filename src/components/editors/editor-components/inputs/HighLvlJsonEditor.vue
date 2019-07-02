@@ -34,8 +34,8 @@
                                 </select>
                             </div>
                             <div class="form-row w-100">
-                                <label class="shrinkable-text col-3 mt-auto">Required : </label>
-                                <input type="checkbox" style="margin-top: 0.3em;margin-left: -2.2em" v-model="required" :name="_uid+'-is-required'"/>
+                                <label class="shrinkable-text mt-1">Required :</label>
+                                <input type="checkbox" style="margin-left: 0.5em" v-model="required" :name="_uid+'-is-required'"/>
                             </div>
                         </div>
                         <div v-else class="row">
@@ -64,14 +64,16 @@
                             </div>
                             <div class="form-row mt-2 mb-2">
                                 <a style="color: #4493e2;cursor: pointer;" v-bind:id="_uid+'-more-attribute'"
-                                   class="more-attribute btn-link text-right w-100" @click="clickMoreDisplay">more attributes</a>
+                                   class="more-attribute btn-link text-right w-100" @click="clickMoreDisplay"
+                                v-html="(isMoreDisplay)?'less':'more attributes'"
+                                >more attributes</a>
                             </div>
                         </div>
-                        <div v-else class="container">
-                            <div class="row" style="text-align: right;display: block;">
+                        <div v-else style="padding-left: 50%">
+                            <div class="row" style="display: block;">
                                 <p v-if="description !== undefined">Description : {{description}}</p>
                             </div>
-                            <div class="row" style="text-align: right;display: block;">
+                            <div class="row" style="display: block;">
                                 <p v-if="example !== undefined">Example : {{example}}</p>
                             </div>
                         </div>

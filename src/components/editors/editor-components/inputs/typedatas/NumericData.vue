@@ -26,24 +26,28 @@
                 <input class="col-9 form-control" name="default-val" v-model="defaultVal"/>
             </div>
         </slot>
-        <div v-else class="float-right">
+        <div v-else style="padding-left: 50%">
             <div class="row" v-if="enums.length !== 1">
-                <p class="col-5">Enum</p>
-                <div class="col-5">
+                <p>Enum:</p>
+                <div class="ml-2">
                     <p v-for="(_enum,i) in enums" v-bind:key="i">{{_enum}}</p>
                 </div>
             </div>
             <div class="row" v-if="format !== '' && format !== undefined ">
-                <p>Format : {{format}}</p>
+                <p>Format :</p>
+                <p class="ml-2">{{format}}</p>
             </div>
             <div v-if="minimum !== '' && minimum !== undefined" class="row">
-                <p>Minimum : {{minimum}}</p>
+                <p>Minimum :</p>
+                <p class="ml-2">{{minimum}}</p>
             </div>
             <div v-if="maximum !== '' && maximum !== undefined" class="row">
-                <p>Maximum : {{maximum}}</p>
+                <p>Maximum :</p>
+                <p class="ml-2">{{maximum}}</p>
             </div>
             <div v-if="defaultVal !== '' && defaultVal !== undefined" class="row">
-                <p>Default : {{defaultVal}}</p>
+                <p>Default :</p>
+                <p class="ml-2">{{defaultVal}}</p>
             </div>
         </div>
     </div>

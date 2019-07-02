@@ -24,24 +24,28 @@
                 <input class="col-9 form-control" v-model="defaultVal" name="default-val">
             </div>
         </slot>
-        <div v-else class="float-right">
-            <div class="row" v-if="enums.length !== 1">
-                <p class="col">Enum :</p>
-                <div class="col">
-                    <p class="text-right" v-for="_enum in enums" v-bind:key="_enum">{{_enum}}</p>
+        <div style="padding-left: 50%" v-else>
+            <div class="row w-100" v-if="enums.length !== 1">
+                <p>Enum :</p>
+                <div class="ml-2">
+                    <p v-for="_enum in enums" v-bind:key="_enum">{{_enum}}</p>
                 </div>
             </div>
-            <div class="row" v-if="pattern !== undefined">
-                <p class="col text-right">Pattern : {{pattern}}</p>
+            <div class="row w-100" v-if="pattern !== undefined">
+                <p>Pattern :</p>
+                <p class="ml-2">{{pattern}}</p>
             </div>
-            <div class="row" v-if="minLength !== '' && minLength !== undefined">
-                <p class="col text-right">Min length : {{minLength}}</p>
+            <div class="row w-100" v-if="minLength !== '' && minLength !== undefined">
+                <p>Min length :</p>
+                <p class="ml-2">{{minLength}}</p>
             </div>
-            <div v-if="maxLength !== '' && maxLength !== undefined" class="row">
-                <p class="col text-right">Max length : {{maxLength}}</p>
+            <div v-if="maxLength !== '' && maxLength !== undefined" class="row w-100">
+                <p>Max length :</p>
+                <p class="ml-2">{{maxLength}}</p>
             </div>
-            <div class="row" v-if="defaultVal !== '' && defaultVal !== undefined">
-                <p class="col text-right">Default : {{defaultVal}}</p>
+            <div class="row w-100" v-if="defaultVal !== '' && defaultVal !== undefined">
+                <p>Default :</p>
+                <p class="ml-2">{{defaultVal}}</p>
             </div>
         </div>
     </div>

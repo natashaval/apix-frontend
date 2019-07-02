@@ -1,11 +1,11 @@
 <template>
     <div>
-        <div v-if="isEditing" class="form-inline float-right">
-            <label>Additional properties</label>
+        <div v-if="isEditing" class="form-inline w-100">
+            <label class="col-3 text-left">Additional properties:</label>
             <input type="checkbox" class="form-check" value="true"
                    name="additional-properties" v-model="additionalProperties"/>
         </div>
-        <div v-else>
+        <div v-else style="padding-left: 46%">
             <p>Additional Properties : {{additionalProperties}}</p>
         </div>
     </div>
