@@ -1,9 +1,7 @@
 <template>
     <div>
-        <ul v-show="isEdited">
-            <li><button @click="submit">Save</button></li>
-            <li><button @click="cancel">Cancel</button></li>
-        </ul>
+        <SaveComponent :isEdited="isEdited"
+                       :submit="submit" :cancel="cancel"></SaveComponent>
         <div class="form-row">
             <div v-if="isEditing" class="col-11">
                 <div class="form-group">
@@ -42,10 +40,11 @@
     import {BASE_URL} from "../../stores/actions/const";
     import uuidv4 from 'uuid/v4';
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
+    import SaveComponent from "./editor-components/SaveComponent";
 
     export default {
         name: "SectionEditor",
-        components: {VueEditor},
+        components: {SaveComponent, VueEditor},
         mixins : [ChangeObserverMixin],
         data: function(){
             return {

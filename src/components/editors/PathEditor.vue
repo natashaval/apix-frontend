@@ -1,14 +1,12 @@
 <template>
     <div>
-        <ul v-if="isEdited">
-            <li><button @click="submit">Save</button></li>
-            <li><button @click="cancel">Cancel</button></li>
-        </ul>
+        <SaveComponent :isEdited="isEdited"
+                       :submit="submit" :cancel="cancel"></SaveComponent>
         <div class="form-row">
             <div v-if="isEditing" class="col-11">
                 <div class="form-group">
                     <label class="font-weight-bold">Name:</label>
-                    <input class="input-group" v-model="path" name="path-input"/>
+                    <input class="form-control" v-model="path" name="path-input"/>
                 </div>
                 <div class="form-group">
                     <label class="font-weight-bold">Description:</label>
@@ -16,6 +14,7 @@
                 </div>
                 <div class="form-group">
                     <label class="font-weight-bold">Path Variables : </label>
+                    <br /><small>Add curly braces in path name</small>
                     <div class="form-group" v-for="(variable,idx) in variables" v-bind:key="variable.name">
                         <HighLvlJsonEditor :editable="true"
                                            :nameable="true"
@@ -66,11 +65,12 @@
     import TreeBuilder from "@/utils/DeepTreeBuilderUtil";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
+    import SaveComponent from "./editor-components/SaveComponent";
 
 
     export default {
         name: "PathEditor",
-        components: {VueEditor,HighLvlJsonEditor},
+        components: {SaveComponent, VueEditor,HighLvlJsonEditor},
         mixins : [ChangeObserverMixin],
         computed : {
             projectState : function (){
