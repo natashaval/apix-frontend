@@ -86,6 +86,10 @@
                     this.name = this.definitionApi
                     this.isCreateNew = false
                 }
+                else {
+                    this.name = ''
+                    this.description = ''
+                }
                 this.$_changeObserverMixin_initObserver(['name','description'])
             },
             reloadData : function () {
@@ -164,6 +168,7 @@
                     }
                 }
                 console.log(tree)
+
                 axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
                     (response) => {
                         if(response.status === 200){
@@ -176,6 +181,7 @@
                 ).catch(function (error) {
                     console.log(error);
                 })
+
 
             },
             cancel : function () {

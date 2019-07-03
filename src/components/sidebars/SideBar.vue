@@ -50,14 +50,28 @@
 
         <b-collapse id="collapse-model" v-model="collapseModel" class="mt-2">
 
-            <ModelBar v-for="(value, key) in projectData.definitions"
-                      v-bind:key="key" :projectData="value" :definition-api="value.name" />
+            <ul class="list-group">
+                <ModelBar v-for="(value, key) in projectData.definitions"
+                      v-bind:key="key"
+                          :definition-key="key"
+                          :definition-api="value.name"
+                          :project-api="projectApi"
+                />
+            </ul>
 
         </b-collapse>
 
         <hr />
 
-        <b-button :to="{name: 'github-editor' }">Github</b-button>
+        <b-list-group flush>
+            <b-list-group-item :to="{name: 'github-editor' }" class="py-1 text-light sidebar-content"
+                               style="background-color: transparent;" exact-active-class="active-bar">
+                <i class="fab fa-github"></i> Github
+            </b-list-group-item>
+            <b-list-group-item variant="dark" :to="{}" class="py-1 text-light sidebar-content"
+                               style="background-color: transparent;"><i class="fas fa-cog"></i> Settings</b-list-group-item>
+        </b-list-group>
+<!--        <b-button :to="{name: 'github-editor' }">Github</b-button>-->
 
     </div>
 
@@ -68,6 +82,7 @@
     import Section from "./SectionBar";
     import ProjectBar from "./ProjectBar";
     import ModelBar from "./ModelBar";
+
 
     export default {
         name: "SideBar",

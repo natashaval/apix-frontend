@@ -1,20 +1,9 @@
 <template>
     <div>
-        <!--GithubEditor {{projectId}}-->
-        <!--{{githubData}}-->
-
-        <!--FetchOwner: <small>{{isOwner}}</small> {{ownerData}}-->
-
-        <!--<div class="row">-->
-            <!--<button class="btn btn-primary float-right" v-if="!isEditing" @click="push">Push to Github</button>-->
-        <!--</div>-->
-
     <div class="row">
         <div v-if="showEdit" class="col-11 editRepo" style="border-color: crimson">
-            <ul v-if="isEdited">
-                <li><button @click="submit">Save</button></li>
-                <li><button @click="cancel">Cancel</button></li>
-            </ul>
+            <SaveComponent :isEdited="isEdited"
+                           :submit="submit" :cancel="cancel"></SaveComponent>
 
             Owner: <span class="badge badge-secondary">{{owner}}</span>
             Repo: <input class="input-group" v-model="repo" @input="searchRepo">
@@ -69,10 +58,11 @@
     import ChangeObserverMixin from "../../mixins/ChangeObserverMixin";
     import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
     import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
+    import SaveComponent from "./editor-components/SaveComponent";
 
     export default {
         name: "GithubEditor",
-        components: {VueEditor},
+        components: {SaveComponent, VueEditor},
         mixins: [ChangeObserverMixin],
         data: function(){
             return {
