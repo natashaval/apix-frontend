@@ -16,6 +16,7 @@ import TeamViewer from "../components/auth/TeamViewer";
 import ProjectsList from "../components/projects/ProjectsList";
 import UserViewer from "../components/auth/admin-components/UserViewer";
 import ErrorNotFound from "../ErrorNotFound";
+import SettingsEditor from "../components/editors/SettingsEditor";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -99,6 +100,11 @@ export const router = new VueRouter({
         {
             name: 'github-editor', path: '/projects/:projectId/github',
             component: GithubEditor, props: true,
+            beforeEnter: initProject
+        },
+        {
+            name: 'settings-editor', path: '/projects/:projectId/settings',
+            component: SettingsEditor, props: true,
             beforeEnter: initProject
         },
         {// List of Projects available

@@ -7,7 +7,7 @@
             <input v-model="name" class="form-control"/>
         </div>
         <div class="form-group">
-            <label class="font-weight-bold">Description:</label>
+            <label class="font-weight-bold">Description :</label>
             <vue-editor v-model="description"></vue-editor>
         </div>
         <div class="container" style="padding-left: 60px">
@@ -89,6 +89,7 @@
                 else {
                     this.name = ''
                     this.description = ''
+                    this.isCreateNew = true
                 }
                 this.$_changeObserverMixin_initObserver(['name','description'])
             },

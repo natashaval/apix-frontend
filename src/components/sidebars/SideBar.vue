@@ -64,11 +64,14 @@
         <hr />
 
         <b-list-group flush>
-            <b-list-group-item :to="{name: 'github-editor' }" class="py-1 text-light sidebar-content"
-                               style="background-color: transparent;" exact-active-class="active-bar">
+            <b-list-group-item :to="{name: 'github-editor' }"
+                               class="py-1 text-light sidebar-content" exact-active-class="active-bar"
+                               style="background-color: transparent;">
                 <i class="fab fa-github"></i> Github
             </b-list-group-item>
-            <b-list-group-item variant="dark" :to="{}" class="py-1 text-light sidebar-content"
+            <b-list-group-item variant="dark"
+                               :to="{name: 'settings-editor', params: {projectId: projectApi} }"
+                               class="py-1 text-light sidebar-content" exact-active-class="active-bar"
                                style="background-color: transparent;"><i class="fas fa-cog"></i> Settings</b-list-group-item>
         </b-list-group>
 <!--        <b-button :to="{name: 'github-editor' }">Github</b-button>-->
