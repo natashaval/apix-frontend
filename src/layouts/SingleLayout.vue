@@ -13,7 +13,7 @@
 <!--            </b-col>-->
 <!--            <b-col cols="9">-->
         <section class="main">
-                <h2>Single Layout</h2>
+<!--                <h2>Single Layout</h2>-->
                 <router-view></router-view>
         </section>
 <!--            </b-col>-->

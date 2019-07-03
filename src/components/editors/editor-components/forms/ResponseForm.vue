@@ -10,19 +10,21 @@
             <div v-else class="col">
                 <p>Status Code : {{selectedCode}}</p>
             </div>
-            <b-button v-if="editable" @click="isEditing = !isEditing" class="float-right round-button">
+            <b-button v-if="editable" @click="isEditing = !isEditing" class="float-right">
                 <i class="fa fa-pencil-alt"></i>
             </b-button>
         </div>
         <div>
-            <button v-if="editable" @click="hasHeaders = true">Add Header</button>
+            <button v-if="editable" @click="hasHeaders = true" class="btn btn-sm btn-info mr-2 mb-2">Add Header</button>
+            <button v-if="editable && !hasBody" @click="hasBody = true" class="btn btn-sm btn-primary mb-2">Add Body</button>
+            <p class="font-weight-bold">Headers: </p>
             <PropertyForm v-if="hasHeaders" ref="headers"
                           :editable="editable"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                           :schemas-data="headersData"/>
         </div>
         <div>
-            <button v-if="editable" @click="hasBody = true">Add Body</button>
+<!--            <button v-if="editable" @click="hasBody = true" class="btn btn-sm btn-outline-primary">Add Body</button>-->
             <BodyForm v-if="hasBody" :body-data="responseData" ref="body"
                       :editable="editable"
                       :$_changeObserverMixin_parent="$_changeObserverMixin_this"
@@ -86,12 +88,14 @@
             },
             statusOptions : function () {
                 return HttpStatusCode.map(statusData => {
-                    return {text : statusData.code+' - '+statusData.description, value : statusData.code}
+                    return {text : statusData.code+' - '+statusData.description,
+                        value : statusData.code,
+                        disabled: (statusData.disabled !== undefined) ? true : false }
                 })
             }
         },
         methods : {
-            //fungsi callback dari $watch.selectedCode
+            //fungsi callback dari $watch.selectedCode -> jika ada response code yang sama maka error
             //tidak ditulis di dalam 'watch : {}' karna kita perlu mengaktifkan observer setelah semua data terload
             //sedangkan 'watch : {}' ditrigger sebelum data diload
             watchSelectedCode : function () {

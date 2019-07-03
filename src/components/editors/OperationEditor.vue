@@ -1,9 +1,7 @@
 <template>
     <div>
-        <ul v-if="isEdited">
-            <li><button @click="submit">Save</button></li>
-            <li><button @click="cancel">Cancel</button></li>
-        </ul>
+        <SaveComponent :isEdited="isEdited"
+                       :submit="submit" :cancel="cancel"></SaveComponent>
         <div class="row">
         <div v-if="showEdit" class="col-11">
             <div class="form-group">
@@ -11,14 +9,14 @@
                 <b-input v-model="summary" class="col"></b-input>
             </div>
             <div class="form-row">
-                <div class="form-group col-8">
+                <div class="form-group col-4">
                     <label class="font-weight-bold">Method :</label>
                     <b-select class="form-control" v-model="method" :options="selectMethodOptions"></b-select>
                     <p v-for="(error,i) in $_changeObserverMixin_getErrors('method')"
                        v-bind:key="i"
                        class="error-message">{{error}}</p>
                 </div>
-                <div class="form-group col-4">
+                <div class="form-group col-8">
                     <label class="font-weight-bold">Path :</label>
                     <b-input class="form-control" v-model="pathApi" disabled></b-input>
                 </div>
@@ -99,10 +97,11 @@
     import ActionBuilder from "@/utils/ActionBuilderUtil";
     import vSelect from 'vue-select';
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
+    import SaveComponent from "./editor-components/SaveComponent";
 
     export default {
         name: "OperationEditor",
-        components: {ResponseComponent, RequestComponent,VueEditor,vSelect},
+        components: {SaveComponent, ResponseComponent, RequestComponent, VueEditor,vSelect},
         mixins : [ChangeObserverMixin],
         data : () => ({
             isCreateNew : false,
