@@ -27,7 +27,7 @@
 
         <b-row>
             <b-col md="10">
-                <b-button
+                <b-button size="sm"
                         :class = "collapseModel ? 'collapsed' : null"
                         :aria-expanded="collapseModel ? 'true' : 'false' "
                         aria-controls="collapse-model"
@@ -60,8 +60,6 @@
             </ul>
 
         </b-collapse>
-
-        <hr />
 
         <b-list-group flush>
             <b-list-group-item :to="{name: 'github-editor' }"

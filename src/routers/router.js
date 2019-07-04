@@ -17,6 +17,7 @@ import ProjectsList from "../components/projects/ProjectsList";
 import UserViewer from "../components/auth/admin-components/UserViewer";
 import ErrorNotFound from "../ErrorNotFound";
 import SettingsEditor from "../components/editors/SettingsEditor";
+import ClientEditor from "../components/editors/ClientEditor";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -107,12 +108,17 @@ export const router = new VueRouter({
             component: SettingsEditor, props: true,
             beforeEnter: initProject
         },
+        {
+            name: 'client-editor', path : '/projects/:projectId/sections/:sectionApi/paths/:pathApi/operations/:operationApi/client',
+            component: ClientEditor, props: true,
+            beforeEnter: initProject
+        },
         {// List of Projects available
             name: 'project-repo', path: '/projects',
             component: ProjectsList
         },
         {
-          name: 'project-import', path: '/projects/import',
+            name: 'project-import', path: '/projects/import',
             component: ProjectsUpload
         },
         {

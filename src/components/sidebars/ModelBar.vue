@@ -2,25 +2,12 @@
     <li>
         <div class="sidebar-content row" style="height: 2em;" :class="{'active-bar':isActive}"
              @mouseover="onHover=true" @mouseleave="onHover=false">
-            <!--        <router-link :to="{name: 'definition-editor', params: {definitionApi: this.definitionApi} }" tag="li"-->
-            <!--                     class="font-weight-light list-group-item border-0 py-0 shrinkable-text"-->
-            <!--                     style="background-color: transparent;"-->
-            <!--                     exact-active-class="active-bar"-->
-            <!--        >-->
-            <!--            <div v-show="onHover">-->
-            <!--                <button class="btn-circle" @click="deleteDefinition">-->
-            <!--                    <i style="font-size: 13px;" class="fas fa-trash"></i>-->
-            <!--                </button>-->
-            <!--            </div>-->
-            <!--        </router-link>-->
+
             <p @click="definitionClick" class="col-10 ml-4" style="font-size: 1em;">{{ definitionApi }}</p>
             <div v-if="onHover">
                 <button class="btn-circle" @click="deleteDefinition">
                     <i class="fas fa-trash"></i>
                 </button>
-<!--                <button class="btn-circle" @click="dumpDef">-->
-<!--                    <i class="fas fa-times"></i>-->
-<!--                </button>-->
             </div>
         </div>
     </li>

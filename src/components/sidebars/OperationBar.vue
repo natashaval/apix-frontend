@@ -3,11 +3,15 @@
          :class="{'active-bar':isActive}">
         <li style="padding-left: 4em;font-size: 14px" class="row">
             <div class="col-2" style="margin-top: 0.3em" v-html="operationBadge" @click="methodClick" ></div>
-            <span class="shrinkable-text col-8" style="margin-top: 0.35em;" @click="methodClick">
+            <span class="shrinkable-text col-7" style="margin-top: 0.35em;" @click="methodClick">
                 {{operationData.summary}}</span>
-            <button class="btn-circle" style="margin-right: 1em;" @click="deleteOperation"
+            <button class="btn-circle float-right" @click="deleteOperation"
                     :class="onHover ? 'visible': 'invisible' ">
                 <i style="font-size: 13px;" class="fas fa-trash"></i>
+            </button>
+            <button class="btn-circle float-right" @click="clientClick"
+                    :class="onHover ? 'visible': 'invisible' ">
+                <i style="font-size: 13px;" class="fas fa-paper-plane"></i>
             </button>
         </li>
     </div>
@@ -64,6 +68,16 @@
             methodClick : function () {
                 this.$router.push({
                     name :'operation-editor',
+                    params: {
+                        sectionApi : this.sectionApi,
+                        pathApi : this.pathApi,
+                        operationApi : this.operationApi
+                    }
+                })
+            },
+            clientClick: function(){
+                this.$router.push({
+                    name :'client-editor',
                     params: {
                         sectionApi : this.sectionApi,
                         pathApi : this.pathApi,
