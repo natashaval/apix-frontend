@@ -20,6 +20,7 @@
 <script>
     import {BASE_URL} from "../../../stores/actions/const";
     import axios from 'axios'
+    import {makeToast} from "../../../assets/toast";
 
     export default {
         name: "TeamCard",
@@ -35,6 +36,7 @@
             },
         },
         methods: {
+            makeToast,
             confirm: function (teamName) {
                 console.log('confirm')
                 let grantList = []
@@ -47,11 +49,11 @@
 
 
                 axios.put(BASE_URL + "teams/" + teamName, grantList).then((resp) => {
-                    console.log('granted')
-                    alert(resp.data.message)
+                    this.makeToast('success', resp.data.success, resp.data.message);
                     this.$emit('update');
                 }).catch((e) => {
                     console.error(e);
+                    this.makeToast('danger', e.response.data.success, e.response.data.message);
                 })
 
             }

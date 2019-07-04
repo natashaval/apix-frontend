@@ -125,11 +125,11 @@ export const router = new VueRouter({
         },
         {
             name: 'team-create', path: '/team/new-team',
-            component: TeamCreate
+            component: TeamCreate, props: true
         },
         {
             name: 'team-viewer', path: '/team/:name',
-            component: TeamViewer
+            component: TeamViewer, props: true
         },
         {
             name: 'user-viewer', path: '/admin/users',

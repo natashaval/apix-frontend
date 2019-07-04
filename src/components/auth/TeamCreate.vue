@@ -2,13 +2,19 @@
     <div>
         <div class="row mb-3">
             <div class="col-md-1 ">
-                <b-button variant="outline-info" :to="{name: 'user-profile'}">
+                <b-button v-if="isInvite" :to="{name: 'team-viewer', params: {name: teamInvite.name }}">
+                    <i class="fas fa-angle-left"></i> Back</b-button>
+                <b-button v-else variant="outline-info" :to="{name: 'user-profile'}">
                     <i class="fas fa-angle-left"></i> Back
                 </b-button>
             </div>
-            <div class="col-md-4 mx-0">
-                <h3>Create Team</h3>
-                <button @click="toast">Toast</button>
+            <div class="col-md-6 mx-0">
+                <div v-if="isInvite">
+                    <h3>Invite Members of <span class="font-italic">{{ teamInvite.name }}</span></h3>
+                </div>
+                <div v-else>
+                    <h3>Create Team</h3>
+                </div>
             </div>
         </div>
 
@@ -26,15 +32,18 @@
             <div class="form-row">
                 <div class="form-group col-md-5 mb-2">
                     <label for="create-name">Name: </label>
-                    <input type="text" v-model="name" id="create-name" class="form-control" required />
+                    <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.name" readonly />
+                    <input v-else type="text" class="form-control" v-model="name" id="create-name" required />
                 </div>
                 <div class="form-group col-md-3 mb-2">
                     <label for="create-division">Division: </label>
-                    <input type="text" v-model="division" id="create-division" class="form-control" />
+                    <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.division" readonly/>
+                    <input v-else type="text" v-model="division" id="create-division" class="form-control" />
                 </div>
                 <div class="form-group col-md-2 mb-2">
                     <label for="create-access">Access: </label>
-                    <select v-model="access" id="create-access" class="form-control">
+                    <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.access" readonly/>
+                    <select v-else v-model="access" id="create-access" class="form-control">
                         <option value="public">Public</option>
                         <option value="private">Private</option>
                     </select>
@@ -70,7 +79,6 @@
                             <label class="custom-control-label"
                                     :for="user.username">{{user.username}}</label>
                         </li>
-                        <!--<input type="checkbox" id="user.username" value="user.username" v-model="selectedMember" />-->
                     </ul>
                 </div>
             </div>
@@ -103,6 +111,10 @@
                 show: true
             }
         },
+        props: {
+            isInvite: Boolean,
+            teamInvite: Object
+        },
         created(){
             this.loadUsers();
         },
@@ -111,9 +123,6 @@
                 this.$store.commit('layout/SET_LAYOUT', layout);
             },
             makeToast,
-            toast: function(){
-                this.makeToast('danger', false, 'mboh')
-            },
             loadUsers: function(){
                 axios.get(BASE_URL + 'admin/users').then((response) => {
                     this.users = response.data
@@ -123,52 +132,82 @@
             },
             dump: function () {
                 let res = {}
-                res.name = this.name
-                res.access = this.access
-                res.division = this.division
-                res.creator = this.profile.username
-                console.log(res)
+                if (!this.isInvite) {
+                    res.name = this.name
+                    res.access = this.access
+                    res.division = this.division
+                    res.creator = this.profile.username
+                    console.log(res)
 
-                let members = []
-                members.push({ // add creator as member
-                    grant: true,
-                    username: this.profile.username
-                })
+                    let members = []
+                    members.push({ // add creator as member
+                        grant: true,
+                        username: this.profile.username
+                    })
 
-                if (this.access == 'public') {
-                    for (let i=0; i < this.selectedMember.length; i++) {
-                        let member = {
-                            grant: true,
-                            username: this.selectedMember[i]
+                    if (this.access == 'public') {
+                        for (let i = 0; i < this.selectedMember.length; i++) {
+                            let member = {
+                                grant: true,
+                                username: this.selectedMember[i]
+                            }
+                            members.push(member)
                         }
-                        members.push(member)
+                    } else {
+                        for (let i = 0; i < this.selectedMember.length; i++) {
+                            let member = {
+                                grant: false,
+                                username: this.selectedMember[i]
+                            }
+                            members.push(member)
+                        }
                     }
+                    res.members = members
+                    return res
                 }
                 else {
+                    res.name = this.teamInvite.name
+                    res.access = this.teamInvite.access
+                    res.division = this.teamInvite.division
+                    res.creator = this.teamInvite.creator
+
+                    let members = []
                     for (let i=0; i < this.selectedMember.length; i++) {
-                        let member = {
-                            grant: false,
-                            username: this.selectedMember[i]
+                        let member =  {
+                            username: this.selectedMember[i],
+                            grant: false
                         }
                         members.push(member)
                     }
+                    res.members = members
+                    return res
                 }
-                res.members = members
-                return res
             },
             submit: function () {
-                console.log('submit create team')
                 let payload = this.dump()
-                axios.post(BASE_URL + 'teams', payload).then((res) => {
-                    console.log('finish axios post create team')
-                    // this.response.show = true
-                    // this.response.success = res.data.success
-                    // this.response.message = res.data.message
-                    // if (res.data.errors && res.data.errors.length > 0) this.response.errors = res.data.errors
-                    this.makeToast('success', res.data.success, res.data.message)
-                }).catch((e) => {
-                    console.error(e)
-                })
+                if (!this.isInvite) {
+                    axios.post(BASE_URL + 'teams', payload).then((res) => {
+                        // this.response.show = true
+                        // this.response.success = res.data.success
+                        // this.response.message = res.data.message
+                        // if (res.data.errors && res.data.errors.length > 0) this.response.errors = res.data.errors
+                        this.makeToast('success', res.data.success, res.data.message)
+                        // this.reset();
+                    }).catch((e) => {
+                        console.error(e)
+                        this.makeToast('danger', e.response.data.success, e.response.data.message)
+                    })
+                }
+                else {
+                    // console.log(payload);
+
+                    axios.put(BASE_URL + 'teams', payload).then((res) => {
+                        this.makeToast('success', res.data.success, res.data.message)
+                    }).catch((e) => {
+                        console.error(e)
+                        this.makeToast('danger', e.response.data.success, e.response.data.message)
+                    })
+                }
             },
             reset: function(evt){
                 evt.preventDefault();

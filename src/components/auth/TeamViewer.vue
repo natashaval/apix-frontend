@@ -37,41 +37,28 @@
         </div>
 
         <div v-if="isCreator">
-            <!--<h4>You are creator</h4>-->
-            <!--{{selectedMember}}-->
             <div class="row">
-                <div class="col-md-12">
-                    <!--<ul class="ul-user">-->
-                    <!--<li v-for="(user, i) in team.members" :key="i">-->
-                    <!--<input type="checkbox"-->
-                    <!--:id="user.username" :value="user.username"-->
-                    <!--v-show="!user.grant"-->
-                    <!--v-model="selectedMember"-->
-                    <!--/>-->
-                    <!--<label-->
-                    <!--:for="user.username">{{user.username}}</label>-->
-                    <!--</li>-->
-                    <!--</ul>-->
+                <div class="col-md-6">
                     <button class="btn btn-success" @click="grant">Grant access</button>
                     <b-form-group>
                         <b-form-checkbox-group v-model="selectedMember" v-for="(user, i) in team.members" :key="i">
-                            <li v-if="user.grant" class="ml-4 li-user">{{user.username}}</li>
+                            <li v-if="user.grant" class="ml-4 li-creator">{{user.username}}</li>
                             <b-form-checkbox :value="user.username" v-if="!user.grant">
                                 {{user.username}}
                             </b-form-checkbox>
                         </b-form-checkbox-group>
                     </b-form-group>
                 </div>
+                <div class="col-md-6">
+                    <b-button class="btn btn-info" :to="{name: 'team-create', params: {isInvite: true, teamInvite: team}}">
+                        Invite Member</b-button>
+                </div>
             </div>
-            <!--<div v-for="(member, i) in team.members" :key="i">-->
-            <!--<input type="checkbox" v-if="!member.grant" :value="member.username" v-model="selectedMember"/>-->
-            <!--<label :for="member.username">{{member.username}}</label>-->
-            <!--</div>-->
         </div>
 
         <div v-else>
             <!--You are not anything-->
-            <li v-for="(member,i) in team.members" :key="i">{{member.username}}</li>
+            <li v-for="(member,i) in team.members" :key="i" class="ml-4 li-member">{{member.username}}</li>
         </div>
 
         <div class="row">
@@ -176,4 +163,5 @@
         content: '✓';
         padding-right: 2px;
     }
+
 </style>

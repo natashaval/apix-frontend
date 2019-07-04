@@ -36,6 +36,8 @@
             </div>
         </div>
 
+        <AssignComponent :project-id="projectId"></AssignComponent>
+
 
     </div>
 </template>
@@ -44,9 +46,11 @@
     import axios from 'axios';
     import {BASE_URL} from "../../stores/actions/const";
     import {makeToast} from "../../assets/toast";
+    import AssignComponent from "./editor-components/AssignComponent";
 
     export default {
         name: "SettingsEditor",
+        components: {AssignComponent},
         data: function(){
             return {
                 projectId: '',
@@ -160,7 +164,7 @@
                 })
             }
         },
-        mounted() {
+        created() {
             this.loadData()
         }
     }
