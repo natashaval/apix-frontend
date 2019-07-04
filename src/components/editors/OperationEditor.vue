@@ -1,7 +1,7 @@
 <template>
     <div>
         <SaveComponent :isEdited="isEdited"
-                       :submit="submit" :cancel="cancel"></SaveComponent>
+                       :submit="submit" :cancel="cancel" name="<h3 class=font-weight-bold>Operation Editor</h3>"></SaveComponent>
         <div class="row">
         <div v-if="showEdit" class="col-11">
             <div class="form-group">
@@ -11,10 +11,10 @@
             <div class="form-row">
                 <div class="form-group col-4">
                     <label class="font-weight-bold">Method :</label>
-                    <b-select class="form-control" v-model="method" :options="selectMethodOptions"></b-select>
-                    <p v-for="(error,i) in $_changeObserverMixin_getErrors('method')"
-                       v-bind:key="i"
-                       class="error-message">{{error}}</p>
+                    <b-form-group class="form-row mb-2 w-100"
+                                  :state="methodState" :invalid-feedback="methodInvalidFeedback">
+                        <b-select class="form-control" :state="methodState" trim v-model="method" :options="selectMethodOptions"></b-select>
+                    </b-form-group>
                 </div>
                 <div class="form-group col-8">
                     <label class="font-weight-bold">Path :</label>
@@ -149,6 +149,12 @@
             pathActionQuery : [],
         }),
         computed : {
+            methodState : function (){
+                return this.$_changeObserverMixin_isValid('method')
+            },
+            methodInvalidFeedback : function () {
+                return this.$_changeObserverMixin_getErrors('method')[0]
+            },
             projectState : function (){
                 return this.$store.getters['project/getState']
             },
@@ -293,6 +299,7 @@
                             pointer._hasActions = true
                             pointer._actions = this.operationActionQuery
 
+
                             let callback = this.$refs.request.buildQuery(tree.leaf,pointer.request = {})
                             if(callback === undefined){
                                 delete pointer.request
@@ -300,7 +307,6 @@
                             else{
                                 callbacks.push(callback)
                             }
-
                             callback = this.$refs.response.buildQuery(pointer.responses = {})
                             if(callback === undefined){
                                 delete pointer.responses
@@ -308,8 +314,6 @@
                             else{
                                 callbacks.push(callback)
                             }
-
-
 
                             if(pointer._actions.length === 0){
                                 delete pointer._actions
@@ -372,9 +376,7 @@
                     this.operationId = od.operationId
                     this.consumes = od.consumes
                     this.produces = od.produces
-                    if(this.description !== undefined && this.description[0] !== '<'){
-                        this.description = '<p>'+this.description+'</p>'
-                    }
+                    this.description = od.description
                 }
                 else{
                     this.summary = ''
@@ -382,7 +384,7 @@
                     this.operationId = ''
                     this.consumes = ''
                     this.produces = ''
-                    this.description = '<p></p>'
+                    this.description = ''
                 }
                 this.$_changeObserverMixin_initObserver([
                     'summary',
@@ -408,7 +410,6 @@
         watch : {
             $route : function () {
                 this.loadData()
-                console.log(this.operationData)
             },
             operationData : function (after,before) {
                 this.loadData()

@@ -1,18 +1,17 @@
 <template>
     <div>
-        <button v-if="editable" @click="addProperty" class="btn btn-light text-primary btn-sm"><i class="fas fa-plus"></i> Add</button>
+        <p v-if="editable" @click="addProperty" class="text-primary btn-text" style="font-size: 15px"><i class="fas fa-plus"></i> Add</p>
         <div v-for="(property,idx) in propertiesData" v-bind:key="property.id">
-            <HighLvlJsonEditor :parent-is-editing="property.isEditing"
+            <HighLvlJsonEditor :ref="'property-'+property.id"
+                           :parent-is-editing="property.isEditing"
                            :project-id="projectId"
                            :editable="editable"
                            :deleteable="editable"
                            :parent-functions="publicFunctions"
                            :schema-data="property.schemaData"
-                           :ref="'property-'+property.id"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                            :component-id="idx"/>
         </div>
-        <button @click="buildQuery">Dump!</button>
     </div>
 </template>
 
@@ -51,11 +50,9 @@
                     deleteChild : this.deleteChild,
                     isValidName : this.isValidName
                 }
-            }
-        },
-        watch : {
-            schemasData : function () {
-                this.loadData()
+            },
+            myRef : function () {
+                return this.$refs
             }
         },
         methods : {
@@ -83,13 +80,13 @@
             addProperty : function () {
                 this.propertiesData.push({id : this.propertyId++,isEditing : true})
             },
-            reloadData : function(){
+            reloadData : function () {
                 this.loadData()
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
-                this.propertiesData = []
-                if (this.schemasData !== undefined) {
+                this.propertiesData.length = 0
+                if (this.schemasData) {
                     let sd = this.schemasData
                     for (let key in sd) {
                         let tmp = sd[key]
@@ -116,7 +113,7 @@
                 }
                 this.propertiesData.splice(childIndex,1)
             },
-            buildQuery : function (query) {
+            buildQuery :function (query) {
                 this.commitChangeCallback = []
                 let isEdited = false
                 for(let i = 0; i < this.propertiesData.length; i++){
@@ -127,7 +124,6 @@
                         this.commitChangeCallback.push(callback)
                     }
                 }
-
                 if(this.deletedProperty.length > 0){
                     isEdited = true
                     if(query._actions === undefined){
@@ -146,10 +142,15 @@
                         this.actionsQuery = query._actions
                     }
                 }
-
                 return (isEdited)?this.commitChange : undefined
             }
         },
+        watch : {
+            schemasData : function () {
+                this.loadData()
+            }
+        },
+
         mounted() {
             this.loadData()
         }

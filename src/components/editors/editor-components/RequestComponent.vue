@@ -1,21 +1,23 @@
 <template>
-    <div class="green-frame container" >
-        <div>
-            <h1>ini headers</h1>
+    <div>
+        <div class="dot-border mb-3">
+            <h5 class="font-weight-bold">Headers:</h5>
             <PropertyForm ref="headers" :schemas-data="headersData"
                           :editable="editable"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         </div>
-        <div>
-            <h1>ini query param</h1>
+        <div class="dot-border mb-3">
+            <h5 class="font-weight-bold">Query Parameters:</h5>
             <PropertyForm ref="queryParams" :schemas-data="queryParamsData"
                           :editable="editable"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         </div>
-
-        <BodyForm v-if="hasBody" ref="body" :body-data="requestData"
-                  :editable="editable"
-                  :$_changeObserverMixin_parent="$_changeObserverMixin_this" style="padding-left: 10%"/>
+        <div class="dot-border mb-3">
+            <h5 class="font-weight-bold">Body:</h5>
+            <BodyForm v-if="hasBody" ref="body" :body-data="requestData"
+                      :editable="editable"
+                      :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
+        </div>
     </div>
 </template>
 

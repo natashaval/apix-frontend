@@ -21,8 +21,12 @@
             </div>
         </div>
         <div class="form-group mt-3">
-            <button v-b-modal.modal-importer>import from external json</button>
-            <button @click="showHighLevelEditor = !showHighLevelEditor">change editor</button>
+            <button @click="showHighLevelEditor = !showHighLevelEditor" class="btn btn-primary" style="font-size: 12px;">
+                <i class="fas fa-edit"></i> switch editor
+            </button>
+            <button v-b-modal.modal-importer class="btn btn-success" style="font-size: 12px;margin-left: 1em;">
+                <i class="fas fa-download"></i> import from external json
+            </button>
         </div>
         <HighLvlJsonEditor ref="root"
             v-bind:style="{display : isShow(EDITOR_TYPE_HIGH_LEVEL)}"
@@ -34,8 +38,7 @@
         <LowLvlJsonEditor ref="lowLvlEditor"
             v-if="schemaDataWrapper.data !== undefined"
             v-bind:style="{
-                display : isShow(EDITOR_TYPE_LOW_LEVEL),
-                height: '1000px'
+                display : isShow(EDITOR_TYPE_LOW_LEVEL)
             }"
             :$_changeObserverMixin_parent="$_changeObserverMixin_this"
             :json-input="schemaDataWrapper.data" class="form-control"/>
@@ -106,7 +109,6 @@
                 Vue.set(this.schemaDataWrapper, 'data', JsonOasUtil.toSwaggerOas(this.$refs.modalJsonInput.getJson()))
                 this.$_changeObserverMixin_onDataChanged()
                 this.$refs.lowLvlEditor._data.isEdited = true
-                console.log(this.$refs.lowLvlEditor._data)
             },
             isShow : function (type){
                 switch (type) {
@@ -136,13 +138,17 @@
             },
             buildQuery : function (requestPointer) {
                 let isEdited = false
+                if(requestPointer._hasActions === undefined){
+                    requestPointer._hasActions = true
+                    requestPointer._actions = []
+                }
                 if(this.$refs.lowLvlEditor.isEdited){
                     let json = this.$refs.lowLvlEditor.getJson()
-                    requestPointer._actions = [{
+                    requestPointer._actions.push({
                         action : 'put',
                         key : 'schema',
                         value : json
-                    }]
+                    })
                     this.commitChangeCallback.push(()=>{
                         Vue.delete(this.bodyData.schema)
                         Vue.set(this.bodyData, 'schema', json)
@@ -150,10 +156,9 @@
                     return this.commitChange
                 }
 
-                requestPointer._actions = ActionBuilderUtil.createActions(
-                    this.bodyData,this._data,this.attributesKey
+                requestPointer._actions = requestPointer._actions.concat(
+                    ActionBuilderUtil.createActions(this.bodyData,this._data,this.attributesKey)
                 )
-                requestPointer._hasActions = true
 
                 if(this.dataFromExternal){
                     requestPointer._actions.push({
@@ -202,7 +207,6 @@
                     this.in = bd.in
                     this.description = (bd.description === undefined)?'':bd.description
                     this.schemaDataWrapper.data = Object.assign({},this.bodyData.schema)
-                    this.bodyData.schema.original = true
                 }
                 else{
                     this.in = ''

@@ -1,37 +1,39 @@
 <template>
     <div :class="(borderable)?'dot-border':''">
-        <div ref="alwaysShown">
-
-        </div>
         <div class="row justify-content-end" style="margin-left: -10%">
             <div class="col-10 mt-3">
                 <div class="container row">
                     <!--kolom kiri-->
                     <div class="col-6">
                         <div v-if="showEdit" class="form-row">
-                            <div v-if="nameable" class="form-row mb-2 w-100">
-                                <label class="shrinkable-text col-2 mt-auto">Name :</label>
+                            <b-form-group v-if="nameable" class="form-row mb-2 w-100"
+                                          :state="nameState" :invalid-feedback="nameInvalidFeedback"
+                                          label="name * :"
+                                          label-cols="2">
                                 <slot v-if="disableName">
-                                    <input class="col-10 form-control" disabled v-model="name" :name="_uid+'-name'"/>
+                                    <b-form-input class="col-10 form-control" disabled v-model="name" :name="_uid+'-name'"/>
                                 </slot>
                                 <slot v-else>
-                                    <input class="col-10 form-control" v-model="name" :name="_uid+'-name'"/>
+                                    <b-form-input class="form-control" v-model="name"
+                                                  :state="nameState" trim
+                                                  :name="_uid+'-name'" id="target1" ref="yay"/>
                                 </slot>
-                                <p v-for="(error,i) in $_changeObserverMixin_getErrors('name')"
-                                   v-bind:key="i"
-                                   class="error-message" style="margin-bottom: -0.3em;margin-top: 0.3em;margin-left: 4.2em;">{{error}}</p>
-                            </div>
+                            </b-form-group>
                             <div class="form-row w-100 mb-2">
                                 <label class="shrinkable-text col-2 mt-auto">{{(isSubArray)?'Of :':'Type :'}}</label>
-                                <select class="form-control col-10" :name="_uid+'-select-type'" v-model="selectedType">
+                                <b-select class="form-control col-10" :name="_uid+'-select-type'" v-model="selectedType">
+                                    <optgroup label="Data Type"/>
+                                    <hr/>
                                     <option v-for="dataType in dataTypes"
                                             v-bind:key="dataType.val"
                                             :value="dataType.val">{{dataType.text}}</option>
                                     <hr/>
+                                    <optgroup label="Model / Custom DataType"/>
+                                    <hr/>
                                     <option v-for="dataType in customDataTypes"
                                             v-bind:key="dataType.value"
                                             :value="dataType.value">{{dataType.name}}</option>
-                                </select>
+                                </b-select>
                             </div>
                             <div class="form-row w-100">
                                 <label class="shrinkable-text mt-1">Required :</label>
@@ -63,8 +65,8 @@
                                 <input class="col-9 form-control" v-model="example"/>
                             </div>
                             <div class="form-row mt-2 mb-2">
-                                <a style="color: #4493e2;cursor: pointer;" v-bind:id="_uid+'-more-attribute'"
-                                   class="more-attribute btn-link text-right w-100" @click="clickMoreDisplay"
+                                <a v-bind:id="_uid+'-more-attribute'"
+                                   class="btn-text more-attribute text-right w-100" @click="clickMoreDisplay"
                                 v-html="(isMoreDisplay)?'less':'more attributes'"
                                 >more attributes</a>
                             </div>
@@ -156,7 +158,9 @@
                                    :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                    v-on:delete="deleteChild" class="col-11"/>
                 </div>
-                <button :ref="_uid+'-add-child-btn'" @click="addNewProperty">Add more property</button>
+                <a :ref="_uid+'-add-child-btn'" @click="addNewProperty" class="btn-text">
+                    <i class="fas fa-plus"></i> Add more property
+                </a>
             </div>
         </b-collapse>
     </div>
@@ -269,6 +273,12 @@
             ]
         }),
         computed : {
+            nameState: function(){
+                return this.$_changeObserverMixin_isValid('name')
+            },
+            nameInvalidFeedback() {
+                return this.$_changeObserverMixin_getErrors('name')[0]
+            },
             refName : function () {
                 if(this.ref === undefined){
                     return undefined
@@ -299,6 +309,9 @@
                     isValidName : this.isValidName
                 }
             },
+            nameError : function () {
+                return this.$_changeObserverMixin_getErrors('name');
+            }
         },
         methods : {
             isValidName : function (name) {
@@ -334,7 +347,7 @@
                 let tmp = this.schemaData
                 return ActionBuilder.createActions(tmp, this._data, this.attributesKey)
             },
-            //mengcopy hasil edit ke state vuex project
+            //mengcopy hasil edit ke nameState vuex project
             commitChange : function () {
                 ActionExecutorUtil.executeActions(this.schemaData, this.actionsQuery)
                 if(this.type === 'object' ){
@@ -504,33 +517,13 @@
                 }
                 this.propertiesData.splice(childIndex,1)
             },
-            onExampleTyped : function(i) {
-                if(i === this.exampleCount - 1 ){
-                    if(this.examples[i] !== ''){
-                        this.exampleCount++
-                        this.examples.push('')
-                    }
-                }
-                else if(i === this.exampleCount - 2){
-                    if(this.examples[i] === ''){
-                        this.exampleCount--
-                        this.examples.pop()
-                    }
-                }
-            },
             dump : function () {
                 let tmp = {}
                 this.buildQuery(tmp)
-                console.log(tmp)
-                console.log(this.getData())
             },
             reloadData : function(){
                 this.loadData()
             },
-            /*
-            * input : #/definitions/mydatatype
-            * output : mydatatype
-            * */
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
                 this.projectId = this.$route.params.projectId
@@ -567,6 +560,9 @@
                                 isEditing : false
                             })
                         }
+                    }
+                    else{
+                        this.ref = undefined
                     }
                 }
 

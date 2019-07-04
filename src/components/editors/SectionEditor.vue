@@ -1,8 +1,8 @@
 <template>
     <div>
         <SaveComponent :isEdited="isEdited"
-                       :submit="submit" :cancel="cancel"></SaveComponent>
-        <div class="form-row">
+                       :submit="submit" :cancel="cancel" name="<h3 class=font-weight-bold>Section Editor</h3>"></SaveComponent>
+        <div class="row dot-border" style="margin-left: 0.1em;margin-right: 0.5em;">
             <div v-if="isEditing" class="col-11">
                 <div class="form-group">
                     <label class="font-weight-bold">Name:</label>
@@ -21,7 +21,7 @@
             </div>
             <div class="col-1">
                 <button v-if="editable" @click="isEditing = !isEditing"
-                        class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
+                        class="float-right round-button btn mt-2" v-bind:id="_uid+'-edit-btn'">
                     <i class="fa fa-pencil-alt"></i>
                 </button>
             </div>
@@ -118,7 +118,6 @@
                 let sectionQuery = [] // refer to PathEditor
 
                 if (this.isCreateNew){ // refer to Definition Editor create new Definitions
-                    // console.log('create new section')
                     tree = DeepTreeBuilderUtil.buildDeepTree(['sections'])
                     tree.root._signature = this.projectData._signature
                     let data = this.getData()
@@ -139,7 +138,6 @@
                     })
                 }
                 else { // refer to Path Editor edit path, because also change path name in Side Bar
-                    // console.log('edit section')
                     tree = DeepTreeBuilderUtil.buildDeepTree(['sections'])
 
                     if (this.sectionApi !== this.name) {
@@ -190,11 +188,9 @@
                         if(response.status === 200){
                             if (tree.root._signature !== undefined) {
                                 this.projectData._signature = response.data.new_signature
-                                console.log('berhasil rename sections')
                             } // terjadi rename sections
                             else {
                                 this.sectionData.info._signature = response.data.new_signature;
-                                console.log('berhasil update section info saja')
                             }
                             callbacks.forEach(fn => fn())
                             this.$router.push({

@@ -1,7 +1,7 @@
 <template>
- <div>
+ <div style="height: 40em">
      <AceEditor v-model="jsonText" @init="editorInit()" lang="json" theme="apix" :options="editorOptions"
-     style="width: 100%;height: 100%"></AceEditor>
+                style="height: 100%;width: 100%"></AceEditor>
  </div>
 </template>
 

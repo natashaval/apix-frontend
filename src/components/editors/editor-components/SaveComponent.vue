@@ -4,7 +4,6 @@
             <div class="col-4">
                 <div v-html="name"></div>
                 <div v-html="description"></div>
-                TITLE HERE
             </div>
             <div class="col-4" v-show="isEdited">
                 <button class="btn btn-secondary float-right" @click="onCancel">Cancel</button>
@@ -33,8 +32,7 @@
         },
         methods: {
             onSubmit: function(){
-                let res = this.submit();
-                console.log(res);
+                let res = this.submit()
             },
             onCancel: function(){
                 this.cancel()

@@ -1,13 +1,11 @@
 /*
-* ChangeObserver digunakan untuk memantau attribute yang diedit dan
-* mentrigger SEKALI SAJA parent yang menerapkan mixin ini
-* atau parent yang memiliki fungsi $_changeObserverMixin_onDataChanged
+* ChangeObserver digunakan untuk recursive watch terhadap attribute lalu memanggil fungsi onDataChanged dari parent
+* melalui object props $_changeObserverMixin_parent
 * **/
+import Vue from "vue"
+
 export default {
     props : {
-        $_changeObserverMixin_ParentCallback : {//fungsi $_changeObserverMixin_onDataChanged dari parent
-            type : Function
-        },
         $_changeObserverMixin_parent : {
             type : Object
         }
@@ -74,7 +72,8 @@ export default {
                     this._data.$_changeObserverMixin_unwatchFunctions.push(
                         this.$watch(attr[i].model, watcherCallback)
                     )
-                    this._data.$_changeObserverMixin_validators[attr[i].model] = attr[i].validator
+
+                    Vue.set(this._data.$_changeObserverMixin_validators,attr[i].model,attr[i].validator)
                 }
             }
         },
@@ -101,14 +100,13 @@ export default {
         },
         $_changeObserverMixin_isValid : function (key) {
             if(this._data.$_changeObserverMixin_validators[key] === undefined)return true
-            return this._data.$_changeObserverMixin_validators[key]()
+            return this._data.$_changeObserverMixin_validators[key]().length === 0
         },
         //fungsi yang akan dipanggil ketika key yang diobserve diedit
-        $_changeObserverMixin_onDataChanged : function () {
+        $_changeObserverMixin_onDataChanged : function (after, before) {
             if(!this.$_changeObserverMixin_wasTriggered && this.$_changeObserverMixin_parent !== undefined){
                 this.$_changeObserverMixin_unObserve()
-                this.$_changeObserverMixin_parent.onDataChanged()
-
+                this.$_changeObserverMixin_parent.onDataChanged(after, before)
             }
             this.$_changeObserverMixin_wasTriggered = true
         },

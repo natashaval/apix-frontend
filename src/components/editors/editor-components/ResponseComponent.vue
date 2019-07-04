@@ -1,43 +1,17 @@
 <template>
     <div>
-        <h2>Responses :</h2>
-        <!--        <div class="row">-->
-        <!--            <div class="col-2">-->
-        <!--                <ul>-->
-        <!--                    <li v-for="(response,i) in responseList" v-bind:key="i" class="row">-->
-        <!--                        <button @click="setActiveView(i)">{{response.code}}</button>-->
-        <!--                        <b-button v-if="editable" @click="deleteChild(i)">-->
-        <!--                            <i class="fa fa-trash"></i>-->
-        <!--                        </b-button>-->
-        <!--                    </li>-->
-        <!--                    <button v-if="editable" @click="addResponse">Add</button>-->
-        <!--                </ul>-->
-        <!--            </div>-->
-        <!--            <div class="col-10 red-frame">-->
-        <!--                <div class="row" v-for="(response,i) in responseList" v-bind:key="response.id">-->
-        <!--                    <ResponseForm v-bind:style="{display: (i === activeIndex)?'block':'none'}"-->
-        <!--                                  ref="responseForm"-->
-        <!--                                  :editable="editable"-->
-        <!--                                  :component-idx="i"-->
-        <!--                                  :is-duplicate-code="isDuplicateCode"-->
-        <!--                                  :notify-change-status-code="notifyChangeStatusCode"-->
-        <!--                                  :$_changeObserverMixin_parent="$_changeObserverMixin_this"-->
-        <!--                                  :response-data="response.data" :response-code="response.code" class="w-100"/>-->
-        <!--                </div>-->
-        <!--            </div>-->
-
-        <!--        </div>-->
+        <label class="font-weight-bold">Response :</label>
         <b-card no-body>
             <b-tabs vertical card pills nav-wrapper-class="w-15">
-                <b-tab v-for="(response, i) in responseList" :key="i">
-                    <template slot="title">
-                        <span @click="setActiveView(i)">
+                <b-tab v-for="(response, i) in responseList" :key="i.id" @click="setActiveView(i)">
+                    <div slot="title">
+                        <span ref="codeTabs">
                             {{response.code}}
                         </span>
                         <button class="btn-circle" v-if="editable" @click="deleteChild(i)" size="sm">
                             <i class="fas fa-trash"></i>
                         </button>
-                    </template>
+                    </div>
 
                     <ResponseForm v-bind:style="{display: (i === activeIndex)?'block':'none'}"
                                   ref="responseForm"
@@ -55,7 +29,6 @@
                         <small><i class="fas fa-plus"></i> Add</small>
                     </b-nav-item>
                 </template>
-
                 <div slot="empty" class="text-center text-muted">
                     There are no response http code available <br />
                 </div>
@@ -68,7 +41,7 @@
     import HttpStatusCode from "@/consts/HttpStatusCode";
     import ResponseForm from "./forms/ResponseForm";
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
-    import ActionExecutorUtil from "../../../utils/ActionExecutorUtil";
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
 
     export default {
         name: "ResponseComponent",
@@ -90,11 +63,12 @@
             optionList : HttpStatusCode,
             actionsQuery : [],
             commitChangeCallback : [],
+            codeTabsRef: null
         }),
         computed : {
             operationApi : function () {
                 return this.$route.params.operationApi
-            },
+            }
         },
         methods : {
             getData : function () {
@@ -111,7 +85,9 @@
             addResponse : function () {
                 this.responseList.push({code : "200"})
                 this.activeIndex = this.responseList.length-1
-
+                setTimeout(()=>{
+                    this.$refs.codeTabs[this.activeIndex].click()
+                },10)
             },
             notifyChangeStatusCode : function (childIndex, newStatusCode) {
                 this.responseList[childIndex].code = newStatusCode
@@ -127,6 +103,7 @@
             },
             reloadData : function(){
                 this.loadData()
+                this.$refs.responseForm.forEach(form => form.reloadData())
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()

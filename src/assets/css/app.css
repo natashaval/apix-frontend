@@ -35,3 +35,8 @@ li {
 .active-bar{
     background-color: #356c8c !important;
 }
+
+.btn-text{
+    color: #4493e2 !important;
+    cursor: pointer !important;
+}

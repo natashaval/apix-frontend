@@ -1,12 +1,12 @@
 <template>
     <div>
+        {{_uid}}
         <div class="row">
-            <div v-if="isEditing" class="col">
-                <b-select v-model="selectedCode" :options="statusOptions"/>
-                <p v-for="(error,i) in $_changeObserverMixin_getErrors('selectedCode')"
-                   v-bind:key="i"
-                   class="error-message">{{error}}</p>
-            </div>
+            <b-form-group v-if="isEditing" class="col"
+                          :invalid-feedback="selectedCodeInvalidFeedback"
+                          :state="selectedCodeState">
+                <b-select v-model="selectedCode" :state="selectedCodeState" :options="statusOptions"/>
+            </b-form-group>
             <div v-else class="col">
                 <p>Status Code : {{selectedCode}}</p>
             </div>
@@ -15,16 +15,18 @@
             </b-button>
         </div>
         <div>
-            <button v-if="editable" @click="hasHeaders = true" class="btn btn-sm btn-info mr-2 mb-2">Add Header</button>
-            <button v-if="editable && !hasBody" @click="hasBody = true" class="btn btn-sm btn-primary mb-2">Add Body</button>
             <p class="font-weight-bold">Headers: </p>
-            <PropertyForm v-if="hasHeaders" ref="headers"
+            <PropertyForm ref="headers"
                           :editable="editable"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                           :schemas-data="headersData"/>
         </div>
         <div>
-<!--            <button v-if="editable" @click="hasBody = true" class="btn btn-sm btn-outline-primary">Add Body</button>-->
+            <p class="font-weight-bold mr-3 mt-3">Body: </p>
+            <p v-if="editable && !hasBody" @click="hasBody = true"
+                    class="text-primary btn-text" style="font-size: 15px"><i class="fas fa-plus"></i> Add</p>
+            <p v-if="editable && hasBody" @click="hasBody = false"
+                    class="text-primary btn-text" style="font-size: 15px"><i class="fas fa-plus"></i> Delete</p>
             <BodyForm v-if="hasBody" :body-data="responseData" ref="body"
                       :editable="editable"
                       :$_changeObserverMixin_parent="$_changeObserverMixin_this"
@@ -34,11 +36,10 @@
 </template>
 
 <script>
-    import HttpStatusCode from "@/consts/HttpStatusCode";
-    import BodyForm from "./BodyForm";
-    import PropertyForm from "./PropertyForm";
-    import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
-    import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
+    import HttpStatusCode from "@/consts/HttpStatusCode"
+    import BodyForm from "./BodyForm"
+    import PropertyForm from "./PropertyForm"
+    import ChangeObserverMixin from "@/mixins/ChangeObserverMixin"
 
     export default {
         name : "ResponseForm",
@@ -71,14 +72,19 @@
         },
         data : () => ({
             isEditing : false,
+            isCreateNew : false,
             selectedCode : '',
             initCode : '',
-            hasBody : false,
-            hasHeaders : false,
             commitChangeCallback : [],
-            actionsQuery : []
+            hasBody : false
         }),
         computed : {
+            selectedCodeState : function () {
+                return  this.$_changeObserverMixin_isValid('selectedCode')
+            },
+            selectedCodeInvalidFeedback : function(){
+                return  this.$_changeObserverMixin_getErrors('selectedCode')[0]
+            },
             headersData : function () {
                 if(this.responseData === undefined){
                     return undefined
@@ -108,19 +114,25 @@
                 }
                 this.$_changeObserverMixin_wasTriggered = true
             },
+            reloadData : function (){
+                this.loadData()
+                this.$refs.headers.reloadData()
+                if(this.hasBody) this.$refs.body.reloadData()
+            },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
                 if(this.responseData !== undefined){
+                    this.isCreateNew = false
                     let rd = this.responseData
                     if(rd.schema !== undefined){
                         this.hasBody = true
                     }
-
-                    if(rd.headers){
-                        this.hasHeaders = true
-                    }
-
                     this.description = rd.description
+                }
+                else{
+                    this.isCreateNew = true
+                    this.hasBody = false
+                    this.description = ''
                 }
 
                 if(this.responseCode !== undefined){
@@ -139,33 +151,15 @@
                     }
                 }])
             },
-            getActions : function () {
-                if(this.responseData === undefined)return []
-
-                //cuma 1 yang perlu dicek, maka tidak usah pakai ActionBuilderUtil.js
-                if(this.responseData.description !== this.description){
-                    return [{
-                        action : 'put',
-                        key : 'description',
-                        value : this.description
-                    }]
-                }
-                else{
-                    return []
-                }
-            },
             getData : function () {
                 let res = {}
                 if(this.hasBody)res = this.$refs.body.getData()
                 res.description = this.description
-
-                if(this.hasHeaders)res.headers = this.$refs.headers.getData()
+                res.headers = this.$refs.headers.getData()
                 return res
             },
             buildQuery : function (responsesPointer) {
-                let isEdited = false
-                let callback = undefined
-                if(this.responseData === undefined){
+                if(this.isCreateNew){
                     responsesPointer._actions.push({
                         action : 'put',
                         key : this.selectedCode,
@@ -173,21 +167,23 @@
                     })
                     return undefined
                 }
-                let codePointer = responsesPointer[this.selectedCode] = {}
-                this.actionsQuery = codePointer._actions = this.getActions()
-                codePointer._hasActions = true
-                if(this.initCode !== this.selectedCode){
-                    responsesPointer._actions.push({
-                        action : 'rename',
-                        key : this.initCode,
-                        newKey : this.selectedCode
-                    })
-                    isEdited = true
-                }
+                else{
+                    let isEdited = false
+                    let callback = undefined
+                    let codePointer = responsesPointer[this.selectedCode] = {}
+                    codePointer._hasActions = true
+                    codePointer._actions = []
+                    if(this.initCode !== this.selectedCode){
+                        responsesPointer._actions.push({
+                            action : 'rename',
+                            key : this.initCode,
+                            newKey : this.selectedCode
+                        })
+                        isEdited = true
+                    }
 
-                if(this.hasHeaders){
                     let rd = this.responseData
-                    if(rd === undefined || rd.headers === undefined){
+                    if(rd.headers === undefined){
                         codePointer._actions.push({
                             action : 'put',
                             key : 'headers',
@@ -204,34 +200,48 @@
                             this.commitChangeCallback.push(callback)
                         }
                     }
-                }
-
-                if(this.hasBody){
-                    callback = this.$refs.body.buildQuery(codePointer)
-                    if(callback === undefined){
-                        delete codePointer.schema
+                    if(this.hasBody){
+                        callback = this.$refs.body.buildQuery(codePointer)
+                        if(callback === undefined){
+                            delete codePointer.schema
+                        }
+                        else{
+                            isEdited = true
+                            this.commitChangeCallback.push(callback)
+                        }
                     }
                     else{
-                        isEdited = true
-                        this.commitChangeCallback.push(callback)
+                        if(rd.schema){
+                            responsesPointer._actions.push({
+                                action: 'put',
+                                key : 'description',
+                                value : ''
+                            })
+                            codePointer._actions.push({
+                                action: 'delete',
+                                key: 'schema'
+                            })
+                            isEdited = true
+                        }
                     }
-                }
 
-                if(codePointer._hasActions !== undefined && codePointer._actions.length === 0){
-                    delete codePointer._actions
-                    delete codePointer._hasActions
-                }
+                    if(codePointer._hasActions && codePointer._actions.length === 0){
+                        delete codePointer._actions
+                        delete codePointer._hasActions
+                    }
 
-                if(!isEdited){
-                    delete responsesPointer[this.selectedCode]
-                }
+                    if(!isEdited){
+                        delete responsesPointer[this.selectedCode]
+                    }
 
-                return (isEdited)?this.commitChange : undefined
+
+                    return (isEdited)?this.commitChange : undefined
+                }
             },
             commitChange : function () {
-                ActionExecutorUtil.executeActions(this.responseData, this.actionsQuery)
                 this.commitChangeCallback.forEach(fn => fn())
-            },
+                this.commitChangeCallback.length = 0
+            }
         },
         watch : {
             responseData : function () {
