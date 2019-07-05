@@ -1,6 +1,6 @@
 <template>
     <div>
-        <SaveComponent :isEdited="isEdited"
+        <SaveComponent :isEdited="isEdited" :editable="editable"
                        :submit="submit" :cancel="cancel" name="<h3 class=font-weight-bold>Operation Editor</h3>"></SaveComponent>
         <div class="row">
         <div v-if="showEdit" class="col-11">
@@ -163,7 +163,11 @@
             },
             editable : function () {
                 let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
-                if(hasEditingPrivilege === undefined)return false
+                let projectTeams = this.$store.getters['project/getTeams']
+                if (hasEditingPrivilege === undefined && projectTeams) {
+                    this.$store.dispatch('user/checkEditingPrivilege', projectTeams);
+                    return false
+                }
                 return hasEditingPrivilege
             },
             showEdit : function () {

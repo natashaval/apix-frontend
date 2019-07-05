@@ -2,10 +2,11 @@
     <div>
         <b-row class="my-2">
             <b-col md="10">
+<!--                {{profile}}-->
                 <ProjectBar :apiData="projectData"/>
             </b-col>
             <b-col md="2">
-                <b-button :to="{name: 'section-create'}"
+                <b-button :to="{name: 'section-create', params: {projectId: projectApi} }"
                           size="sm"
                           class="float-right">
                     <i class="fa fa-plus-circle"></i>
@@ -39,7 +40,8 @@
                 </b-button>
             </b-col>
             <b-col md="2">
-                <b-button :to="{name: 'definition-create'}" pill size="sm" variant="outline-secondary"
+                <b-button :to="{name: 'definition-create', params: {projectId: projectApi}}"
+                          pill size="sm" variant="outline-secondary"
                           v-b-tooltip.hover title="new definition"
                           class="float-right"
                 >
@@ -48,7 +50,7 @@
             </b-col>
         </b-row>
 
-        <b-collapse id="collapse-model" v-model="collapseModel" class="mt-2">
+        <b-collapse id="collapse-model" v-model="collapseModel" class="mt-2" v-if="projectData">
 
             <ul class="list-group">
                 <ModelBar v-for="(value, key) in projectData.definitions"
@@ -61,7 +63,7 @@
 
         </b-collapse>
 
-        <b-list-group flush>
+        <b-list-group flush v-if="projectApi">
             <b-list-group-item :to="{name: 'github-editor' }"
                                class="py-1 text-light sidebar-content" exact-active-class="active-bar"
                                style="background-color: transparent;">
@@ -72,7 +74,6 @@
                                class="py-1 text-light sidebar-content" exact-active-class="active-bar"
                                style="background-color: transparent;"><i class="fas fa-cog"></i> Settings</b-list-group-item>
         </b-list-group>
-<!--        <b-button :to="{name: 'github-editor' }">Github</b-button>-->
 
     </div>
 
@@ -83,6 +84,7 @@
     import Section from "./SectionBar";
     import ProjectBar from "./ProjectBar";
     import ModelBar from "./ModelBar";
+    import {USER_REQUEST} from "../../stores/actions/user";
 
 
     export default {
@@ -91,20 +93,27 @@
         data: function(){
             return {
                 collapseModel: true,
+                isProfile: false,
             }
         },
         computed : {
+            profile() {
+                if (!this.isProfile) {
+                    this.$store.dispatch('user/' + USER_REQUEST)
+                    // return undefined;
+                }
+                return this.$store.getters['user/getProfile']
+            },
             projectApi : function () {
                 return this.$route.params.projectId
             },
             projectData : function () {
                 if(this.projectApi)return this.$store.getters['project/getProjectData']
                 return undefined
-            }
+            },
         },
         methods : {
-
-        }
+        },
     }
 </script>
 

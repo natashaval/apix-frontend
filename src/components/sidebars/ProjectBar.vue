@@ -7,10 +7,9 @@
 <script>
     export default {
         name: "ProjectBar",
-        computed : {
-
+        props : {
+            apiData: Object,
         },
-        props : ['apiData'],
         methods : {
             projectClick : function(){
                 this.$router.push({

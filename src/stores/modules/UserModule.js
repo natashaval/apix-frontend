@@ -8,12 +8,13 @@ export default {
     state: {
         status: '',
         profile: {},
-        users: []
+        users: [],
+        editingPrivilege: undefined
     },
     getters: {
         getProfile: state => state.profile,
         isProfileLoaded: state => !!state.profile.username,
-        hasEditingPrivilege : () => true,
+        hasEditingPrivilege : state => state.editingPrivilege,
         getUsers: state => state.users
     },
     actions: {
@@ -37,6 +38,15 @@ export default {
         },
         addUser: ({ commit }, payload) => {
             commit('PUSH_DATA', payload)
+        },
+        checkEditingPrivilege({commit, state}, payload){
+            // let editable = state.profile.teams.some(x => payload.include(x));
+            // console.log('ACTION USER MODULE EDITPRIV: ', editable)
+            // commit('CHECK_PRIVILEGE', editable)
+            // console.log(state.profile)
+            // console.log('dari usermodule TEAM: ', state.profile.teams)
+            let editable = state.profile.teams.some(x => payload.includes(x));
+            commit('CHECK_PRIVILEGE', editable)
         }
     },
     mutations: {
@@ -58,6 +68,9 @@ export default {
         },
         PUSH_DATA (state, newData) {
             state.users.push(newData)
+        },
+        CHECK_PRIVILEGE (state, editable) {
+            state.editingPrivilege = editable
         }
 
     }

@@ -53,6 +53,9 @@ export default{
         },
         getState(state){
             return state.fetchStatus
+        },
+        getTeams(state) {
+            return state.project.teams
         }
     },
     mutations: {
@@ -74,6 +77,9 @@ export default{
         },
         CHANGE_STATE(state, processState){
             state.fetchStatus = processState
+        },
+        PUSH_TEAM(state, newTeam) {
+            state.project.teams.push(newTeam)
         }
     },
     actions : {
@@ -110,6 +116,7 @@ export default{
             })
             deleteProject()
         },
+
         createProjectData({commit}, newProjectForm) {
             return new Promise((resolve, reject) => {
                 axios.post(BASE_URL + 'projects', newProjectForm)
@@ -123,6 +130,12 @@ export default{
                         reject(error)
                     })
             })
+        },
+
+        assignTeamToProject({state, commit}, payload){
+            console.log('dari project module: ',payload)
+            if (!state.project.teams.includes(payload)) commit('PUSH_TEAM', payload)
+            else console.log('tidak perlu push')
         }
     }
 }

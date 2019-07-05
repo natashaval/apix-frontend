@@ -21,10 +21,9 @@
                     </b-form-group>
                 </b-col>
 
-<!--                <b-col md="2" class="my-1"></b-col>-->
-
                 <b-col md="2" class="my-1 ml-auto">
-                    <b-button @click="loadProjects" variant="outline-info" class="float-right"><i class="fas fa-sync-alt"></i> Refresh</b-button>
+                    <b-button @click="loadProjects" variant="outline-info" class="float-right">
+                        <i class="fas fa-sync-alt"></i> Refresh</b-button>
                 </b-col>
             </b-row>
 
@@ -146,8 +145,6 @@
             this.$nextTick(function () {
                 this.setLayout('all-layout');
             });
-
-            // this.totalRows = this.projects.length;
         },
         computed: {
             totalRows(){

@@ -1,9 +1,8 @@
 <template>
     <div>
-        <ul v-if="isEdited">
-            <li><button @click="submit">Save</button></li>
-            <li><button @click="cancel">Cancel</button></li>
-        </ul>
+        <SaveComponent :isEdited="isEdited" :editable="editable"
+                       :submit="submit" :cancel="cancel" :name="title"></SaveComponent>
+
         <div class="row" v-if="isEditing">
             <div class="col-11">
                 <div class="form-row">
@@ -80,10 +79,11 @@
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
     import {NOT_FOUND} from "@/stores/consts/FetchStatus"
+    import SaveComponent from "./editor-components/SaveComponent";
 
     export default {
         name: "ProjectEditor",
-        components: {VueEditor},
+        components: {SaveComponent, VueEditor},
         mixins : [ChangeObserverMixin],
         props : ['projectId'],
         data : ()=>({
@@ -107,7 +107,11 @@
             },
             editable : function () {
                 let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
-                if(hasEditingPrivilege === undefined)return false
+                let projectTeams = this.$store.getters['project/getTeams']
+                if (hasEditingPrivilege === undefined && projectTeams) {
+                    this.$store.dispatch('user/checkEditingPrivilege', projectTeams);
+                    return false
+                }
                 return hasEditingPrivilege
             },
         },

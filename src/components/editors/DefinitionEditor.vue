@@ -1,7 +1,7 @@
 <template>
     <div>
         <SaveComponent :isEdited="isEdited"
-                       :submit="submit" :cancel="cancel"></SaveComponent>
+                       :submit="submit" :cancel="cancel" :name="name"></SaveComponent>
         <div class="form-group">
             <label class="font-weight-bold">Name :</label>
             <input v-model="name" class="form-control"/>

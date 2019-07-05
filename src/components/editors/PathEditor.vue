@@ -1,6 +1,6 @@
 <template>
     <div>
-        <SaveComponent :isEdited="isEdited"
+        <SaveComponent :isEdited="isEdited" :editable="editable"
                        :submit="submit" :cancel="cancel" :name="editorName"></SaveComponent>
         <div class="form-row dot-border ml-1">
             <div v-if="isEditing" class="col-11">
@@ -16,7 +16,7 @@
                     <label class="font-weight-bold">Path Variables : </label>
                     <br /><small>Add curly braces in path name</small>
                     <div class="form-group" v-for="(variable,idx) in variables" v-bind:key="variable.name">
-                        <HighLvlJsonEditor :editable="true"
+                        <HighLvlJsonEditor :editable="editable"
                                            :nameable="true"
                                            :deleteable="false"
                                            :schema-data="variable"
@@ -44,7 +44,7 @@
         <div class="dot-border w-100 row mt-3 ml-1">
             <h4 class="font-weight-bold w-100">Path Variables:</h4>
             <div class="w-100" v-for="(variable,idx) in variables" v-bind:key="variable.name">
-                <HighLvlJsonEditor :editable="true"
+                <HighLvlJsonEditor :editable="editable"
                                    :parent-is-editing="false"
                                    :nameable="true"
                                    :deleteable="false"
@@ -82,7 +82,11 @@
             },
             editable : function () {
                 let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
-                if(hasEditingPrivilege === undefined)return false
+                let projectTeams = this.$store.getters['project/getTeams']
+                if (hasEditingPrivilege === undefined && projectTeams) {
+                    this.$store.dispatch('user/checkEditingPrivilege', projectTeams);
+                    return false
+                }
                 return hasEditingPrivilege
             },
             sectionData(){

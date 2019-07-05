@@ -2,6 +2,7 @@
     <div class="row my-3">
         <div class="col-5">
             <h5>Assign My Team to this project</h5>
+<!--            {{ teamInProject }}-->
             <small>You are required to be the creator of the team</small>
 <!--            <div class="row">-->
                 <select class="form-control col-10" v-model="selectedTeamName">
@@ -49,6 +50,9 @@
                 return this.teams.filter((t) => {
                     return t.creator === self.profile.username
                 })
+            },
+            teamInProject(){
+                return this.$store.getters['project/getTeams']
             }
         },
         methods: {
@@ -66,6 +70,7 @@
                 axios.post(BASE_URL + 'projects/' + this.projectId + '/assign?teamName=' + this.selectedTeamName)
                     .then((response) => {
                     this.makeToast('success', response.data.success, response.data.message)
+                    this.$store.dispatch('project/assignTeamToProject', this.selectedTeamName)
                 })
                     .catch((e) => {
                         console.error(e);

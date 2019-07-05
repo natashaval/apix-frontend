@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="row my-3">
+        <div class="row my-3" v-if="apiData">
             <h3>{{ apiData.info.title }}</h3>
         </div>
         <div class="row my-3">
@@ -106,7 +106,6 @@
                             else {
                                 self.makeToast('warning', false, 'Wrong type! Use default type')
                             }
-
                             instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
 
 
@@ -141,8 +140,7 @@
                     ],
                     buttons: [
                         ['<button class="btn btn-sm btn-outline-danger ml-1">Delete</button>', function (instance, toast, button, e, inputs) {
-
-                            if (inputs[0].value === self.apiData.info.title){
+                            if (inputs[0].value === self.apiData.info.title && self.apiData){
                                 axios.delete(BASE_URL + 'projects/' + self.projectId).then((response) => {
                                     self.makeToast('success', response.data.success, response.data.message)
                                     self.$router.push({
@@ -155,10 +153,7 @@
                             else {
                                 self.makeToast('warning', false, 'Wrong project name!')
                             }
-
                             instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
-
-
                         }, false]
                     ]
                 })

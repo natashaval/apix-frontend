@@ -2,7 +2,7 @@
     <div>
     <div class="row">
         <div v-if="showEdit" class="col-11 editRepo" style="border-color: crimson">
-            <SaveComponent :isEdited="isEdited"
+            <SaveComponent :isEdited="isEdited" :editable="editable"
                            :submit="submit" :cancel="cancel"></SaveComponent>
 
             Owner: <span class="badge badge-secondary">{{owner}}</span>
@@ -90,7 +90,11 @@
         computed : {
             editable : function () {
                 let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
-                if(hasEditingPrivilege === undefined)return false
+                let projectTeams = this.$store.getters['project/getTeams']
+                if (hasEditingPrivilege === undefined && projectTeams) {
+                    this.$store.dispatch('user/checkEditingPrivilege', projectTeams);
+                    return false
+                }
                 return hasEditingPrivilege
             },
             showEdit : function () {

@@ -28,7 +28,8 @@
             },
             name: String,
             description: String,
-            isEdited: Boolean
+            isEdited: Boolean,
+            editable: Boolean
         },
         methods: {
             onSubmit: function(){
