@@ -18,6 +18,7 @@ import UserViewer from "../components/auth/admin-components/UserViewer";
 import ErrorNotFound from "../ErrorNotFound";
 import SettingsEditor from "../components/editors/SettingsEditor";
 import ClientEditor from "../components/editors/ClientEditor";
+import SwaggerClient from "../components/editors/SwaggerClient";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -112,6 +113,10 @@ export const router = new VueRouter({
             name: 'client-editor', path : '/projects/:projectId/sections/:sectionApi/paths/:pathApi/operations/:operationApi/client',
             component: ClientEditor, props: true,
             beforeEnter: initProject
+        },
+        {
+          name: 'swagger-client', path: '/projects/:projectId/swagger',
+          component: SwaggerClient
         },
         {// List of Projects available
             name: 'project-repo', path: '/projects',

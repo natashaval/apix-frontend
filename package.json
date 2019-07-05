@@ -16,6 +16,7 @@
     "bootstrap-vue": "^2.0.0-rc.24",
     "jquery": "^1.12.4",
     "npm": "^6.9.2",
+    "swagger-ui": "^3.23.0",
     "vue": "^2.6.10",
     "vue-izitoast": "^1.1.2",
     "vue-router": "^3.0.6",

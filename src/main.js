@@ -6,7 +6,8 @@ import axios from 'axios'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
-import 'izitoast/dist/css/iziToast.min.css';
+import 'izitoast/dist/css/iziToast.min.css'
+// import 'swagger-ui/dist/swagger-ui.css'
 
 import BootstrapVue from 'bootstrap-vue'
 Vue.use(BootstrapVue)
