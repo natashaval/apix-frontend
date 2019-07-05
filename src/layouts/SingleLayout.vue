@@ -1,7 +1,7 @@
 <template>
     <div class="container-fluid">
 
-        <aside class="sidebar text-white pt-0" style="background: #1d2225;min-width:18em;">
+        <aside class="sidebar text-white pt-0" style="background: #1d2225;">
             <nav>
                 <SideBar :apiData="apiData" />
             </nav>
@@ -46,11 +46,10 @@
     }
     .main {
         left: 25%;
-        min-width: 100em;
         right: 0;
         padding-left: 1em;
         padding-right: 10px;
         overflow-y: auto;
-        overflow-x: auto;
+        overflow-x: hidden;
     }
 </style>

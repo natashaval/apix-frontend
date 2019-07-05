@@ -112,14 +112,6 @@
                         }, false]
                     ]
                 })
-                /*
-                axios.post(BASE_URL + 'projects/' + this.projectId + '/export').then((response) => {
-                    this.makeToast('success', response.data.success, response.data.message)
-                }).catch((e) => {
-                    this.makeToast('danger', e.response.data.success, e.response.data.message)
-                })
-
-                 */
             },
             deleteOas: function () {
                 let self = this

@@ -13,6 +13,8 @@
                     <button class="btn btn-danger" @click="resetFile()">Reset</button>
                 </div>
 
+                <AssignComponent ref="assign" :assign-new="assignNew"></AssignComponent>
+
                 <div v-for="(existFile,i) in files" :key="i">
                     <div class="row">
                         <div class="col-md-4">
@@ -43,9 +45,11 @@
 <script>
     import axios from 'axios'
     import {BASE_URL} from "../../stores/actions/const";
+    import AssignComponent from "../editors/editor-components/AssignComponent";
 
     export default {
         name: "ProjectsUpload",
+        components: {AssignComponent},
         data: function() {
             return {
                 files: {},
@@ -79,6 +83,9 @@
                     const postFile = self.files[key];
                     formData.append('type', 'oas-swagger2');
                     formData.append('file', postFile['file']);
+
+                    let team = this.$refs.assign.selectedTeamName;
+                    formData.append('team', team);
 
                     // Validation if file exists and file type is application/json
                     if (typeof postFile['file'].name === 'undefined') {
