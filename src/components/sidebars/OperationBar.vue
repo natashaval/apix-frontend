@@ -5,7 +5,7 @@
             <div class="col-2" style="margin-top: 0.3em" v-html="operationBadge" @click="methodClick" ></div>
             <span class="shrinkable-text col-7" style="margin-top: 0.35em;" @click="methodClick">
                 {{operationData.summary}}</span>
-            <button class="btn-circle float-right" @click="deleteOperation"
+            <button v-if="$_projectPrivilege_canEdit" class="btn-circle float-right" @click="deleteOperation"
                     :class="onHover ? 'visible': 'invisible' ">
                 <i style="font-size: 13px;" class="fas fa-trash"></i>
             </button>
@@ -20,9 +20,10 @@
 <script>
     import DeepTreeBuilderUtil from "@/utils/DeepTreeBuilderUtil"
     import * as axios from "axios"
-    import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
-    import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
-    import ApixUtil from "../../utils/ApixUtil";
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
+    import ApixUtil from "@/utils/ApixUtil"
+    import BadgeGeneratorUtil from "@/utils/BadgeGeneratorUtil"
+    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 
     export default {
         name: "OperationBar",
@@ -33,28 +34,14 @@
             sectionApi : String,
             operationData : Object
         },
+        mixins : [ProjectPrivilegeMixin],
         data : ()=>({
             onHover : false
         }),
         computed: {
             operationBadge() {
-                switch (this.operationApi) {
-                    case "get":
-                        return '<a class="badge badge-success" style="width: 4.5em;text-align: center">GET</a>'
-                    case "head":
-                        return '<a class="badge badge-success" style="width: 4.5em;text-align: center">HEAD</a>'
-                    case "option":
-                        return '<a class="badge badge-success" style="width: 4.5em;text-align: center">OPTION</a>'
-                    case "post":
-                        return '<a class="badge badge-warning" style="width: 4.5em;text-align: center">POST</a>'
-                    case "patch":
-                        return '<a class="badge badge-warning" style="width: 4.5em;text-align: center">PATCH</a>'
-                    case "put":
-                        return '<a class="badge badge-info" style="width: 4.5em;text-align: center">PUT</a>'
-                    case "delete":
-                        return '<a class="badge badge-danger" style="width: 4.5em;text-align: center">DELETE</a>'
-                }
-                return null
+                let badgeClass = BadgeGeneratorUtil.getBadgeClassOfOperation(this.operationApi)
+                return '<a class="'+badgeClass+'" style="width: 4.5em;text-align: center">'+this.operationApi.toUpperCase()+'</a>'
             },
             pathData : function () {
                 return this.$store.getters['project/getPathData'](this.sectionApi,this.pathApi)

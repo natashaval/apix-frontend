@@ -1,7 +1,7 @@
 <template>
  <div style="height: 40em">
      <AceEditor v-model="jsonText" @init="editorInit()" lang="json" theme="apix" :options="editorOptions"
-                style="height: 100%;width: 100%"></AceEditor>
+                style="height: 100%;width: 100%;" disabled></AceEditor>
  </div>
 </template>
 
@@ -17,17 +17,26 @@
             jsonInput : {
                 type : Object,
                 required : false
+            },
+            editable : {
+                type : Boolean,
+                default : true
             }
         },
         data : () => ({
             jsonText : '',
-            editorOptions:{
-                fontSize: 12,
-                fontFamily: 'monospace'
-            },
             isEdited : false,
             unwatchList : []
         }),
+        computed : {
+            editorOptions : function () {
+                return {
+                    fontSize: 12,
+                    fontFamily: 'monospace',
+                    readOnly: this.editable
+                }
+            }
+        },
         methods : {
             editorInit : function () {
                 require('brace/mode/json');

@@ -13,7 +13,7 @@
 
             <p @click="pathClick" class="shrinkable-text col-9"
                style="font-size: 0.9em;margin-left: -1em;margin-top: 0.3em;"> {{ pathApi }}</p>
-            <div v-if="onHover" class="row">
+            <div v-if="onHover && $_projectPrivilege_canEdit" class="row">
                 <button class="btn-circle" @click="deletePath" style="z-index: 90">
                     <i style="font-size: 13px;" class="fas fa-trash"></i>
                 </button>
@@ -40,6 +40,7 @@
     import DeepTreeBuilderUtil from "@/utils/DeepTreeBuilderUtil"
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
+    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
     export default {
         name: "PathBar",
         components: {OperationBar},
@@ -49,6 +50,8 @@
             pathApi : String,
             pathData : Object
         },
+
+        mixins : [ProjectPrivilegeMixin],
         data: function(){
             return {
                 isArrow: false,

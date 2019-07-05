@@ -1,14 +1,19 @@
 <template>
     <div>
+        <b-row>
+            <b-button href="/projects" squared variant="outline-info" block>
+                <i class="fas fa-chevron-left"></i> Back to Projects
+            </b-button>
+        </b-row>
+
         <b-row class="my-2">
             <b-col md="10">
 <!--                {{profile}}-->
                 <ProjectBar :apiData="projectData"/>
             </b-col>
             <b-col md="2">
-                <b-button :to="{name: 'section-create', params: {projectId: projectApi} }"
-                          size="sm"
-                          class="float-right">
+                <b-button v-if="$_projectPrivilege_canEdit" :to="{name: 'section-create'}" pill size="sm" variant="outline-light"
+                          class="float-right btn-circle">
                     <i class="fa fa-plus-circle"></i>
                 </b-button>
             </b-col>
@@ -24,24 +29,24 @@
             </b-col>
         </b-row>
 
-        <hr />
+        <hr style="background-color: white"/>
 
         <b-row>
-            <b-col md="10">
-                <b-button size="sm"
+            <b-col md="10" style="padding-left: 1.25em;">
+                <span size="sm"
                         :class = "collapseModel ? 'collapsed' : null"
                         :aria-expanded="collapseModel ? 'true' : 'false' "
                         aria-controls="collapse-model"
-                        @click="collapseModel = !collapseModel"
+                        @click="collapseModel = !collapseModel" class="text-white"
+                      style="cursor: pointer !important;"
                 >
                     <i class="fas fa-caret-down" v-show="collapseModel"></i>
                     <i class="fas fa-caret-right" v-show="!collapseModel"></i>
-                    Models
-                </b-button>
+                     <span class="ml-2">Models</span>
+                </span>
             </b-col>
             <b-col md="2">
-                <b-button :to="{name: 'definition-create', params: {projectId: projectApi}}"
-                          pill size="sm" variant="outline-secondary"
+                <b-button v-if="$_projectPrivilege_canEdit" :to="{name: 'definition-create'}" pill size="sm" variant="outline-light"
                           v-b-tooltip.hover title="new definition"
                           class="float-right"
                 >
@@ -62,19 +67,17 @@
             </ul>
 
         </b-collapse>
-
-        <b-list-group flush v-if="projectApi">
+        <b-list-group flush v-if="$_projectPrivilege_canEdit" style="">
             <b-list-group-item :to="{name: 'github-editor' }"
-                               class="py-1 text-light sidebar-content" exact-active-class="active-bar"
+                               class="py-1 text-light sidebar-content pl-0" exact-active-class="active-bar"
                                style="background-color: transparent;">
                 <i class="fab fa-github"></i> Github
             </b-list-group-item>
             <b-list-group-item variant="dark"
                                :to="{name: 'settings-editor', params: {projectId: projectApi} }"
-                               class="py-1 text-light sidebar-content" exact-active-class="active-bar"
+                               class="py-1 text-light sidebar-content pl-0" exact-active-class="active-bar"
                                style="background-color: transparent;"><i class="fas fa-cog"></i> Settings</b-list-group-item>
         </b-list-group>
-
     </div>
 
 </template>
@@ -84,12 +87,13 @@
     import Section from "./SectionBar";
     import ProjectBar from "./ProjectBar";
     import ModelBar from "./ModelBar";
-    import {USER_REQUEST} from "../../stores/actions/user";
-
+    import {USER_REQUEST} from "@/stores/actions/user";
+    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 
     export default {
         name: "SideBar",
         components: {ModelBar, ProjectBar, Section},
+        mixins : [ProjectPrivilegeMixin],
         data: function(){
             return {
                 collapseModel: true,

@@ -1,7 +1,7 @@
 <template>
     <div>
-        <SaveComponent :isEdited="isEdited" :editable="editable"
-                       :submit="submit" :cancel="cancel" name="<h3 class=font-weight-bold>Section Editor</h3>"></SaveComponent>
+        <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
+                       :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
         <div class="row dot-border" style="margin-left: 0.1em;margin-right: 0.5em;">
             <div v-if="isEditing" class="col-11">
                 <div class="form-group">
@@ -20,7 +20,7 @@
                 <div v-html="description"></div>
             </div>
             <div class="col-1">
-                <button v-if="editable" @click="isEditing = !isEditing"
+                <button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"
                         class="float-right round-button btn mt-2" v-bind:id="_uid+'-edit-btn'">
                     <i class="fa fa-pencil-alt"></i>
                 </button>
@@ -41,11 +41,12 @@
     import uuidv4 from 'uuid/v4';
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
     import SaveComponent from "./editor-components/SaveComponent";
+    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 
     export default {
         name: "SectionEditor",
         components: {SaveComponent, VueEditor},
-        mixins : [ChangeObserverMixin],
+        mixins : [ChangeObserverMixin, ProjectPrivilegeMixin],
         data: function(){
             return {
                 projectId: undefined,
@@ -61,6 +62,10 @@
             }
         },
         computed : {
+            editorTitle : function (){
+                let name = (this.sectionApi)?this.sectionApi:'New Section'
+                return '<h4 class=font-weight-bold><i class="fas fa-folder-open"></i> '+name+'</h4>'
+            },
             projectState : function (){
                 return this.$store.getters['project/getState']
             },

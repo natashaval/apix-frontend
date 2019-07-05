@@ -1,12 +1,12 @@
 <template>
     <div>
-        <SaveComponent :isEdited="isEdited" :editable="editable"
-                       :submit="submit" :cancel="cancel" :name="editorName"></SaveComponent>
+        <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
+                       :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
         <div class="form-row dot-border ml-1">
             <div v-if="isEditing" class="col-11">
                 <div class="form-group">
                     <label class="font-weight-bold">Name:</label>
-                    <input class="form-control" v-model="path" name="path-input"/>
+                    <input class="form-control" v-model="path" name="path-input" placeholder="/path/{myVariable}/data"/>
                 </div>
                 <div class="form-group">
                     <label class="font-weight-bold">Description:</label>
@@ -16,7 +16,7 @@
                     <label class="font-weight-bold">Path Variables : </label>
                     <br /><small>Add curly braces in path name</small>
                     <div class="form-group" v-for="(variable,idx) in variables" v-bind:key="variable.name">
-                        <HighLvlJsonEditor :editable="editable"
+                        <HighLvlJsonEditor :editable="$_projectPrivilege_canEdit"
                                            :nameable="true"
                                            :deleteable="false"
                                            :schema-data="variable"
@@ -34,7 +34,7 @@
                 <div v-html="description" class="mb-4"></div>
             </div>
             <div class="col-1 pr-2 pt-2">
-                <button v-if="editable" @click="isEditing = !isEditing"
+                <button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"
                         class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
                     <i class="fa fa-pencil-alt"></i>
                 </button>
@@ -44,7 +44,7 @@
         <div class="dot-border w-100 row mt-3 ml-1">
             <h4 class="font-weight-bold w-100">Path Variables:</h4>
             <div class="w-100" v-for="(variable,idx) in variables" v-bind:key="variable.name">
-                <HighLvlJsonEditor :editable="editable"
+                <HighLvlJsonEditor :editable="$_projectPrivilege_canEdit"
                                    :parent-is-editing="false"
                                    :nameable="true"
                                    :deleteable="false"
@@ -70,24 +70,15 @@
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
     import SaveComponent from "./editor-components/SaveComponent";
-
+    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 
     export default {
         name: "PathEditor",
         components: {SaveComponent, VueEditor,HighLvlJsonEditor},
-        mixins : [ChangeObserverMixin],
+        mixins : [ChangeObserverMixin, ProjectPrivilegeMixin],
         computed : {
             projectState : function (){
                 return this.$store.getters['project/getState']
-            },
-            editable : function () {
-                let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
-                let projectTeams = this.$store.getters['project/getTeams']
-                if (hasEditingPrivilege === undefined && projectTeams) {
-                    this.$store.dispatch('user/checkEditingPrivilege', projectTeams);
-                    return false
-                }
-                return hasEditingPrivilege
             },
             sectionData(){
                 return this.$store.getters['project/getSectionData'](this.sectionApi)
@@ -104,8 +95,9 @@
                 }
                 return undefined
             },
-            editorName() {
-                return '<h4 class=font-weight-bold>'+this.pathApi+'</h4>'
+            editorTitle() {
+                let name = (this.pathApi)?this.pathApi:'New Path'
+                return '<h4 class=font-weight-bold><i class="fas fa-link"></i> '+name+'</h4>'
             }
         },
         data : () => ({

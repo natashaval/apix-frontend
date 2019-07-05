@@ -2,6 +2,7 @@ import {USER_REQUEST, USER_ERROR, USER_SUCCESS} from "../actions/user";
 import { AUTH_LOGOUT } from "../actions/auth";
 import axios from 'axios'
 import {BASE_URL} from "../actions/const";
+import {IN_PROCESS, NOT_START} from "../consts/FetchStatus";
 
 export default {
     namespaced: true,
@@ -9,7 +10,8 @@ export default {
         status: '',
         profile: {},
         users: [],
-        editingPrivilege: undefined
+        editingPrivilege: undefined,
+        fetchStatus : NOT_START,
     },
     getters: {
         getProfile: state => state.profile,

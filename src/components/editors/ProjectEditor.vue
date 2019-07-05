@@ -1,8 +1,7 @@
 <template>
     <div>
-        <SaveComponent :isEdited="isEdited" :editable="editable"
+        <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
                        :submit="submit" :cancel="cancel" :name="title"></SaveComponent>
-
         <div class="row" v-if="isEditing">
             <div class="col-11">
                 <div class="form-row">
@@ -48,7 +47,7 @@
 
             </div>
             <div class="col-1">
-                <button v-if="editable" @click="isEditing = !isEditing"
+                <button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"
                         class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
                     <i class="fa fa-pencil-alt"></i>
                 </button>
@@ -63,7 +62,7 @@
                 <div v-html="description"></div>
             </div>
             <div class="col-1">
-                <button v-if="editable" @click="isEditing = !isEditing"
+                <button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"
                         class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
                     <i class="fa fa-pencil-alt"></i>
                 </button>
@@ -79,12 +78,13 @@
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
     import {NOT_FOUND} from "@/stores/consts/FetchStatus"
-    import SaveComponent from "./editor-components/SaveComponent";
+    import SaveComponent from "./editor-components/SaveComponent"
+    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin"
 
     export default {
         name: "ProjectEditor",
         components: {SaveComponent, VueEditor},
-        mixins : [ChangeObserverMixin],
+        mixins : [ChangeObserverMixin, ProjectPrivilegeMixin],
         props : ['projectId'],
         data : ()=>({
             title : '',
@@ -104,16 +104,7 @@
             },
             apiData : function () {
                 return this.$store.getters['project/getProjectData']
-            },
-            editable : function () {
-                let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
-                let projectTeams = this.$store.getters['project/getTeams']
-                if (hasEditingPrivilege === undefined && projectTeams) {
-                    this.$store.dispatch('user/checkEditingPrivilege', projectTeams);
-                    return false
-                }
-                return hasEditingPrivilege
-            },
+            }
         },
         methods: {
             setLayout (layout) {

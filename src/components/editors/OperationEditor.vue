@@ -1,85 +1,92 @@
 <template>
-    <div>
-        <SaveComponent :isEdited="isEdited" :editable="editable"
-                       :submit="submit" :cancel="cancel" name="<h3 class=font-weight-bold>Operation Editor</h3>"></SaveComponent>
-        <div class="row">
-        <div v-if="showEdit" class="col-11">
-            <div class="form-group">
-                <label class="font-weight-bold">Summary :</label>
-                <b-input v-model="summary" class="col"></b-input>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-4">
-                    <label class="font-weight-bold">Method :</label>
-                    <b-form-group class="form-row mb-2 w-100"
-                                  :state="methodState" :invalid-feedback="methodInvalidFeedback">
-                        <b-select class="form-control" :state="methodState" trim v-model="method" :options="selectMethodOptions"></b-select>
-                    </b-form-group>
-                </div>
-                <div class="form-group col-8">
-                    <label class="font-weight-bold">Path :</label>
-                    <b-input class="form-control" v-model="pathApi" disabled></b-input>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="font-weight-bold">Operation Id :</label>
-                <b-input v-model="operationId" class="form-control"></b-input>
-            </div>
-            <div class="form-group">
+    <div class="pb-5">
+        <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
+                       :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
+        <div class="form-row w-100 dot-border mb-4">
+            <div v-if="showEdit" class="col-11 pl-3">
                 <div class="form-group">
-                    <label class="font-weight-bold">Description:</label>
-                    <vue-editor v-model="description"></vue-editor>
+                    <label class="font-weight-bold">Summary : </label>
+                    <b-input v-model="summary" class="col"></b-input>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-4">
+                        <label  class="font-weight-bold">Method :</label>
+                        <b-form-group class="form-row mb-2 w-100"
+                                      :state="methodState" :invalid-feedback="methodInvalidFeedback">
+                            <b-select class="form-control" :state="methodState" trim v-model="method" :options="selectMethodOptions"></b-select>
+                        </b-form-group>
+                    </div>
+                    <div class="form-group col-8">
+                        <label class="font-weight-bold">Path :</label>
+                        <b-input class="form-control" v-model="pathApi" disabled></b-input>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold">Operation Id :</label>
+                    <b-input v-model="operationId" class="form-control"></b-input>
+                </div>
+                <div class="form-group">
+                    <div class="form-group">
+                        <label class="font-weight-bold">Description:</label>
+                        <vue-editor v-model="description"></vue-editor>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold">Consumes :</label>
+                    <v-select multiple v-model="consumes" class="w-100" :options="options"></v-select>
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold">Produces :</label>
+                    <v-select multiple v-model="produces" class="w-100" :options="options">
+                    </v-select>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="font-weight-bold">Consumes :</label>
-                <v-select multiple v-model="consumes" class="w-100" :options="options"></v-select>
-            </div>
-            <div class="form-group">
-                <label class="font-weight-bold">Produces :</label>
-                <v-select multiple v-model="produces" class="w-100" :options="options">
-                </v-select>
-            </div>
-        </div>
-        <div v-else class="col-11">
-                <div class="row">
-                    <p>Summary : {{summary}}</p>
+            <div v-else class="col-11 pl-3">
+                <div class="form-row">
+                    <p class="font-weight-bold">Summary : </p>
+                    <p class="ml-2">{{summary}}</p>
                 </div>
-                <div class="row">
-                    <p>Method :{{method}}</p>
+                <div class="form-row">
+                    <p class="font-weight-bold">Method : </p>
+                    <p class="ml-2">{{method}}</p>
                 </div>
-                <div class="row">
-                    <p>Path : {{pathApi}}</p>
+                <div class="form-row">
+                    <p class="font-weight-bold">Path : </p>
+                    <p class="ml-2">{{pathApi}}</p>
                 </div>
-                <div class="row">
-                    <p>Operation Id :{{operationId}}</p>
+                <div class="form-row">
+                    <p class="font-weight-bold">Operation Id : </p>
+                    <p class="ml-2">{{operationId}}</p>
                 </div>
-                <div class="row">
-                    <p>Description:</p>
-                    <p v-html="description"></p>
+                <div class="form-row">
+                    <p class="font-weight-bold w-100">Description:</p>
+                    <br>
+                    <p v-html="description" class="dot-border w-100"></p>
                 </div>
-                <div class="row">
-                    <p>Consumes :</p>
-                    <p v-for="consume in consumes" v-bind:key="consume">{{consume}}</p>
+                <div class="form-row">
+                    <p class="font-weight-bold w-100">Consumes :</p>
+                    <p v-for="consume in consumes" v-bind:key="consume" class="mr-2 btn-outline-primary btn btn-sm">{{consume}}</p>
                 </div>
-                <div class="row">
-                    <p>Produces :</p>
-                    <p v-for="produce in produces" v-bind:key="produce">{{produce}}</p>
+                <div class="form-row">
+                    <p class="font-weight-bold w-100">Produces :</p>
+                    <p v-for="produce in produces" v-bind:key="produce" class="mr-2 btn-outline-primary btn btn-sm">{{produce}}</p>
                 </div>
             </div>
-            <button v-if="editable" @click="isEditing = !isEditing"
-                    class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
-                <i class="fa fa-pencil-alt"></i>
-            </button>
+            <div class="col-1 pr-0">
+                <button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"
+                        class="float-right round-button btn mt-2 mr-2" v-bind:id="_uid+'-edit-btn'">
+                    <i class="fa fa-pencil-alt"></i>
+                </button>
+            </div>
         </div>
 
         <RequestComponent ref="request"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                          :editable="editable"
+                          :editable="$_projectPrivilege_canEdit"
                           :request-data="requestData" :operation-api="method"/>
         <ResponseComponent ref="response"
                            :responses-data="responsesData"
-                           :editable="editable"
+                           :editable="$_projectPrivilege_canEdit"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
 
     </div>
@@ -98,11 +105,13 @@
     import vSelect from 'vue-select';
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
     import SaveComponent from "./editor-components/SaveComponent";
+    import BadgeGeneratorUtil from "@/utils/BadgeGeneratorUtil";
+    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 
     export default {
         name: "OperationEditor",
         components: {SaveComponent, ResponseComponent, RequestComponent, VueEditor,vSelect},
-        mixins : [ChangeObserverMixin],
+        mixins : [ChangeObserverMixin, ProjectPrivilegeMixin],
         data : () => ({
             isCreateNew : false,
             projectId : undefined,
@@ -111,7 +120,7 @@
             operationApi : 'get',
             dataUpdated : false,
             isEdited : false,
-            isEditing : true,
+            isEditing : false,
             aceModel : '{}',
             testModel : {
                 name : 'alfian'
@@ -149,6 +158,10 @@
             pathActionQuery : [],
         }),
         computed : {
+            editorTitle : function (){
+                return '<h4><span class="'+BadgeGeneratorUtil.getBadgeClassOfOperation(this.method)+' mr-3">'+this.method+'</span>'+
+                        this.pathApi+'</h4>'
+            },
             methodState : function (){
                 return this.$_changeObserverMixin_isValid('method')
             },
@@ -161,17 +174,8 @@
             modelName : function (){
                 return this.testModel.name
             },
-            editable : function () {
-                let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
-                let projectTeams = this.$store.getters['project/getTeams']
-                if (hasEditingPrivilege === undefined && projectTeams) {
-                    this.$store.dispatch('user/checkEditingPrivilege', projectTeams);
-                    return false
-                }
-                return hasEditingPrivilege
-            },
             showEdit : function () {
-                if(!this.editable){
+                if(!this.$_projectPrivilege_canEdit){
                     return false
                 }
                 return this.isEditing
@@ -407,6 +411,8 @@
             },
             //override
             $_changeObserverMixin_onDataChanged : function (after,before) {
+                console.log(before)
+                console.log(after)
                 this.isEdited = true
             }
 

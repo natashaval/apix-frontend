@@ -2,8 +2,7 @@
     <li>
         <div class="sidebar-content row" style="height: 2em;" :class="{'active-bar':isActive}"
              @mouseover="onHover=true" @mouseleave="onHover=false">
-
-            <p @click="definitionClick" class="col-10 ml-4" style="font-size: 1em;">{{ definitionApi }}</p>
+            <p @click="definitionClick" class="col-10 ml-4 mt-1" style="font-size: 0.9em;">{{ definitionApi }}</p>
             <div v-if="onHover">
                 <button class="btn-circle" @click="deleteDefinition">
                     <i class="fas fa-trash"></i>
@@ -14,9 +13,9 @@
 </template>
 
 <script>
-    import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
-    import axios from "axios";
-    import {makeToast} from "../../assets/toast";
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
+    import axios from "axios"
+    import {makeToast} from "@/assets/toast"
 
     export default {
         name: "ModelBar",

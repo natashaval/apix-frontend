@@ -10,7 +10,7 @@
                 <i class="fas fa-caret-down" v-show="isArrow"></i>
             </button>
             <span @click="gotoRoute" style="font-size: 1.3em;width: 68%;">{{ sectionApi }}</span>
-            <div v-if="onHover">
+            <div v-if="onHover && $_projectPrivilege_canEdit">
                 <button class="btn-circle" @click="deleteSection">
                     <i style="font-size: 13px;" class="fas fa-trash"></i>
                 </button>
@@ -38,12 +38,14 @@
     import PathBar from './PathBar'
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
+    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 
     export default {
         name: "SectionBar",
         components : {
             PathBar
         },
+        mixins : [ProjectPrivilegeMixin],
         props : {
             projectApi : String,
             sectionApi : String,
