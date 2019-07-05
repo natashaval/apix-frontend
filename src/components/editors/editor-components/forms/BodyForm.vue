@@ -12,7 +12,7 @@
                     <label class="font-weight-bold">Description:</label>
                     <div v-html="description"></div>
                 </div>
-                <div class="col-1">
+                <div class="col-1 pr-3 mt-2 mb-2">
                     <button v-if="editable" @click="isEditing = !isEditing"
                             class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
                         <i class="fa fa-pencil-alt"></i>
@@ -24,7 +24,7 @@
             <button @click="showHighLevelEditor = !showHighLevelEditor" class="btn btn-primary" style="font-size: 12px;">
                 <i class="fas fa-edit"></i> switch editor
             </button>
-            <button v-b-modal.modal-importer class="btn btn-success" style="font-size: 12px;margin-left: 1em;">
+            <button v-if="editable" v-b-modal="'modal-importer-'+_uid" class="btn btn-success" style="font-size: 12px;margin-left: 1em;">
                 <i class="fas fa-download"></i> import from external json
             </button>
         </div>
@@ -43,7 +43,7 @@
             :$_changeObserverMixin_parent="$_changeObserverMixin_this"
             :json-input="schemaDataWrapper.data" class="form-control"/>
 
-        <b-modal id="modal-importer" title="Import From External Json" hide-footer>
+        <b-modal :id="'modal-importer-'+_uid" title="Import From External Json" hide-footer>
             <div class="form-group">
                 <label class="font-weight-bold">select json file or paste to here</label>
                 <input type="file" v-on:change="jsonFileLoaded">

@@ -1,18 +1,21 @@
 <template>
     <div>
-        {{_uid}}
-        <div class="row">
-            <b-form-group v-if="isEditing" class="col"
+        <div class="form-row w-100">
+            <b-form-group v-if="isEditing" class="col-11"
                           :invalid-feedback="selectedCodeInvalidFeedback"
                           :state="selectedCodeState">
                 <b-select v-model="selectedCode" :state="selectedCodeState" :options="statusOptions"/>
             </b-form-group>
-            <div v-else class="col">
+            <div v-else class="col-11">
                 <p>Status Code : {{selectedCode}}</p>
             </div>
-            <b-button v-if="editable" @click="isEditing = !isEditing" class="float-right">
-                <i class="fa fa-pencil-alt"></i>
-            </b-button>
+            <div class="col-1 float-right">
+                <div class="float-right">
+                    <button v-if="editable" @click="isEditing = !isEditing" class="round-button btn mt-auto" style="margin-left:auto; margin-right:0;">
+                        <i class="fa fa-pencil-alt"></i>
+                    </button>
+                </div>
+            </div>
         </div>
         <div>
             <p class="font-weight-bold">Headers: </p>

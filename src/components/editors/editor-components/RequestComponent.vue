@@ -1,19 +1,19 @@
 <template>
-    <div>
-        <div class="dot-border mb-3">
-            <h5 class="font-weight-bold">Headers:</h5>
+    <div class="dot-border pl-2">
+        <div class="mb-3">
+            <h6 class="font-weight-bold">Headers:</h6>
             <PropertyForm ref="headers" :schemas-data="headersData"
                           :editable="editable"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         </div>
-        <div class="dot-border mb-3">
-            <h5 class="font-weight-bold">Query Parameters:</h5>
+        <div class="mb-3">
+            <h6 class="font-weight-bold">Query Parameters:</h6>
             <PropertyForm ref="queryParams" :schemas-data="queryParamsData"
                           :editable="editable"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         </div>
-        <div class="dot-border mb-3">
-            <h5 class="font-weight-bold">Body:</h5>
+        <div class="mb-3 pr-1">
+            <h6 class="font-weight-bold">Body:</h6>
             <BodyForm v-if="hasBody" ref="body" :body-data="requestData"
                       :editable="editable"
                       :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>

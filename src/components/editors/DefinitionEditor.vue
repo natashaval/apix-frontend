@@ -1,7 +1,7 @@
 <template>
     <div>
         <SaveComponent :isEdited="isEdited"
-                       :submit="submit" :cancel="cancel" :name="name"></SaveComponent>
+                       :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
         <div class="form-group">
             <label class="font-weight-bold">Name :</label>
             <input v-model="name" class="form-control"/>
@@ -51,6 +51,10 @@
             definitionActions : []
         }),
         computed: {
+            editorTitle : function (){
+                let name = (this.definitionApi)?this.definitionApi:'New Definition'
+                return '<h4><i class="fas fa-cube"></i> '+ name +'</h4>'
+            },
             projectState : function (){
                 return this.$store.getters['project/getState']
             },

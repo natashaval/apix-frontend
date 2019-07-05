@@ -62,8 +62,8 @@
             getAttributes : function () {
                 return {
                     type : 'array',
-                    minItems : parseInt(this.minItems),
-                    maxItems : parseInt(this.maxItems),
+                    minItems : parseInt(this.minItems)?NaN:null,
+                    maxItems : parseInt(this.maxItems)?NaN:null,
                     uniqueItems : this.uniqueItems
                 }
             },

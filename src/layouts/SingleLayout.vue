@@ -1,26 +1,16 @@
 <template>
     <div class="container-fluid">
-<!--        <b-row>-->
-<!--            <b-col cols="3">-->
-                <aside class="sidebar text-white" style="background: #1d2225">
-                <nav>
-                    <b-button href="/projects" squared variant="outline-info" block>
-                        <i class="fas fa-chevron-left"></i> Back to Projects
-                    </b-button>
-                    <SideBar :apiData="apiData" />
-                </nav>
-                </aside>
-<!--            </b-col>-->
-<!--            <b-col cols="9">-->
+
+        <aside class="sidebar text-white pt-0" style="background: #1d2225;min-width:18em;">
+            <nav>
+                <SideBar :apiData="apiData" />
+            </nav>
+        </aside>
         <section class="main">
-<!--                <h2>Single Layout</h2>-->
-                <router-view></router-view>
+            <router-view></router-view>
         </section>
-<!--            </b-col>-->
-<!--        </b-row>-->
     </div>
 </template>
-
 <script>
     import SideBar from "../components/sidebars/SideBar";
     export default {
@@ -49,19 +39,18 @@
     }
     .sidebar {
         width: 25%;
-        min-width: 20%;
         left: 0;
         overflow-y: auto;
         overflow-x: hidden;
         padding: 0.25em 0.5em;
     }
     .main {
-        position: absolute;
-        left: 25vw;
+        left: 25%;
+        min-width: 100em;
         right: 0;
         padding-left: 1em;
         padding-right: 10px;
         overflow-y: auto;
-        overflow-x: hidden;
+        overflow-x: auto;
     }
 </style>

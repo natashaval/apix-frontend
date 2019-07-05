@@ -1,16 +1,24 @@
 <template>
-    <div>
+    <div class="dot-border">
         <label class="font-weight-bold">Response :</label>
-        <b-card no-body>
             <b-tabs vertical card pills nav-wrapper-class="w-15">
-                <b-tab v-for="(response, i) in responseList" :key="i.id" @click="setActiveView(i)">
+                <b-tab v-for="(response, i) in responseList" :key="i.id" @click="setActiveView(i)" class="pr-0">
                     <div slot="title">
                         <span ref="codeTabs">
-                            {{response.code}}
+                            <slot v-if="isDuplicateCode(i)">
+                                <span class="text-danger">{{response.code}}</span>
+                            </slot>
+                            <slot v-else>
+                                <span>{{response.code}}</span>
+                            </slot>
                         </span>
-                        <button class="btn-circle" v-if="editable" @click="deleteChild(i)" size="sm">
+                        <button class="btn-circle ml-2" v-if="editable" @click="deleteChild(i)" size="sm">
                             <i class="fas fa-trash"></i>
                         </button>
+                        <slot v-if="isDuplicateCode(i)">
+                            <br>
+                            <div class="text-danger w-100" style="font-size: 13px;">must be unique!</div>
+                        </slot>
                     </div>
 
                     <ResponseForm v-bind:style="{display: (i === activeIndex)?'block':'none'}"
@@ -33,7 +41,6 @@
                     There are no response http code available <br />
                 </div>
             </b-tabs>
-        </b-card>
     </div>
 </template>
 
@@ -93,6 +100,7 @@
                 this.responseList[childIndex].code = newStatusCode
             },
             deleteChild : function (childIndex) {
+                if(childIndex === this.activeIndex)this.activeIndex = 0
                 if(this.responseList[childIndex].data !== undefined){
                     this.actionsQuery.push({
                         action : 'delete',

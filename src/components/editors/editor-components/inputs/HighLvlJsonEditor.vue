@@ -1,5 +1,5 @@
 <template>
-    <div :class="(borderable)?'dot-border':''">
+    <div class="dot-border">
         <div class="row justify-content-end" style="margin-left: -10%">
             <div class="col-10 mt-3">
                 <div class="container row">
@@ -126,7 +126,6 @@
         <!--tambahan view jika tipe datanya array-->
         <div class="w-100" v-if="type === 'array'">
             <HighLvlJsonEditor ref="arrayItem" :schema-data="(schemaData !== undefined)?schemaData.items:undefined"
-                           :borderable="false"
                            :nameable="false" :deleteable="false" :editable="false"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                            :is-sub-array="true" :parent-is-editing="showEdit"/>
@@ -146,7 +145,7 @@
         <b-collapse v-bind:id="_uid+'-child-collapse'" visible>
             <div v-if="type === 'object'" style="padding-right: 0">
                 <!--child object-->
-                <div v-for="(val,i) in propertiesData" v-bind:key="val.id" class="row justify-content-end" style="">
+                <div v-for="(val,i) in propertiesData" v-bind:key="val.id" class="form-row justify-content-end" style="">
                     <div style="margin-top: -16px;margin-bottom: 16px">
                         <hr class="vline"/>
                     </div>
@@ -156,7 +155,7 @@
                                    :editable="editable"
                                    :deleteable="editable"
                                    :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                                   v-on:delete="deleteChild" class="col-11"/>
+                                   v-on:delete="deleteChild" class="col-11 border-right-0"/>
                 </div>
                 <a :ref="_uid+'-add-child-btn'" @click="addNewProperty" class="btn-text">
                     <i class="fas fa-plus"></i> Add more property
@@ -209,10 +208,6 @@
             },
             fixedName : {//jika @nameable == false, maka nama yang dipakai adalah @fixedName
                 type : String
-            },
-            borderable : {//punya border (default : true)
-                type : Boolean,
-                default : true
             },
             deleteable : {//punya tombol delete (default : true)
                 type : Boolean,
@@ -530,14 +525,14 @@
 
                 this.deletedProperty = []
                 this.propertiesData = []
-
+                this.ref = undefined
                 if(this.parentIsEditing !== undefined){
                     this.isEditing = this.parentIsEditing
                 }
                 if(this.schemaData !== undefined){
                     let sd = this.schemaData
                     this.name = sd.name
-                    this.type = sd.type
+                    this.type = (sd.type)?sd.type:undefined
                     this.selectedType = sd.type
                     this.description = sd.description
                     this.required = sd.required
@@ -545,6 +540,7 @@
                     if(sd['$ref'] !== undefined){
                         this.ref = sd['$ref']
                         this.selectedType = this.ref
+                        this.type = undefined
                     }
 
                     //punya properties/child
@@ -560,9 +556,6 @@
                                 isEditing : false
                             })
                         }
-                    }
-                    else{
-                        this.ref = undefined
                     }
                 }
 

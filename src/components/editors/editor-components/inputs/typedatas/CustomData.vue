@@ -42,7 +42,7 @@
         },
         mounted() {
             if(this.schemaData !== undefined){
-                this.refBefore = this.schemaData.ref
+                this.refBefore = this.schemaData['$ref']
             }
             this.$_changeObserverMixin_initObserver()
         }
