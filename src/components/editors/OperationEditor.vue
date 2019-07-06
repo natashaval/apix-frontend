@@ -6,14 +6,15 @@
             <div v-if="showEdit" class="col-11 pl-2">
                 <div class="form-group">
                     <label class="font-weight-bold">Summary : </label>
-                    <b-input v-model="summary" class="col"></b-input>
+                    <input v-model="summary" class="col form-control" name="operation-summary">
                 </div>
                 <div class="form-row">
                     <div class="form-group col-3">
                         <label  class="font-weight-bold">Method :</label>
                         <b-form-group class="mb-2 w-100"
                                       :state="methodState" :invalid-feedback="methodInvalidFeedback">
-                            <b-select class="form-control w-100" :state="methodState" trim v-model="method" :options="selectMethodOptions"></b-select>
+                            <b-select class="form-control w-100" :state="methodState" trim v-model="method"
+                                      :options="selectMethodOptions" name="operation-method"></b-select>
                         </b-form-group>
                     </div>
                     <div class="form-group col-9">
@@ -23,7 +24,7 @@
                 </div>
                 <div class="form-group">
                     <label class="font-weight-bold">Operation Id :</label>
-                    <b-input v-model="operationId" class="form-control"></b-input>
+                    <input v-model="operationId" class="form-control" name="operation-id"></input>
                 </div>
                 <div class="form-group">
                     <div class="form-group">
@@ -33,11 +34,13 @@
                 </div>
                 <div class="form-group">
                     <label class="font-weight-bold">Consumes :</label>
-                    <v-select multiple v-model="consumes" class="w-100" :options="options"></v-select>
+                    <v-select multiple v-model="consumes" class="w-100" :options="options"
+                              name="operation-consumes"></v-select>
                 </div>
                 <div class="form-group">
                     <label class="font-weight-bold">Produces :</label>
-                    <v-select multiple v-model="produces" class="w-100" :options="options">
+                    <v-select multiple v-model="produces" class="w-100" :options="options"
+                              name="operation-produces">
                     </v-select>
                 </div>
             </div>
@@ -153,14 +156,14 @@
                 {key : 'consumes'},
                 {key : 'produces'}
             ],
-
             operationActionQuery : [],
-            pathActionQuery : [],
+            pathActionQuery : []
         }),
         computed : {
             editorTitle : function (){
-                return '<h4><span class="'+BadgeGeneratorUtil.getBadgeClassOfOperation(this.method)+' mr-3">'+this.method+'</span>'+
-                        this.pathApi+'</h4>'
+                return '<h4><span class="'
+                    + BadgeGeneratorUtil.getBadgeClassOfOperation(this.method)+' mr-3">'+this.method+'</span>'
+                    + this.pathApi+'</h4>'
             },
             methodState : function (){
                 return this.$_changeObserverMixin_isValid('method')
@@ -346,7 +349,7 @@
 
 
                     this.isEdited = false
-
+                    return tree.root
                 }
                 catch (e) {
                     console.log(e)
@@ -376,6 +379,7 @@
                 else{
                     this.isCreateNew = true
                     this.isEdited = true
+                    this.isEditing = true
                 }
                 let od = this.operationData
                 if(od !== undefined){
@@ -411,8 +415,6 @@
             },
             //override
             $_changeObserverMixin_onDataChanged : function (after,before) {
-                console.log(before)
-                console.log(after)
                 this.isEdited = true
             }
 
@@ -427,7 +429,7 @@
             projectState : function () {
                 if(
                     (this.projectState === NOT_FOUND) ||
-                    (this.projectState === COMPLETE && this.operationData === undefined)
+                    (this.projectState === COMPLETE && this.operationData === undefined && !this.isCreateNew)
                 ){
                     this.$router.push({
                         name :'project-editor',

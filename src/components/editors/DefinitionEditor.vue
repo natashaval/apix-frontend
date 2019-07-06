@@ -66,7 +66,7 @@
             name : '',
             description : '',
             isEdited : false,
-            isEditing : true,
+            isEditing : false,
             isCreateNew : true,
             attributesKey : [{key : 'name'},{key : 'description'}],
             definitionsRootActions : [],

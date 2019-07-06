@@ -6,11 +6,11 @@
             <div v-if="isEditing" class="col-11 pl-1">
                 <div class="form-group">
                     <label class="font-weight-bold">Name:</label>
-                    <input class="form-control" v-model="name"/>
+                    <input class="form-control" v-model="name" name="section-name"/>
                 </div>
                 <div class="form-group">
                     <label class="font-weight-bold">Description:</label>
-                    <vue-editor v-model="description"></vue-editor>
+                    <vue-editor v-model="description" name="section-description"></vue-editor>
                 </div>
             </div>
             <div v-else class="col-11 pl-1">
@@ -65,18 +65,6 @@
             editorTitle : function (){
                 let name = (this.sectionApi)?this.sectionApi:'New Section'
                 return '<h4 class=font-weight-bold><i class="fas fa-folder-open"></i> '+name+'</h4>'
-            },
-            projectState : function (){
-                return this.$store.getters['project/getState']
-            },
-            editable : function () {
-                let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
-                let projectTeams = this.$store.getters['project/getTeams']
-                if (hasEditingPrivilege === undefined && projectTeams) {
-                    this.$store.dispatch('user/checkEditingPrivilege', projectTeams);
-                    return false
-                }
-                return hasEditingPrivilege
             },
             sectionData(){
                 if(this.sectionApi){
@@ -211,6 +199,7 @@
                 ).catch(function (error) {
                     console.log(error);
                 })
+                return tree.root
             },
             cancel: function(){
                 console.log('cancel')

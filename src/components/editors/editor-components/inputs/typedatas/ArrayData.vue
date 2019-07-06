@@ -60,10 +60,12 @@
                 return this.attributesKey
             },
             getAttributes : function () {
+                let minItems = parseInt(this.minItems)
+                let maxItems = parseInt(this.maxItems)
                 return {
                     type : 'array',
-                    minItems : parseInt(this.minItems)?NaN:null,
-                    maxItems : parseInt(this.maxItems)?NaN:null,
+                    minItems : minItems?minItems:null,
+                    maxItems : maxItems?maxItems:null,
                     uniqueItems : this.uniqueItems
                 }
             },
