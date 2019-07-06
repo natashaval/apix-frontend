@@ -1,6 +1,6 @@
 export default {
     isEqual(obj1,obj2) {
-        if(obj1 instanceof Array){
+        if(obj1 instanceof Array && obj2 instanceof Array){
             if(obj1.length !== obj2.length)return false
             for(let i in obj1){
                 if(obj1[i] != obj2[i])return false
