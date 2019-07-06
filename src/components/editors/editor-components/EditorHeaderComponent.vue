@@ -1,7 +1,7 @@
 <template>
     <div class="sticky-top">
         <div class="row justify-content-between no-gutters border rounded bg-white shadow-sm p-1 mb-3">
-            <div class="col-4">
+            <div class="col-8">
                 <div v-html="name"></div>
                 <div v-html="description"></div>
             </div>

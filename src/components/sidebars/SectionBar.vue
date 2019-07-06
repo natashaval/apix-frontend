@@ -9,7 +9,9 @@
                 <i class="fas fa-caret-right" v-show="!isArrow"></i>
                 <i class="fas fa-caret-down" v-show="isArrow"></i>
             </button>
-            <span @click="gotoRoute" style="font-size: 1.3em;width: 68%;">{{ sectionApi }}</span>
+            <span @click="gotoRoute" style="font-size: 1.3em;width: 68%;">
+                <i class="fas fa-folder-open" style="font-size: 16px"></i> {{ sectionApi }}
+            </span>
             <div v-if="onHover && $_projectPrivilege_canEdit">
                 <button class="btn-circle" @click="deleteSection">
                     <i style="font-size: 13px;" class="fas fa-trash"></i>
@@ -39,6 +41,7 @@
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
+    import {BASE_PROJECT_URL} from "../../stores/actions/const";
 
     export default {
         name: "SectionBar",
@@ -108,7 +111,7 @@
                                     key: this.sectionApi
                                 }]
                                 tree.sections._hasActions = true
-                                axios.put('http://localhost:8080/projects/'+this.projectApi, tree).then(
+                                axios.put(BASE_PROJECT_URL+'/'+this.projectApi, tree).then(
                                     (response) => {
                                         if(response.status === 200){
                                             this.projectData._signature = response.data.new_signature

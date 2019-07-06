@@ -58,7 +58,7 @@
     import ChangeObserverMixin from "../../mixins/ChangeObserverMixin";
     import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
     import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
-    import SaveComponent from "./editor-components/SaveComponent";
+    import SaveComponent from "./editor-components/EditorHeaderComponent";
 
     export default {
         name: "GithubEditor",
@@ -212,8 +212,7 @@
 
             },
             push: function () {
-                console.log('push to github')
-                axios.put(BASE_URL + 'github/api/repos/' + this.owner + '/' + this.repo + '/contents/' + this.path,
+                axios.put(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/contents/' + this.path,
                     {
                         message: this.message,
                         projectId: this.projectId,
@@ -228,7 +227,7 @@
             },
             fetchBranchList: function () {
                 if (this.githubData !== undefined) {
-                    axios.get(BASE_URL + 'github/api/repos/' + this.owner + '/' + this.repo + '/branches')
+                    axios.get(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/branches')
                         .then((response) => {
                             this.branchList = response.data
                         })
@@ -243,7 +242,7 @@
             fetchOas: function() {
                 if (this.githubData !== undefined) {
                     this.oasLoading = true;
-                    axios.get(BASE_URL + 'github/api/repos/' + this.owner + '/' + this.repo + '/contents/' + this.path,
+                    axios.get(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/contents/' + this.path,
                         {
                             params: {
                                 ref: this.branch

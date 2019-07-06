@@ -16,19 +16,19 @@ export default{
     },
     actions: {
         fetchOwner({commit}){
-            axios.get(BASE_URL + 'github/api/user')
+            axios.get(BASE_URL + '/github/api/user')
                 .then(resp => {
                     commit('ASSIGN_OWNER', resp.data)
                 })
         },
         fetchRepos({commit}){
-            axios.get(BASE_URL + 'github/api/user/repos')
+            axios.get(BASE_URL + '/github/api/user/repos')
                 .then(resp => {
                     commit('ASSIGN_REPOS', resp.data)
                 })
         },
         fetchOas({commit}, payload) {
-            axios.get(BASE_URL + 'github/api/repos/' + payload.owner + '/' + payload.repo + '/contents/' + payload.path,
+            axios.get(BASE_URL + '/github/api/repos/' + payload.owner + '/' + payload.repo + '/contents/' + payload.path,
                 {params: {
                         ref: this.branch
                     }}

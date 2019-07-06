@@ -124,7 +124,7 @@
             },
             makeToast,
             loadUsers: function(){
-                axios.get(BASE_URL + 'admin/users').then((response) => {
+                axios.get(BASE_URL + '/admin/users').then((response) => {
                     this.users = response.data
                 }).catch((e) => {
                     console.error(e);
@@ -186,7 +186,7 @@
             submit: function () {
                 let payload = this.dump()
                 if (!this.isInvite) {
-                    axios.post(BASE_URL + 'teams', payload).then((res) => {
+                    axios.post(BASE_URL + '/teams', payload).then((res) => {
                         // this.response.show = true
                         // this.response.success = res.data.success
                         // this.response.message = res.data.message
@@ -201,7 +201,7 @@
                 else {
                     // console.log(payload);
 
-                    axios.put(BASE_URL + 'teams', payload).then((res) => {
+                    axios.put(BASE_URL + '/teams', payload).then((res) => {
                         this.makeToast('success', res.data.success, res.data.message)
                     }).catch((e) => {
                         console.error(e)

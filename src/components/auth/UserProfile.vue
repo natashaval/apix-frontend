@@ -115,7 +115,7 @@
                 this.dump = !this.dump;
             },
             loadTeam(){
-                axios.get(BASE_URL + "teams/my-team").then((response) => {
+                axios.get(BASE_URL + "/teams/my-team").then((response) => {
                     this.teams = response.data
                 }).catch((e) => {
                     console.error(e)

@@ -44,7 +44,7 @@
 
 <script>
     import axios from 'axios'
-    import {BASE_URL} from "../../stores/actions/const";
+    import {BASE_PROJECT_URL} from "../../stores/actions/const";
     import AssignComponent from "../editors/editor-components/AssignComponent";
 
     export default {
@@ -98,7 +98,7 @@
 
                     } else {
 
-                        axios.post(BASE_URL + 'projects/import', formData, {
+                        axios.post(BASE_PROJECT_URL +'/'+ 'import', formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data'
                             },

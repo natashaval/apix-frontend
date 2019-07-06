@@ -42,7 +42,7 @@
                 >
                     <i class="fas fa-caret-down" v-show="collapseModel"></i>
                     <i class="fas fa-caret-right" v-show="!collapseModel"></i>
-                     <span class="ml-2">Models</span>
+                     <span class="ml-2"><i class="fas fa-archive" style="font-size: 16px"></i> Models</span>
                 </span>
             </b-col>
             <b-col md="2">

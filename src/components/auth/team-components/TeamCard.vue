@@ -48,7 +48,7 @@
                 console.log(grantList, teamName)
 
 
-                axios.put(BASE_URL + "teams/" + teamName, grantList).then((resp) => {
+                axios.put(BASE_URL + "/teams/" + teamName, grantList).then((resp) => {
                     this.makeToast('success', resp.data.success, resp.data.message);
                     this.$emit('update');
                 }).catch((e) => {

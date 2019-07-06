@@ -46,9 +46,10 @@
     }
     .main {
         left: 25%;
+        min-width: 75%;
         right: 0;
-        padding-left: 1em;
-        padding-right: 10px;
+        padding-left: 0;
+        padding-right: 0;
         overflow-y: auto;
         overflow-x: hidden;
     }

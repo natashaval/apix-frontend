@@ -1,7 +1,7 @@
 <template>
     <div>
         <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
-                       :submit="submit" :cancel="cancel" :name="title"></SaveComponent>
+                       :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
         <div class="row" v-if="isEditing">
             <div class="col-11">
                 <div class="form-row">
@@ -78,8 +78,9 @@
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
     import {NOT_FOUND} from "@/stores/consts/FetchStatus"
-    import SaveComponent from "./editor-components/SaveComponent"
+    import SaveComponent from "./editor-components/EditorHeaderComponent"
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin"
+    import {BASE_PROJECT_URL} from "@/stores/actions/const"
 
     export default {
         name: "ProjectEditor",
@@ -104,6 +105,9 @@
             },
             apiData : function () {
                 return this.$store.getters['project/getProjectData']
+            },
+            editorTitle : function () {
+                return '<h4><i class="fas fa-atom"></i> '+ this.title+'</h4>'
             }
         },
         methods: {
@@ -149,7 +153,7 @@
                     ActionExecutorUtil.executeActions(this.apiData, apiQuery)
                 }
 
-                axios.put('http://localhost:8080/projects/'+this.projectId,tree).then(
+                axios.put(BASE_PROJECT_URL+'/'+this.projectId,tree).then(
                     (response) => {
                         if(response.status === 200){
                             this.apiData._signature = response.data.new_signature

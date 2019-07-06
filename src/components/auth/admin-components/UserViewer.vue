@@ -89,7 +89,7 @@
                 // console.log(id);
                 let idx = this.users.findIndex(x => x.id == id)
                 console.log(id, idx);
-                axios.delete(BASE_URL + 'admin/users/' + id).then((response) => {
+                axios.delete(BASE_URL + '/admin/users/' + id).then((response) => {
                     this.makeToast('danger', response.data.success, response.data.message)
                     this.users.splice(idx, 1)
                 }).catch((e) => {

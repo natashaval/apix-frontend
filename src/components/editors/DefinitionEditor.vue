@@ -1,21 +1,41 @@
 <template>
     <div>
-        <SaveComponent :isEdited="isEdited"
+        <SaveComponent :isEdited="isEdited" class="w-100"
                        :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
-        <div class="form-group">
-            <label class="font-weight-bold">Name :</label>
-            <input v-model="name" class="form-control"/>
+
+        <div class="form-row ml-1 mr-1 dot-border">
+            <div class="col-11">
+                <slot v-if="isEditing">
+                    <div class="form-group">
+                        <label class="font-weight-bold">Name :</label>
+                        <input v-model="name" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="font-weight-bold">Description :</label>
+                        <vue-editor v-model="description"></vue-editor>
+                    </div>
+                </slot>
+                <slot v-else>
+                    <h4 class="font-weight-bold">Name :</h4>
+                    <h5>{{name}}</h5>
+                    <h4 class="font-weight-bold">Description:</h4>
+                    <div v-html="description"></div>
+                </slot>
+            </div>
+            <div class="col-1">
+                <button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"
+                        class="float-right round-button btn mt-2" v-bind:id="_uid+'-edit-btn'">
+                    <i class="fa fa-pencil-alt"></i>
+                </button>
+            </div>
         </div>
-        <div class="form-group">
-            <label class="font-weight-bold">Description :</label>
-            <vue-editor v-model="description"></vue-editor>
-        </div>
-        <div class="container" style="padding-left: 60px">
-            <HighLvlJsonEditor :schema-data="schemaData" ref="root"
-                           :nameable="false"
-                           :deleteable="false"
-                           :fixed-name="'schema'"
-                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
+        <div class="form-row ml-1 mr-1 dot-border">
+            <label class="font-weight-bold w-100">Model :</label>
+            <HighLvlJsonEditor :schema-data="schemaData" ref="root" class="col-12"
+                               :nameable="false"
+                               :deleteable="false"
+                               :fixed-name="'schema'"
+                               :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         </div>
     </div>
 </template>
@@ -23,19 +43,20 @@
 <script>
     import HighLvlJsonEditor from "./editor-components/inputs/HighLvlJsonEditor";
     import { VueEditor } from 'vue2-editor'
-    import ChangeObserverMixin from "../../mixins/ChangeObserverMixin";
-    import DeepTreeBuilderUtil from "../../utils/DeepTreeBuilderUtil";
+    import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
+    import DeepTreeBuilderUtil from "@/utils/DeepTreeBuilderUtil";
     import uuidv4 from 'uuid/v4';
-    import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
-    import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
+    import ActionBuilderUtil from "@/utils/ActionBuilderUtil";
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import * as axios from "axios";
-    import SaveComponent from "./editor-components/SaveComponent";
-    import {COMPLETE, NOT_FOUND} from "../../stores/consts/FetchStatus";
+    import SaveComponent from "./editor-components/EditorHeaderComponent";
+    import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
+    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 
     export default {
         name: "DefinitionEditor",
         components: {SaveComponent, HighLvlJsonEditor,VueEditor},
-        mixins : [ChangeObserverMixin],
+        mixins : [ChangeObserverMixin, ProjectPrivilegeMixin],
         props: {
             definitionApi : {
                 type : String
@@ -45,6 +66,7 @@
             name : '',
             description : '',
             isEdited : false,
+            isEditing : true,
             isCreateNew : true,
             attributesKey : [{key : 'name'},{key : 'description'}],
             definitionsRootActions : [],

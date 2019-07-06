@@ -76,7 +76,7 @@
 
 <script>
     import * as axios from "axios";
-    import {BASE_URL} from "../../../stores/actions/const";
+    import {BASE_PROJECT_URL} from "@/stores/actions/const";
 
     export default {
         name: "ProjectsTable",
@@ -124,8 +124,7 @@
             },
             loadProjects(){
                 this.isBusy = true
-                axios.get(BASE_URL + 'projects/all/info').then((response) => {
-                    console.log('data all info accepted!')
+                axios.get(BASE_PROJECT_URL +'/'+ 'all/info').then((response) => {
                     this.isBusy = false
                     this.projects = response.data
                 });

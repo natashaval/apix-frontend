@@ -111,7 +111,7 @@
                 this.loadTeam()
             },
             loadTeam: function(){
-                axios.get(BASE_URL + 'teams/' + this.name).then((response) => {
+                axios.get(BASE_URL + '/teams/' + this.name).then((response) => {
                     this.team = response.data;
                     // (this.team.creator === this.profile.username) ? this.isCreator = true : this.isCreator = false
                 })
@@ -127,7 +127,7 @@
                 }
                 console.log(members)
 
-                axios.put(BASE_URL + 'teams/' + this.team.name, members).then((res) => {
+                axios.put(BASE_URL + '/teams/' + this.team.name, members).then((res) => {
                     this.makeToast('success', res.data.success, res.data.message)
                     this.selectedMember = []
                     this.loadTeam();

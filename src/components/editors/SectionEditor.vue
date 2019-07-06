@@ -1,9 +1,9 @@
 <template>
     <div>
-        <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
+        <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit" class="w-100"
                        :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
         <div class="row dot-border" style="margin-left: 0.1em;margin-right: 0.5em;">
-            <div v-if="isEditing" class="col-11">
+            <div v-if="isEditing" class="col-11 pl-1">
                 <div class="form-group">
                     <label class="font-weight-bold">Name:</label>
                     <input class="form-control" v-model="name"/>
@@ -13,7 +13,7 @@
                     <vue-editor v-model="description"></vue-editor>
                 </div>
             </div>
-            <div v-else class="col-11">
+            <div v-else class="col-11 pl-1">
                 <h4 class="font-weight-bold">Section:</h4>
                 <h5>{{name}}</h5>
                 <h4 class="font-weight-bold">Description:</h4>
@@ -33,14 +33,14 @@
 
 <script>
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin"
-    import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
-    import DeepTreeBuilderUtil from "../../utils/DeepTreeBuilderUtil";
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
+    import DeepTreeBuilderUtil from "@/utils/DeepTreeBuilderUtil";
     import { VueEditor } from 'vue2-editor'
     import * as axios from "axios"
-    import {BASE_URL} from "../../stores/actions/const";
+    import {BASE_PROJECT_URL} from "@/stores/actions/const";
     import uuidv4 from 'uuid/v4';
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
-    import SaveComponent from "./editor-components/SaveComponent";
+    import SaveComponent from "./editor-components/EditorHeaderComponent";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 
     export default {
@@ -192,7 +192,7 @@
 
                 console.log('Tree: ', tree)
 
-                axios.put(BASE_URL + 'projects/'+this.projectId,tree.root).then(
+                axios.put(BASE_PROJECT_URL+'/'+this.projectId,tree.root).then(
                     (response) => {
                         if(response.status === 200){
                             if (tree.root._signature !== undefined) {

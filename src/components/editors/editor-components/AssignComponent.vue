@@ -25,7 +25,7 @@
 
 <script>
     import axios from 'axios';
-    import {BASE_URL} from "../../../stores/actions/const";
+    import {BASE_PROJECT_URL, BASE_URL} from "../../../stores/actions/const";
     import {USER_REQUEST} from "../../../stores/actions/user";
     import {makeToast} from "../../../assets/toast";
 
@@ -68,7 +68,7 @@
         methods: {
             makeToast,
             loadTeam(){
-                axios.get(BASE_URL + "teams/my-team").then((response) => {
+                axios.get(BASE_URL + "/teams/my-team").then((response) => {
                     this.teams = response.data
                 })
                     .catch((e) => {
@@ -77,7 +77,7 @@
             },
             assignTeam(){
                 console.log(this.selectedTeamName)
-                axios.post(BASE_URL + 'projects/' + this.projectId + '/assign?teamName=' + this.selectedTeamName)
+                axios.post(BASE_PROJECT_URL +'/'+ this.projectId + '/assign?teamName=' + this.selectedTeamName)
                     .then((response) => {
                         this.makeToast('success', response.data.success, response.data.message)
                         this.$store.dispatch('project/assignTeamToProject', this.selectedTeamName)

@@ -12,7 +12,9 @@
             </button>
 
             <p @click="pathClick" class="shrinkable-text col-9"
-               style="font-size: 0.9em;margin-left: -1em;margin-top: 0.3em;"> {{ pathApi }}</p>
+               style="font-size: 0.9em;margin-left: -1em;margin-top: 0.3em;">
+                <i class="fas fa-link" style="font-size: 16px"></i> {{ pathApi }}
+            </p>
             <div v-if="onHover && $_projectPrivilege_canEdit" class="row">
                 <button class="btn-circle" @click="deletePath" style="z-index: 90">
                     <i style="font-size: 13px;" class="fas fa-trash"></i>

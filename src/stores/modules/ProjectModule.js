@@ -1,7 +1,7 @@
 import axios from 'axios'
-import {BASE_URL} from "@/stores/actions/const";
 import {IN_PROCESS,COMPLETE,NOT_FOUND} from "@/stores/consts/FetchStatus";
 import {NOT_START} from "@/stores/consts/FetchStatus";
+import {BASE_PROJECT_URL} from "../actions/const";
 
 export default{
     namespaced : true,
@@ -85,7 +85,7 @@ export default{
     actions : {
         fetchProjectData({ commit }, idProject) {
             commit('CHANGE_STATE', IN_PROCESS)
-            let fetchData = () => axios.get(BASE_URL + 'projects/'+idProject).then(
+            axios.get(BASE_PROJECT_URL +'/'+ idProject).then(
                 (response) => {
                     if(response.status === 200){
                         commit('ASSIGN_DATA', response.data)
@@ -95,11 +95,10 @@ export default{
             ).catch(() => {
                 commit('CHANGE_STATE', NOT_FOUND)
             })
-            fetchData()
         },
 
         fetchAllProjectsData({ commit }) {
-            let fetchProjects = () => axios.get(BASE_URL + 'projects/all/info')
+            let fetchProjects = () => axios.get(BASE_PROJECT_URL + '/all/info')
                 .then((response) => {
                     commit('LIST_DATA', response.data)
                 })
@@ -107,7 +106,7 @@ export default{
         },
 
         deleteProjectData({ commit }, idProject) {
-            let deleteProject = () => axios.delete(BASE_URL + 'projects/' + idProject).then(
+            let deleteProject = () => axios.delete(BASE_PROJECT_URL +'/'+ idProject).then(
                 (response) => {
                     commit('DELETE_DATA', idProject)
                 }
@@ -119,7 +118,7 @@ export default{
 
         createProjectData({commit}, newProjectForm) {
             return new Promise((resolve, reject) => {
-                axios.post(BASE_URL + 'projects', newProjectForm)
+                axios.post(BASE_PROJECT_URL, newProjectForm)
                     .then((response) => {
                         console.log('hasil axios dari module', response.data)
                         commit('ADD_DATA', response.data.newProject)

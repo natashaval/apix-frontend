@@ -2,9 +2,11 @@
     <li>
         <div class="sidebar-content row" style="height: 2em;" :class="{'active-bar':isActive}"
              @mouseover="onHover=true" @mouseleave="onHover=false">
-            <p @click="definitionClick" class="col-10 ml-4 mt-1" style="font-size: 0.9em;">{{ definitionApi }}</p>
+            <p @click="definitionClick" class="col-10 ml-4 mt-1" style="font-size: 0.9em;">
+                <i class="fas fa-cube"></i> {{ definitionApi }}
+            </p>
             <div v-if="onHover">
-                <button class="btn-circle" @click="deleteDefinition">
+                <button v-if="$_projectPrivilege_canEdit" class="btn-circle" @click="deleteDefinition">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
@@ -16,9 +18,11 @@
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
     import axios from "axios"
     import {makeToast} from "@/assets/toast"
+    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 
     export default {
         name: "ModelBar",
+        mixins : [ProjectPrivilegeMixin],
         props: {
             definitionApi: String,
             definitionKey: String,
@@ -27,7 +31,6 @@
         data: function(){
             return {
                 onHover: false,
-                // isClick: false
             }
         },
         computed: {

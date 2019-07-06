@@ -3,20 +3,20 @@
         <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
                        :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
         <div class="form-row w-100 dot-border mb-4">
-            <div v-if="showEdit" class="col-11 pl-3">
+            <div v-if="showEdit" class="col-11 pl-2">
                 <div class="form-group">
                     <label class="font-weight-bold">Summary : </label>
                     <b-input v-model="summary" class="col"></b-input>
                 </div>
                 <div class="form-row">
-                    <div class="form-group col-4">
+                    <div class="form-group col-3">
                         <label  class="font-weight-bold">Method :</label>
-                        <b-form-group class="form-row mb-2 w-100"
+                        <b-form-group class="mb-2 w-100"
                                       :state="methodState" :invalid-feedback="methodInvalidFeedback">
-                            <b-select class="form-control" :state="methodState" trim v-model="method" :options="selectMethodOptions"></b-select>
+                            <b-select class="form-control w-100" :state="methodState" trim v-model="method" :options="selectMethodOptions"></b-select>
                         </b-form-group>
                     </div>
-                    <div class="form-group col-8">
+                    <div class="form-group col-9">
                         <label class="font-weight-bold">Path :</label>
                         <b-input class="form-control" v-model="pathApi" disabled></b-input>
                     </div>
@@ -84,7 +84,7 @@
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                           :editable="$_projectPrivilege_canEdit"
                           :request-data="requestData" :operation-api="method"/>
-        <ResponseComponent ref="response"
+        <ResponseComponent ref="response" class="pl-2"
                            :responses-data="responsesData"
                            :editable="$_projectPrivilege_canEdit"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
@@ -104,7 +104,7 @@
     import ActionBuilder from "@/utils/ActionBuilderUtil";
     import vSelect from 'vue-select';
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
-    import SaveComponent from "./editor-components/SaveComponent";
+    import SaveComponent from "./editor-components/EditorHeaderComponent";
     import BadgeGeneratorUtil from "@/utils/BadgeGeneratorUtil";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 

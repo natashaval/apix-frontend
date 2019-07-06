@@ -44,7 +44,7 @@
 
 <script>
     import axios from 'axios';
-    import {BASE_URL} from "../../stores/actions/const";
+    import {BASE_PROJECT_URL, BASE_URL} from "../../stores/actions/const";
     import {makeToast} from "../../assets/toast";
     import AssignComponent from "./editor-components/AssignComponent";
 
@@ -68,7 +68,7 @@
                 this.projectId = this.$route.params.projectId
             },
             generateCodegen: function () {
-                axios.post(BASE_URL + 'projects/' + this.projectId + '/codegen').then((response) => {
+                axios.post(BASE_PROJECT_URL +'/'+ this.projectId + '/codegen').then((response) => {
                     this.makeToast('success', response.data.success, response.data.message)
                 }).catch((e) => {
                     this.makeToast('danger', e.response.data.success, e.response.data.message)
@@ -95,7 +95,7 @@
                         ['<button class="btn btn-sm ml-1">Export</button>', function (instance, toast, button, e, inputs) {
 
                             if (inputs[0].value === 'oas-swagger2'){
-                                axios.post(BASE_URL + 'projects/' + self.projectId + '/export?type=' + inputs[0].value)
+                                axios.post(BASE_PROJECT_URL +'/'+ self.projectId + '/export?type=' + inputs[0].value)
                                     .then((response) => {
                                     self.makeToast('success', response.data.success, response.data.message)
                                     self.fileExportLocation = response.data.file_url
@@ -133,7 +133,7 @@
                     buttons: [
                         ['<button class="btn btn-sm btn-outline-danger ml-1">Delete</button>', function (instance, toast, button, e, inputs) {
                             if (inputs[0].value === self.apiData.info.title && self.apiData){
-                                axios.delete(BASE_URL + 'projects/' + self.projectId).then((response) => {
+                                axios.delete(BASE_PROJECT_URL +'/'+ self.projectId).then((response) => {
                                     self.makeToast('success', response.data.success, response.data.message)
                                     self.$router.push({
                                         name :'project-repo'

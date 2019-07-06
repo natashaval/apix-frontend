@@ -2,8 +2,8 @@
     <div>
         <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
                        :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
-        <div class="form-row dot-border ml-1">
-            <div v-if="isEditing" class="col-11">
+        <div class="form-row dot-border ml-1 mr-1">
+            <div v-if="isEditing" class="col-11 pl-1">
                 <div class="form-group">
                     <label class="font-weight-bold">Name:</label>
                     <input class="form-control" v-model="path" name="path-input" placeholder="/path/{myVariable}/data"/>
@@ -41,7 +41,7 @@
             </div>
         </div>
 
-        <div class="dot-border w-100 row mt-3 ml-1">
+        <div class="form-row dot-border mt-3 ml-1 mr-1">
             <h4 class="font-weight-bold w-100">Path Variables:</h4>
             <div class="w-100" v-for="(variable,idx) in variables" v-bind:key="variable.name">
                 <HighLvlJsonEditor :editable="$_projectPrivilege_canEdit"
@@ -69,7 +69,7 @@
     import TreeBuilder from "@/utils/DeepTreeBuilderUtil";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
-    import SaveComponent from "./editor-components/SaveComponent";
+    import SaveComponent from "./editor-components/EditorHeaderComponent";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 
     export default {

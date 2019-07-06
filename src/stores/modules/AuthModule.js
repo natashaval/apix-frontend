@@ -34,7 +34,7 @@ export default {
         [AUTH_REQUEST]: ({commit, dispatch}, user) => {
             return new Promise(((resolve, reject) => {
                 commit(AUTH_REQUEST)
-                axios({url: BASE_URL + 'auth/login', data: user, method: 'POST'})
+                axios({url: BASE_URL + '/auth/login', data: user, method: 'POST'})
                     .then(response => {
                         const token = response.data.token
                         localStorage.setItem('apix-token', token)

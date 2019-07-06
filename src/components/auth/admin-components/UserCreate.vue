@@ -79,7 +79,7 @@
 
                 // this.makeToast('success', true, 'ini toast benar')
 
-                axios.post(BASE_URL + 'admin/users', payload).then((response) => {
+                axios.post(BASE_URL + '/admin/users', payload).then((response) => {
                     this.makeToast('success', response.data.success, response.data.message)
                     this.$store.dispatch('user/addUser', payload)
                 }).catch((e) => {

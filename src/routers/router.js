@@ -24,7 +24,9 @@ Vue.use(VueRouter)
 const initProject = (to, from, next) => {
     // jika project id dari url sebelum dan sesudah berbeda, maka fetch ulang datanya
     if(from.params.projectId !== to.params.projectId){
+        console.log('begin outer call')
         store.dispatch('project/fetchProjectData',to.params.projectId)
+        console.log('end outer call')
     }
     next()
 }
