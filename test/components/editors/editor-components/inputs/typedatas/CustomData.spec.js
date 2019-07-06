@@ -3,7 +3,7 @@ import CustomData from "@/components/editors/editor-components/inputs/typedatas/
 
 let schemaData = {
     "required" : false,
-    "ref" : "#/definitions/b7b1926d-de2d-4f09-bdb6-45253e7d594c"
+    "$ref" : "#/definitions/b7b1926d-de2d-4f09-bdb6-45253e7d594c"
 }
 
 describe('getAttributes() tests',() => {
@@ -27,6 +27,7 @@ describe('getAttributes() tests',() => {
                 currentRef : '#/definitions/b7b1926d-de2d-4f09-bdb6-45253e7d594c'
             }
         })
+        console.log(wrapper.vm.getActions())
         expect(wrapper.vm.getAttributes()).toEqual(expected)
         expect(wrapper.vm.getActions().length).toEqual(0)
     })

@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount, mount} from '@vue/test-utils';
+import {createLocalVue, mount} from '@vue/test-utils';
 import PathEditor from "@/components/editors/PathEditor";
 import ProjectModule from "@/stores/modules/ProjectModule";
 import ApixUtil from "@/utils/ApixUtil";
@@ -46,7 +46,8 @@ describe('create new tests', () => {
                         _signature : '123'
                     }
                 },
-                editable: () => true
+                $_projectPrivilege_userTeam : ()=>['MyTeam'],
+                $_projectPrivilege_canEdit : ()=>true
             },
             localVue,
             store,
@@ -89,7 +90,8 @@ describe('create new tests', () => {
         let res = wrapper.vm.submit()
         expect(ApixUtil.isEqualObject(res, expected,['_signature'])).toEqual(true)
     })
-});
+})
+
 describe('edit tests', () => {
     let $route = {
         params : {
@@ -101,7 +103,7 @@ describe('edit tests', () => {
 
 
     let wrapper
-    beforeEach(() => {
+    beforeEach(async () => {
         const store = new Vuex.Store({
             modules: {
                 project: {
@@ -138,14 +140,23 @@ describe('edit tests', () => {
             }
         })
         wrapper = mount(PathEditor,{
-            computed : {
-                editable: () => true
-            },
             localVue,
             store,
+            computed : {
+                sectionData(){
+                    return {
+                        paths :{},
+                        _signature : '123'
+                    }
+                },
+                $_projectPrivilege_userTeam : ()=>['MyTeam'],
+                $_projectPrivilege_canEdit : ()=>true
+
+            },
             stubs: ['router-link','vue-editor'],
             mocks : {$route : $route}
         })
+        wrapper.find('[id="'+wrapper.vm._uid+'-edit-btn"]').trigger('click')
     })
 
     test('should update form when variables added',()=>{
