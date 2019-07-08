@@ -144,7 +144,8 @@
                             newKey: this.name
                         }]
                         callbacks.push(() => {
-                            ActionExecutorUtil.executeActions(this.projectData.sections, tmp)})
+                            ActionExecutorUtil.executeActions(this.projectData.sections, tmp)
+                        })
                         tree.leaf._hasActions = true
                         tree.root._signature = this.projectData._signature // jika rename section, maka refer to project data signature
 
@@ -170,7 +171,7 @@
                     }
 
                     callbacks.push(() => {
-                        ActionExecutorUtil.executeActions(this.projectData.sections[this.name], sectionQuery)
+                        ActionExecutorUtil.executeActions(this.projectData.sections[this.name].info, sectionQuery)
                     })
 
                     if (tree.root._signature === undefined) tree.leaf._signature = this.sectionData.info._signature
