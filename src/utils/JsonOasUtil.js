@@ -6,7 +6,7 @@ export default {
         return res
     },
     _contructOas(output, input){
-        if(input instanceof Object){
+        if(!(input instanceof Array) && input instanceof Object){
             output.type = 'object'
             output.properties = {}
             output = output.properties

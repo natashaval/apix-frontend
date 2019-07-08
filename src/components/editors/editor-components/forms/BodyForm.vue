@@ -48,10 +48,15 @@
                 <label class="font-weight-bold">select json file or paste to here</label>
                 <input type="file" v-on:change="jsonFileLoaded">
             </div>
+            <div class="form-group">
+                <button class="btn btn-outline-primary btn-sm" @click="fillWithExampleJson">click for example json</button>
+
+            </div>
+
             <LowLvlJsonEditor class="form-control"
                     ref="modalJsonInput"
                     v-bind:style="{display: 'block',height: '400px'}"/>
-            <button class="mt-3 btn btn-success" @click="()=>{doImport();$bvModal.hide('modal-importer');}">import</button>
+            <button class="mt-3 btn btn-success" @click="()=>{doImport();$bvModal.hide('modal-importer-'+_uid);}">import</button>
         </b-modal>
     </div>
 </template>
@@ -114,6 +119,26 @@
                     case this.EDITOR_TYPE_LOW_LEVEL:
                         return (!this.showHighLevelEditor)?'block':'none'
                 }
+            },
+            fillWithExampleJson : function(){
+                this.$refs.modalJsonInput.setJson({
+                    "string1": "",
+                    "string2": "myValue",
+                    "number1": 1,
+                    "number2" :1.2,
+                    "obj1" : {
+                        "obj-str": "",
+                        "obj-num": 2
+                    },
+                    "array1": [1],
+                    "array2": [""],
+                    "array3": [{
+                        "arr-obj-str" : ""
+                    }],
+                    "array4":[[
+                        {"arr-arr-obj-str" : ""}
+                    ]]
+                })
             },
             jsonFileLoaded : function(event){
                 let file = event.target.files[0]
