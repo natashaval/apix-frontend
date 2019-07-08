@@ -5,7 +5,7 @@
                 <div v-html="name"></div>
                 <div v-html="description"></div>
             </div>
-            <div class="col-4" v-show="isEdited">
+            <div v-if="editable" class="col-4" v-show="isEdited">
                 <button class="btn btn-secondary float-right" @click="onCancel">Cancel</button>
                 <button class="btn btn-primary float-right mx-2" @click="onSubmit">Save</button>
             </div>

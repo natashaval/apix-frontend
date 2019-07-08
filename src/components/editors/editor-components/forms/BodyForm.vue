@@ -91,12 +91,9 @@
             isEditMode : false,
             dataFromExternal : false,
             externalData : undefined,
-            in : 'body',
             isEditing : false,
             attributesKey : [
-                {key : 'description'},
-                {key : 'in'},
-                {keyBefore : 'name', keyAfter: 'in'}
+                {key : 'description'}
             ],
             commitChangeCallback : [],
             actionsQuery : [],
@@ -131,8 +128,6 @@
             getData : function () {
                 return {
                     description : this.description,
-                    in : this.in,
-                    name : this.name,
                     schema : this.$refs.root.getData()
                 }
             },
@@ -204,12 +199,10 @@
                 this.dataFromExternal = false
                 if(this.bodyData !== undefined){
                     let bd = this.bodyData
-                    this.in = bd.in
                     this.description = (bd.description === undefined)?'':bd.description
                     this.schemaDataWrapper.data = Object.assign({},this.bodyData.schema)
                 }
                 else{
-                    this.in = ''
                     this.schemaDataWrapper.data = {}
                     this.description = ''
                 }
@@ -217,7 +210,7 @@
                 if(this.parentIsEditing !== undefined){
                     this.isEditing = this.parentIsEditing
                 }
-                this.$_changeObserverMixin_initObserver(['in','description','contentTypes.length'])
+                this.$_changeObserverMixin_initObserver(['description','contentTypes.length'])
             },
             reloadData : function () {
                 this.loadData()

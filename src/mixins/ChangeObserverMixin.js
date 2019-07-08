@@ -106,6 +106,7 @@ export default {
         $_changeObserverMixin_onDataChanged : function (after, before) {
             if(!this.$_changeObserverMixin_wasTriggered && this.$_changeObserverMixin_parent !== undefined){
                 this.$_changeObserverMixin_unObserve()
+                if(before === undefined && after === undefined)return
                 this.$_changeObserverMixin_parent.onDataChanged(after, before)
             }
             this.$_changeObserverMixin_wasTriggered = true

@@ -33,7 +33,7 @@
                 return {
                     fontSize: 12,
                     fontFamily: 'monospace',
-                    readOnly: this.editable
+                    readOnly: !this.editable
                 }
             }
         },
