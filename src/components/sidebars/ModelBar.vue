@@ -87,15 +87,12 @@
                                         }
                                         this.makeToast('success', response.data.success, response.data.message)
                                     }
-
-
-                                ).catch(function (e) {
-                                    console.log(e);
-                                    this.makeToast('danger', e.response.data.success, e.response.data.message)
+                                ).catch(error => {
+                                    this.$bvToast.toast(error.response.data.message + ' , Please refresh the page.', {
+                                        title: 'Failed',
+                                        variant: 'danger'
+                                    })
                                 })
-
-
-
                             }, true],
                             ['<button>NO</button>', function (instance, toast) {
                                 instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');

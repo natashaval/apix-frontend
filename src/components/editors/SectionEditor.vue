@@ -56,12 +56,13 @@
                 isEdited: false,
                 isEditing: false,
                 isCreateNew: false,
-                sectionActions: [],
-                sectionRootActions: [],
                 attributesKey: [{key : 'name'},{key : 'description'}],
             }
         },
         computed : {
+            projectState : function (){
+                return this.$store.getters['project/getState']
+            },
             editorTitle : function (){
                 let name = (this.sectionApi)?this.sectionApi:'New Section'
                 return '<h4 class=font-weight-bold><i class="fas fa-folder-open"></i> '+name+'</h4>'
@@ -113,13 +114,12 @@
                 let tree = undefined
                 let callbacks = []
                 let sectionQuery = [] // refer to PathEditor
-
                 if (this.isCreateNew){ // refer to Definition Editor create new Definitions
                     tree = DeepTreeBuilderUtil.buildDeepTree(['sections'])
                     tree.root._signature = this.projectData._signature
                     let data = this.getData()
                     data._signature = uuidv4()
-                    this.sectionRootActions = tree.leaf._actions = [{
+                    tree.leaf._actions = [{
                         action: 'put',
                         key: this.name,
                         value: {
@@ -131,21 +131,20 @@
                     tree.leaf._hasActions = true
 
                     callbacks.push(() => {
-                        ActionExecutorUtil.executeActions(this.projectData.sections, this.sectionRootActions)
+                        ActionExecutorUtil.executeActions(this.projectData.sections, tree.leaf._actions)
                     })
                 }
                 else { // refer to Path Editor edit path, because also change path name in Side Bar
                     tree = DeepTreeBuilderUtil.buildDeepTree(['sections'])
 
                     if (this.sectionApi !== this.name) {
-                        this.sectionRootActions = tree.leaf._actions = [{
+                        let tmp = tree.leaf._actions = [{
                             action: 'rename',
                             key: this.sectionApi,
                             newKey: this.name
                         }]
                         callbacks.push(() => {
-                            ActionExecutorUtil.executeActions(this.projectData.sections, this.sectionRootActions) // TIDAK YAKIN
-                        })
+                            ActionExecutorUtil.executeActions(this.projectData.sections, tmp)})
                         tree.leaf._hasActions = true
                         tree.root._signature = this.projectData._signature // jika rename section, maka refer to project data signature
 
@@ -171,7 +170,7 @@
                     }
 
                     callbacks.push(() => {
-                        ActionExecutorUtil.executeActions(this.sectionData.info, sectionQuery)
+                        ActionExecutorUtil.executeActions(this.projectData.sections[this.name], sectionQuery)
                     })
 
                     if (tree.root._signature === undefined) tree.leaf._signature = this.sectionData.info._signature
@@ -183,11 +182,11 @@
                 axios.put(BASE_PROJECT_URL+'/'+this.projectId,tree.root).then(
                     (response) => {
                         if(response.status === 200){
-                            if (tree.root._signature !== undefined) {
+                            if (tree.root._signature !== undefined) {// terjadi rename sections
                                 this.projectData._signature = response.data.new_signature
-                            } // terjadi rename sections
+                            }
                             else {
-                                this.sectionData.info._signature = response.data.new_signature;
+                                this.sectionData.info._signature = response.data.new_signature
                             }
                             callbacks.forEach(fn => fn())
                             this.$router.push({
@@ -196,8 +195,12 @@
                             })
                         }
                     }
-                ).catch(function (error) {
-                    console.log(error);
+                ).catch(error => {
+                    console.log(error)
+                    this.$bvToast.toast(error.response.data.message + ' , Please refresh the page.', {
+                        title: 'Failed',
+                        variant: 'danger'
+                    })
                 })
                 return tree.root
             },

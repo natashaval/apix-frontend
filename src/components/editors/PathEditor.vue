@@ -143,7 +143,8 @@
                         value : {
                             description : this.description,
                             pathVariables : variableData,
-                            _signature : uuidv4()
+                            _signature : uuidv4(),
+                            methods : {}
                         }
                     }]
                     tree.leaf._hasActions = true
@@ -202,8 +203,11 @@
                             this.loadData()
                         }
                     }
-                ).catch(function (error) {
-                    console.log(error);
+                ).catch(error => {
+                    this.$bvToast.toast(error.response.data.message + ' , Please refresh the page.', {
+                        title: 'Failed',
+                        variant: 'danger'
+                    })
                 })
 
                 return tree.root

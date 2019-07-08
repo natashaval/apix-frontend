@@ -205,8 +205,11 @@
                             this.reloadData()
                         }
                     }
-                ).catch(function (error) {
-                    console.log(error);
+                ).catch(error => {
+                    this.$bvToast.toast(error.response.data.message + ' , Please refresh the page.', {
+                        title: 'Failed',
+                        variant: 'danger'
+                    })
                 })
 
 

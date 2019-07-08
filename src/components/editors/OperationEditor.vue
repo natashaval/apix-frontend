@@ -220,8 +220,8 @@
                 res.operationId = this.operationId
                 res.request = this.$refs.request.getData()
                 res.responses = this.$refs.response.getData()
-                res.consumes = this.consumes
-                res.produces = this.produces
+                res.consumes = (this.consumes === '')?[]:this.consumes
+                res.produces = (this.produces === '')?[]:this.produces
                 return res
             },
             getActions : function () {
@@ -232,128 +232,130 @@
                 ActionExecutorUtil.executeActions(this.pathData.methods, this.pathActionQuery)
             },
             submit : function () {
-                try{
 
-                    if(!this.$_changeObserverMixin_allIsValid()){
-                        console.log('can\'t submit due to unvalid field')
-                        return
-                    }
+                if(!this.$_changeObserverMixin_allIsValid()){
+                    this.$bvToast.toast('Can\'t submit due to invalid input', {
+                        title: 'Failed',
+                        variant: 'danger'
+                    })
+                    return
+                }
 
-                    let callbacks = []
-                    let signaturePointer = undefined
-                    let tree = undefined
-                    if(this.isCreateNew){//jika baru dibuat
+                let callbacks = []
+                let signaturePointer = undefined
+                let tree = undefined
+                if(this.isCreateNew){//jika baru dibuat
+                    signaturePointer = this.pathData
+
+                    let data = this.getData()
+                    data._signature = uuidv4()
+
+                    tree = TreeBuilder.buildDeepTree(
+                        ['sections',this.sectionApi, 'paths',this.pathApi]
+                    )
+
+                    tree.leaf._signature = this.pathData._signature
+
+                    let leaf = tree.leaf.methods = {}
+                    leaf._hasActions = true
+                    leaf._actions = [{
+                        action : 'put',
+                        key : this.method,
+                        value : data
+                    }]
+                    callbacks.push(()=>{
+                        this.$router.push({
+                            name :'operation-editor',
+                            params: {sectionApi : this.sectionApi, pathApi : this.pathApi, operationApi : this.method}
+                        })
+                    })
+                    this.pathActionQuery = leaf._actions
+                }
+                else{//jika edit data
+                    tree = TreeBuilder.buildDeepTree(this.treeKeys)
+                    //jika ganti method
+                    if(this.operationApi !== this.method){
                         signaturePointer = this.pathData
 
+                        let tmp = tree.root.sections[this.sectionApi].paths[this.pathApi].methods
+                        tmp._hasActions = true
                         let data = this.getData()
                         data._signature = uuidv4()
-
-                        tree = TreeBuilder.buildDeepTree(
-                            ['sections',this.sectionApi, 'paths',this.pathApi]
-                        )
-
-                        tree.leaf._signature = this.pathData._signature
-
-                        let leaf = tree.leaf.methods = {}
-                        leaf._hasActions = true
-                        leaf._actions = [{
-                            action : 'put',
-                            key : this.method,
-                            value : data
-                        }]
+                        tmp._actions = [
+                            {
+                                action : 'delete',
+                                key : this.operationApi
+                            },
+                            {
+                                action : 'put',
+                                key : this.method,
+                                value : data
+                            }
+                        ]
                         callbacks.push(()=>{
                             this.$router.push({
                                 name :'operation-editor',
                                 params: {sectionApi : this.sectionApi, pathApi : this.pathApi, operationApi : this.method}
                             })
                         })
-                        this.pathActionQuery = leaf._actions
+                        this.pathActionQuery = tmp._actions
+                        tree.root.sections[this.sectionApi].paths[this.pathApi]._signature = this.pathData._signature
                     }
-                    else{//jika edit data
-                        tree = TreeBuilder.buildDeepTree(this.treeKeys)
-                        //jika ganti method
-                        if(this.operationApi !== this.method){
-                            signaturePointer = this.pathData
+                    else{
+                        signaturePointer = this.operationData
 
-                            let tmp = tree.root.sections[this.sectionApi].paths[this.pathApi].methods
-                            tmp._hasActions = true
-                            let data = this.getData()
-                            data._signature = uuidv4()
-                            tmp._actions = [
-                                {
-                                    action : 'delete',
-                                    key : this.operationApi
-                                },
-                                {
-                                    action : 'put',
-                                    key : this.method,
-                                    value : data
-                                }
-                            ]
-                            callbacks.push(()=>{
-                                this.$router.push({
-                                    name :'operation-editor',
-                                    params: {sectionApi : this.sectionApi, pathApi : this.pathApi, operationApi : this.method}
-                                })
-                            })
-                            this.pathActionQuery = tmp._actions
-                            tree.root.sections[this.sectionApi].paths[this.pathApi]._signature = this.pathData._signature
+                        let pointer = tree.leaf
+                        pointer._signature = this.operationData._signature
+
+                        this.operationActionQuery = this.getActions()
+
+                        pointer._hasActions = true
+                        pointer._actions = this.operationActionQuery
+
+
+                        let callback = this.$refs.request.buildQuery(tree.leaf,pointer.request = {})
+                        if(callback === undefined){
+                            delete pointer.request
                         }
                         else{
-                            signaturePointer = this.operationData
-
-                            let pointer = tree.leaf
-                            pointer._signature = this.operationData._signature
-
-                            this.operationActionQuery = this.getActions()
-
-                            pointer._hasActions = true
-                            pointer._actions = this.operationActionQuery
-
-
-                            let callback = this.$refs.request.buildQuery(tree.leaf,pointer.request = {})
-                            if(callback === undefined){
-                                delete pointer.request
-                            }
-                            else{
-                                callbacks.push(callback)
-                            }
-                            callback = this.$refs.response.buildQuery(pointer.responses = {})
-                            if(callback === undefined){
-                                delete pointer.responses
-                            }
-                            else{
-                                callbacks.push(callback)
-                            }
-
-                            if(pointer._actions.length === 0){
-                                delete pointer._actions
-                                delete pointer._hasActions
-                            }
+                            callbacks.push(callback)
+                        }
+                        callback = this.$refs.response.buildQuery(pointer.responses = {})
+                        if(callback === undefined){
+                            delete pointer.responses
+                        }
+                        else{
+                            callbacks.push(callback)
                         }
 
-                    }//end else
-                    console.log(tree)
-                    axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
-                        (response) => {
-                            if(response.status === 200){
-                                signaturePointer._signature = response.data.new_signature
-                                this.commitChange()
-                                callbacks.forEach(fn => fn())
-                                this.reloadData()
-                            }
+                        if(pointer._actions.length === 0){
+                            delete pointer._actions
+                            delete pointer._hasActions
                         }
-                    ).catch(function (error) {
-                        console.log(error);
+                    }
+
+                }//end else
+                console.log(tree)
+                let context = this
+                axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
+                    (response) => {
+                        if(response.status === 200){
+                            signaturePointer._signature = response.data.new_signature
+                            this.commitChange()
+                            callbacks.forEach(fn => fn())
+                            this.reloadData()
+                        }
+                    }
+                ).catch(error => {
+                    this.$bvToast.toast(error.response.data.message + ' , Please refresh the page.', {
+                        title: 'Failed',
+                        variant: 'danger'
                     })
+                })
 
 
-                    this.isEdited = false
-                    return tree.root
-                }
-                catch (e) {
-                    console.log(e)
-                }
+                this.isEdited = false
+                return tree.root
             },
             cancel : function () {
                 this.reloadData()

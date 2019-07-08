@@ -2,8 +2,8 @@
     <div>
         <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
                        :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
-        <div class="row" v-if="isEditing">
-            <div class="col-11">
+        <div class="form-row">
+            <div class="col-11 pl-3" v-if="isEditing">
                 <div class="form-row">
                     <div class="col-8 mb-2 form-group">
                         <label class="font-weight-bold">Title:</label>
@@ -14,7 +14,7 @@
                         <input name="version" v-model="version" class="form-control">
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="form-row pl-2">
                     <div class="form-group">
                         <label class="font-weight-bold">Description:</label>
                         <vue-editor name="description" v-model="description"></vue-editor>
@@ -46,22 +46,22 @@
                 </div>
 
             </div>
-            <div class="col-1">
-                <button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"
-                        class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
-                    <i class="fa fa-pencil-alt"></i>
-                </button>
+            <div class="col-11 pl-3" v-else>
+                <div class="dot-border">
+                    <h1 class="text-center font-weight-bold">{{title}}</h1>
+                    <h3 class="text-center">v {{version}}</h3>
+                    <h3 class="text-center">Host: {{host}}</h3>
+                    <h3 class="text-center">Base Url: {{basePath}}</h3>
+                    <h3 class="text-center" v-if="contactName">Contact Name: {{contactName}}</h3>
+                    <h3 class="text-center" v-if="contactEmail">Contact Email: {{contactEmail}}</h3>
+                    <h3 class="text-center" v-if="contactUrl">Contact Url: {{contactUrl}}</h3>
+                    <div class="dot-border">
+                        <h3 class="text-center">Description :</h3>
+                        <div v-html="description" class="text-center"></div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="row" v-else>
-            <div class="col-11">
-                <h1 class="text-center font-weight-bold">{{title}}</h1>
-                <h3 class="text-center">v {{version}}</h3>
-                <h3 class="text-center">Host: {{host}}</h3>
-                <h3 class="text-center">Base Url: {{basePath}}</h3>
-                <div v-html="description"></div>
-            </div>
-            <div class="col-1">
+            <div class="col-1 pr-4 pt-1">
                 <button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"
                         class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
                     <i class="fa fa-pencil-alt"></i>
@@ -161,8 +161,11 @@
                             this.loadData()
                         }
                     }
-                ).catch(function (error) {
-                    console.log(error)
+                ).catch(error => {
+                    this.$bvToast.toast(error.response.data.message + ' , Please refresh the page.', {
+                        title: 'Failed',
+                        variant: 'danger'
+                    })
                 })
 
             },

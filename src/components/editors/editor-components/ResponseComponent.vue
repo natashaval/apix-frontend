@@ -111,7 +111,9 @@
             },
             reloadData : function(){
                 this.loadData()
-                this.$refs.responseForm.forEach(form => form.reloadData())
+                if(this.$refs.responseForm){
+                    this.$refs.responseForm.forEach(form => form.reloadData())
+                }
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()

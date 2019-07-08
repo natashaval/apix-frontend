@@ -104,10 +104,12 @@
                                             }
                                         }
                                     }
-                                ).catch(function (error) {
-                                    console.log(error);
+                                ).catch(error => {
+                                    this.$bvToast.toast(error.response.data.message + ' , Please refresh the page.', {
+                                        title: 'Failed',
+                                        variant: 'danger'
+                                    })
                                 })
-
                             }, true],
                             ['<button>NO</button>', function (instance, toast) {
                                 instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
