@@ -53,7 +53,8 @@
         data: function() {
             return {
                 files: {},
-                uploadPercentage: []
+                uploadPercentage: [],
+                assignNew: true
             }
         },
         methods: {

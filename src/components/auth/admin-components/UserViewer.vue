@@ -47,6 +47,7 @@
     import UserCreate from "./UserCreate";
     import {BASE_URL} from "../../../stores/actions/const";
     import axios from 'axios';
+    import {makeToast} from "../../../assets/toast";
 
     export default {
         name: "UserViewer",
@@ -78,6 +79,7 @@
             }
         },
         methods: {
+            makeToast,
             setLayout (layout) {
                 this.$store.commit('layout/SET_LAYOUT', layout);
             },
@@ -97,12 +99,7 @@
                 })
                 // console.log(this.users)
             },
-            makeToast(variant = null, success, message) {
-                this.$bvToast.toast(message, {
-                    title: (success) ? 'Deleted' : 'Failed',
-                    variant: variant,
-                })
-            }
+
         },
         created() {
             if (this.users.length == 0) {
