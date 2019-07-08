@@ -1,69 +1,111 @@
 <template>
     <div>
-    <div class="row">
-        <div v-if="showEdit" class="col-11 editRepo" style="border-color: crimson">
-            <SaveComponent :isEdited="isEdited" :editable="editable"
-                           :submit="submit" :cancel="cancel"></SaveComponent>
-
-            Owner: <span class="badge badge-secondary">{{owner}}</span>
-            Repo: <input class="input-group" v-model="repo" @input="searchRepo">
-            <button @click="dump">Dump!</button>
-            <ul v-show="isRepoSearch">
-                <li v-for="(repoList,r) in filteredRepos" :key="r" @click="setRepo(repoList)">
-                    {{repoList.fullName}}
-                </li>
-            </ul>
-            Branch:
-            <select v-model="branch" @change="fetchOas">
-                <option v-for="(availBranch,i) in branchList" :key="i">
-                    {{availBranch}}
-                </option>
-            </select>
-            Selected Branch: {{branch}}
-
-            Path: <input v-model="path" @change="fetchOas"/>
-            <i v-show="oasLoading" class="fa fa-spinner fa-spin"></i>
-            <p>current sha: {{content.sha}}</p>
-            Commit message: <input type="text" class="form-control" v-model="message" />
-                <button class="btn btn-outline-dark" @click="push">Push to Github</button>
-            <div v-if="commitResponse.commitDate">Has been updated!
-                {{commitResponse}}
+        <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
+                       :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
+        <div class="row">
+            <div class="col-md-11">
+                <h4>Github Editor</h4>
+            </div>
+            <div class="col-md-1">
+                <button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"
+                        class="float-right round-button btn mt-2 mr-2" v-bind:id="_uid+'-edit-btn'">
+                    <i class="fa fa-pencil-alt"></i>
+                </button>
             </div>
         </div>
-
-            <div v-else class="col-11 existRepo" style="border-color: crimson">
-                Owner: <span class="badge badge-secondary">{{owner}}</span>
-                Repo: {{repo}}
-                Branch: {{branch}}
-                Path: {{ path }}
+        <div class="row">
+            <div v-if="showEdit" class="col-11" style="border-color: crimson">
+                <div class="form-group" v-if="ownerData">
+                    <label class="font-weight-bold">Owner : &nbsp;</label>
+                    <span class="badge badge-secondary">
+                        {{owner}}
+                    </span>
+                </div>
+                <div class="row">
+                    <div class="form-group col-8">
+                        <label>Repo: </label>
+                        <div class="autocomplete">
+                            <input class="form-control" v-model="repo" @input="searchRepo" placeholder="Search repositories" />
+                            <ul v-show="isRepoSearch" class="autocomplete-items">
+                                <li v-for="(repoList,r) in filteredRepos" :key="r" @click="setRepo(repoList)">
+                                    {{repoList.fullName}}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="form-group col-4">
+                        <label>Branch: </label>
+                        <select v-model="branch" class="form-control" @change="fetchOas">
+                            <option v-for="(availBranch,i) in branchList" :key="i">
+                                {{availBranch}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Path: &nbsp;&nbsp;&nbsp;</label>
+                    <span><i v-show="oasLoading" class="fa fa-spinner fa-spin"></i></span>
+                    <input v-model="path" class="form-control" @change="fetchOas"/>
+                </div>
+                <div class="row">
+                    <div class="form-group col-8">
+                        <label>Commit message: </label>
+                        <input type="text" class="form-control" v-model="message" />
+                    </div>
+                    <div class="form-group col-4">
+                        <label class="invisible">Push to Github: </label><br />
+                        <button class="btn btn-outline-dark ml-5" @click="push">Push to Github</button>
+                    </div>
+                </div>
+                <div v-if="commitResponse.commitDate">Has been updated!
+                    {{commitResponse}}
+                </div>
             </div>
 
-            <button v-if="editable" @click="revertEditable"
-                    class="col-1 btn float-right">
-                <i class="fa fa-pencil-alt"></i>
-            </button>
+            <div v-else class="col-11">
+                <div class="row">
+                    <div class="col-md-12">
+                        <p class="font-weight-bold">Owner :  <span class="badge badge-secondary">{{owner}}</span></p> <br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="font-weight-bold">Repo: {{repo}}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="font-italic">Branch: {{branch}}</p><br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p class="font-weight-bold">Path: {{ path }}</p>
+                    </div>
+                </div>
+            </div>
 
-            Preview:
             <vue-editor disabled v-model="content.content"></vue-editor>
 
-    </div>
+        </div>
 
     </div>
 </template>
 
 <script>
     import axios from 'axios'
+    import uuidv4 from 'uuid/v4';
     import { VueEditor } from 'vue2-editor'
     import {BASE_URL} from "../../stores/actions/const";
     import ChangeObserverMixin from "../../mixins/ChangeObserverMixin";
     import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
     import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
     import SaveComponent from "./editor-components/EditorHeaderComponent";
+    import ProjectPrivilegeMixin from "../../mixins/ProjectPrivilegeMixin";
+    import {makeToast} from "../../assets/toast";
 
     export default {
         name: "GithubEditor",
         components: {SaveComponent, VueEditor},
-        mixins: [ChangeObserverMixin],
+        mixins: [ChangeObserverMixin, ProjectPrivilegeMixin],
         data: function(){
             return {
                 owner: '',
@@ -88,17 +130,11 @@
             }
         },
         computed : {
-            editable : function () {
-                let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
-                let projectTeams = this.$store.getters['project/getTeams']
-                if (hasEditingPrivilege === undefined && projectTeams) {
-                    this.$store.dispatch('user/checkEditingPrivilege', projectTeams);
-                    return false
-                }
-                return hasEditingPrivilege
+            editorTitle : function (){
+                return '<h4>' + this.path+'</h4>';
             },
             showEdit : function () {
-                if(!this.editable){
+                if(!this.$_projectPrivilege_canEdit){
                     return false
                 }
                 return this.isEditing
@@ -126,39 +162,44 @@
             this.$store.dispatch('github/fetchRepos');
         },
         methods: {
+            makeToast,
             loadData: function(){
-              this.$_changeObserverMixin_unObserve();
-              this.projectId = this.$route.params.projectId;
-              console.log('mounted load data githubApi', this.githubData)
-
-              // if (this.githubData !== null) {
-                if (this.githubData.owner !== '' && this.githubData.repo !== ''){
-                  this.owner = this.githubData.owner;
-                  this.repo = this.githubData.repo;
-                  this.branch = this.githubData.branch;
-                  this.path = this.githubData.path;
-                  this.fetchInitial();
-              }
-              else {
+                this.$_changeObserverMixin_unObserve();
+                this.projectId = this.$route.params.projectId;
+                if (this.githubData !== null) {
+                    // if (this.githubData.owner !== '' && this.githubData.repo !== ''){
+                    this.owner = this.githubData.owner;
+                    this.repo = this.githubData.repo;
+                    this.branch = this.githubData.branch;
+                    this.path = this.githubData.path;
+                    this.fetchInitial();
+                }
+                else {
                     if (this.isOwner){
                         this.owner = this.ownerData.login
-                        this.isCreateNew = false
                     }
                     else {console.log('there nothing you can do')}
-              }
+                }
 
-              this.$_changeObserverMixin_initObserver(['owner','repo', 'branch', 'path', 'message'])
+                this.$_changeObserverMixin_initObserver(['owner','repo', 'branch', 'path', 'message'])
             },
             getData: function(){
-              let res = {};
-              res.owner = this.owner;
-              res.repo = this.repo;
-              res.branch = this.branch;
-              res.path = this.path;
-              return res;
+                let res = {};
+                res.owner = this.owner;
+                res.repo = this.repo;
+                res.branch = this.branch;
+                res.path = this.path;
+                return res;
             },
             getActions: function(){
-                return ActionBuilderUtil.createActions(this.githubData,this._data,this.attributesKey)
+                let action = {
+                    owner: '',
+                    repo: '',
+                    branch: '',
+                    path: '',
+                }
+                if (this.githubData) return ActionBuilderUtil.createActions(this.githubData,this._data,this.attributesKey)
+                else return ActionBuilderUtil.createActions(action, this._data, this.attributesKey);
             },
             commitChange: function(){
                 ActionExecutorUtil.executeActions(this.githubData, this.gitActions)
@@ -186,15 +227,17 @@
                 let callbacks = []
                 this.gitActions = []
 
-                console.log('Edit github link')
                 this.gitActions = this.getActions()
+                console.log('Edit github link', this.gitActions)
 
                 // console.log('============ has Actions ============', this.gitActions)
                 payload.githubProject._actions = this.gitActions
                 payload.githubProject._hasActions = true
-                payload.githubProject._signature = this.githubData._signature
+                if (this.githubData) payload.githubProject._signature = this.githubData._signature
+                else payload.githubProject._signature = uuidv4();
 
                 console.log('Pendek: ', payload);
+
 
                 axios.put('http://localhost:8080/projects/'+this.projectId, payload).then(
                     (response) => {
@@ -204,14 +247,13 @@
                             this.commitChange()
                             this.loadData()
                             callbacks.forEach(fn => fn())
+                            this.makeToast('success', response.data.success, response.data.message);
                         }
                     }
                 ).catch(error => {
-                    this.$bvToast.toast(error.response.data.message + ' , Please refresh the page.', {
-                        title: 'Failed',
-                        variant: 'danger'
-                    })
+                    this.makeToast('danger', error.response.data.success, error.response.data.message + ' , Please refresh the page.')
                 })
+
 
             },
             push: function () {
@@ -224,15 +266,20 @@
                     .then((response) => {
                         this.commitResponse = response.data
                         console.log(this.commitResponse)
+                        this.makeToast('success', response.data.success, "Success push to github: " + response.data.message);
                         this.fetchOas();
                     })
-                    .catch((e) => {console.error(e)})
+                    .catch((e) => {
+                        console.error(e);
+                        this.makeToast('danger', e.response.data.success, e.response.data.message);
+                    })
             },
             fetchBranchList: function () {
                 if (this.githubData !== undefined) {
                     axios.get(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/branches')
                         .then((response) => {
-                            this.branchList = response.data
+                            let master = ['master']
+                            this.branchList = master.concat(response.data)
                         })
                         .catch((e) => {
                             console.error(e)
@@ -304,5 +351,19 @@
 </script>
 
 <style scoped>
-
+    /*https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_autocomplete*/
+.autocomplete {
+    position: relative;
+    /*display: inline-block;*/
+}
+    .autocomplete-items {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #d4d4d4;
+        border-top: none;
+        z-index: 99;
+        top: 100%;
+        left: 0;
+        right: 0;
+    }
 </style>
