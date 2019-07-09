@@ -9,7 +9,7 @@
                 <i class="fas fa-caret-right" v-show="!isArrow"></i>
                 <i class="fas fa-caret-down" v-show="isArrow"></i>
             </button>
-            <span @click="gotoRoute" style="font-size: 1.3em;width: 68%;">
+            <span @click="gotoRoute" style="font-size: 1.2em;width: 68%;">
                 <i class="fas fa-folder-open" style="font-size: 16px"></i> {{ sectionApi }}
             </span>
             <div v-if="onHover && $_projectPrivilege_canEdit">

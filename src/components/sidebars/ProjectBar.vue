@@ -30,7 +30,7 @@
                 })
             },
             tryClient: function () {
-                axios.post(BASE_PROJECT_URL +'/'+ this.apiData.id + '/export?type=oas-swagger2')
+                axios.post(BASE_PROJECT_URL +'/'+ this.apiData.id + '/export?type=oas-swagger2&format=JSON')
                     .then((response) => {
                         // self.makeToast('success', response.data.success, response.data.message)
                         this.fileExportLocation = response.data.file_url

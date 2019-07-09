@@ -56,7 +56,7 @@
             <LowLvlJsonEditor class="form-control"
                     ref="modalJsonInput"
                     v-bind:style="{display: 'block',height: '400px'}"/>
-            <button class="mt-3 btn btn-success" @click="()=>{doImport();$bvModal.hide('modal-importer-'+_uid);}">import</button>
+            <button class="mt-3 btn btn-success" @click="()=>{doImport();}">import</button>
         </b-modal>
     </div>
 </template>
@@ -70,7 +70,7 @@
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
     import JsonOasUtil from "@/utils/JsonOasUtil";
     import LowLvlJsonEditor from "../inputs/LowLvlJsonEditor";
-
+    import {makeToast} from "@/assets/toast";
 
     export default {
         name: "bodyForm",
@@ -106,11 +106,19 @@
             showHighLevelEditor : true
         }),
         methods : {
+            makeToast,
             doImport : function () {
-                Vue.delete(this.schemaDataWrapper.data)
-                Vue.set(this.schemaDataWrapper, 'data', JsonOasUtil.toSwaggerOas(this.$refs.modalJsonInput.getJson()))
-                this.$_changeObserverMixin_onDataChanged()
-                this.$refs.lowLvlEditor._data.isEdited = true
+                try{
+                    Vue.delete(this.schemaDataWrapper.data)
+                    Vue.set(this.schemaDataWrapper, 'data', JsonOasUtil.toSwaggerOas(this.$refs.modalJsonInput.getJson()))
+                    this.$_changeObserverMixin_onDataChanged()
+                    this.$refs.lowLvlEditor._data.isEdited = true
+                    this.$bvModal.hide('modal-importer-'+this._uid)
+                    this.makeToast('success',true,'Json file imported.')
+                }
+                catch (e) {
+                    this.makeToast('danger',false,'Invalid Json!')
+                }
             },
             isShow : function (type){
                 switch (type) {
@@ -145,7 +153,12 @@
 
                 let fr = new FileReader()
                 fr.onload = e => {
-                    this.$refs.modalJsonInput.setJson(JSON.parse(e.target.result))
+                    try{
+                        this.$refs.modalJsonInput.setJson(JSON.parse(e.target.result))
+                    }
+                    catch (e) {
+                        this.makeToast('danger',false,'Invalid Json File!')
+                    }
                 };
                 fr.readAsText(file)
 
