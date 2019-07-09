@@ -3,15 +3,15 @@
         <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
                        :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
         <div class="row">
-            <div class="col-md-11">
+            <div class="col-md-8 pl-4">
                 <h4>Github Editor</h4>
             </div>
-            <div class="col-md-1">
+            <div class="col-md-4 pr-4">
                 <button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"
                         class="float-right round-button btn mt-2 mr-2" v-bind:id="_uid+'-edit-btn'">
                     <i class="fa fa-pencil-alt"></i>
                 </button>
-                <button @click="fetchOas" class="float-right btn mt-2 mr-2" type="button"
+                <button @click="fetchOas" class="float-right btn round-button mt-2 mr-2" type="button"
                         data-toggle="tooltip" data-placement="bottom" title="Sync with Github"
                 >
                     <i class="fas fa-sync-alt"></i>
@@ -21,14 +21,14 @@
         <div class="row">
             <div v-if="showEdit" class="col-11" style="border-color: crimson">
                 <!--{{ownerData}}-->
-                <div class="form-group" v-if="ownerData">
+                <div class="form-group ml-3" v-if="ownerData">
                     <label class="font-weight-bold">Owner : &nbsp;</label>
                     <span class="badge badge-secondary">
                         {{owner}}
                     </span>
                 </div>
                 <div class="row">
-                    <div class="form-group col-8">
+                    <div class="form-group col-7 ml-3">
                         <label>Repo: </label>
                         <div class="autocomplete">
                             <input class="form-control" v-model="repo" @input="searchRepo" placeholder="Search repositories" />
@@ -48,19 +48,19 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group ml-3">
                     <label>Path: &nbsp;&nbsp;&nbsp;</label>
                     <span><i v-show="oasLoading" class="fa fa-spinner fa-spin"></i></span>
-                    <input v-model="path" class="form-control" @change="fetchOas"/>
+                    <input v-model="path" class="form-control col-md-11" @change="fetchOas"/>
                 </div>
                 <div class="row">
-                    <div class="form-group col-8">
+                    <div class="form-group col-7 ml-3">
                         <label>Commit message: </label>
                         <input type="text" class="form-control" v-model="message" />
                     </div>
-                    <div class="form-group col-4">
+                    <div class="form-group col-4 ml-3">
                         <label class="invisible">Push to Github: </label><br />
-                        <button class="btn btn-outline-dark ml-5" @click="push">Push to Github</button>
+                        <button class="btn btn-dark ml-3" @click="push">Push to Github</button>
                     </div>
                 </div>
                 <div clas="row">
@@ -75,20 +75,20 @@
             <div v-else class="col-11">
                 <div class="row">
                     <!--{{ ownerData }}-->
-                    <div class="col-md-12" v-if="ownerData">
+                    <div class="col-md-12 ml-3" v-if="ownerData">
                         <p class="font-weight-bold">Owner :  <span class="badge badge-secondary">{{owner}}</span></p> <br />
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-5 ml-3">
                         <p class="font-weight-bold">Repo: {{repo}}</p>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <p class="font-italic">Branch: {{branch}}</p><br />
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-12 ml-3">
                         <p class="font-weight-bold">Path: {{ path }} &nbsp;
                         <span><i v-show="oasLoading" class="fa fa-spinner fa-spin"></i></span>
                         </p>
@@ -98,7 +98,7 @@
 
         </div>
         <div class="row" v-if="content">
-            <div class="col-md-12">
+            <div class="col-md-11 m-auto">
                 <vue-editor disabled v-model="content.content"></vue-editor>
             </div>
         </div>
@@ -148,7 +148,7 @@
         },
         computed : {
             editorTitle : function (){
-                return '<h4>' + this.path+'</h4>';
+                return '<h4><i class="fab fa-github-alt"></i> ' + this.path+'</h4>';
             },
             showEdit : function () {
                 if(!this.$_projectPrivilege_canEdit){
