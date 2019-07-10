@@ -1,12 +1,13 @@
 <template>
-    <div>
+    <div class="ml-3">
         <div class="row my-3" v-if="apiData">
             <h3>{{ apiData.info.title }}</h3>
         </div>
         <div class="row my-3">
             <div class="col-5">
-            <h5>Generate Codegen</h5>
-            <small>It is used to generate code of Model </small>
+                <h5>Generate Codegen &nbsp;&nbsp;<b-spinner small variant="success" v-show="codegenStatus"></b-spinner></h5>
+                <small>It is used to generate code of Model </small>
+                <p v-show="fileCodegenLocation">File location: {{ fileCodegenLocation }}</p>
             </div>
             <div class="col-2">
                 <button class="btn btn-success btn-block" @click="generateCodegen">Generate</button>
@@ -15,7 +16,7 @@
 
         <div class="row my-3">
             <div class="col-5">
-                <h5>Export Project</h5>
+                <h5>Export Project &nbsp;&nbsp;<b-spinner small variant="primary" v-show="exportStatus"></b-spinner></h5>
                 <small>It is used to export project in the form of JSON format.
                     <span class="font-italic">Default type: oas-swagger2</span>
                 </small>
@@ -54,7 +55,10 @@
         data: function(){
             return {
                 projectId: '',
-                fileExportLocation: ''
+                fileExportLocation: '',
+                fileCodegenLocation: '',
+                codegenStatus: false,
+                exportStatus: false
             }
         },
         computed: {
@@ -68,14 +72,27 @@
                 this.projectId = this.$route.params.projectId
             },
             generateCodegen: function () {
-                axios.post(BASE_PROJECT_URL +'/'+ this.projectId + '/codegen').then((response) => {
-                    this.makeToast('success', response.data.success, response.data.message)
+                this.codegenStatus = true
+                axios.get(BASE_PROJECT_URL +'/'+ this.projectId + '/codegen', {
+                    // onDownloadProgress: (progressEvent) => {
+                    //     let percentCompleted = parseInt(Math.round( (progressEvent.loaded * 100) / progressEvent.total));
+                    //     // https://stackoverflow.com/questions/52030158/can-we-use-ondownloadprogress-from-axios-for-loading-api
+                    //     console.log(progressEvent.lengthComputable);
+                    //     console.log('codegen: ' + percentCompleted);
+                    // }
+                }).then((response) => {
+                    this.makeToast('success', response.data.success, "Success in generating codegen!")
+                    this.fileCodegenLocation = response.data.file_url
+                    this.codegenStatus = false
                 }).catch((e) => {
                     this.makeToast('danger', e.response.data.success, e.response.data.message)
+                    this.codegenStatus = false
                 })
+
             },
             exportOas: function(){
                 let self = this
+                self.exportStatus = true
                 this.$toast.question('Please insert project type!', 'Export', {
                     timeout: 20000,
                     close: true,
@@ -90,17 +107,24 @@
                             console.log(input.value)
                             // this.projectTitleVerify = input.value
                         }, true],
+                        // https://github.com/marcelodolza/iziToast/issues/98
+                        ['<select><option value="JSON">json</option><option value="YAML">yaml</option></select>', 'change', function(instance, toast,select, e){
+                            console.log(select.options[select.selectedIndex].value)
+                        }]
                     ],
                     buttons: [
                         ['<button class="btn btn-sm ml-1">Export</button>', function (instance, toast, button, e, inputs) {
+                        console.log('input type: ' + inputs[0].value + 'select format: ' + inputs[1].options[inputs[1].selectedIndex].value)
 
                             if (inputs[0].value === 'oas-swagger2'){
-                                axios.post(BASE_PROJECT_URL +'/'+ self.projectId + '/export?type=' + inputs[0].value)
+                                axios.post(BASE_PROJECT_URL +'/'+ self.projectId + '/export?type=' + inputs[0].value + '&format=' + inputs[1].options[inputs[1].selectedIndex].value)
                                     .then((response) => {
-                                    self.makeToast('success', response.data.success, response.data.message)
-                                    self.fileExportLocation = response.data.file_url
-                                }).catch((e) => {
+                                        self.makeToast('success', response.data.success, response.data.message)
+                                        self.fileExportLocation = response.data.file_url
+                                        self.exportStatus = false
+                                    }).catch((e) => {
                                     self.makeToast('danger', e.response.data.success, e.response.data.message)
+                                    self.exportStatus = false
                                 })
                             }
                             else {
