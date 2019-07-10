@@ -1,7 +1,7 @@
 <template>
     <div class="pb-5">
-        <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
-                       :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
+        <EditorHeaderComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
+                               :submit="submit" :cancel="cancel" :name="editorTitle"></EditorHeaderComponent>
         <div class="form-row w-100 dot-border mb-4">
             <div v-if="showEdit" class="col-11 pl-2">
                 <div class="form-group">
@@ -107,13 +107,14 @@
     import ActionBuilder from "@/utils/ActionBuilderUtil";
     import vSelect from 'vue-select';
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
-    import SaveComponent from "./editor-components/EditorHeaderComponent";
+    import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";
     import BadgeGeneratorUtil from "@/utils/BadgeGeneratorUtil";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
+    import {BASE_PROJECT_URL} from "../../stores/actions/const";
 
     export default {
         name: "OperationEditor",
-        components: {SaveComponent, ResponseComponent, RequestComponent, VueEditor,vSelect},
+        components: {EditorHeaderComponent, ResponseComponent, RequestComponent, VueEditor,vSelect},
         mixins : [ChangeObserverMixin, ProjectPrivilegeMixin],
         data : () => ({
             isCreateNew : false,
@@ -227,10 +228,6 @@
             getActions : function () {
                 return ActionBuilder.createActions(this.operationData, this._data, this.attributesKey)
             },
-            commitChange : function () {
-                ActionExecutorUtil.executeActions(this.operationData, this.operationActionQuery)
-                ActionExecutorUtil.executeActions(this.pathData.methods, this.pathActionQuery)
-            },
             submit : function () {
 
                 if(!this.$_changeObserverMixin_allIsValid()){
@@ -243,7 +240,12 @@
 
                 let callbacks = []
                 let signaturePointer = undefined
+                let operationActions = []
+                let pathActions = []
                 let tree = undefined
+                let operationData = this.operationData
+                let pathData = this.pathData
+
                 if(this.isCreateNew){//jika baru dibuat
                     signaturePointer = this.pathData
 
@@ -269,7 +271,7 @@
                             params: {sectionApi : this.sectionApi, pathApi : this.pathApi, operationApi : this.method}
                         })
                     })
-                    this.pathActionQuery = leaf._actions
+                    pathActions = leaf._actions
                 }
                 else{//jika edit data
                     tree = TreeBuilder.buildDeepTree(this.treeKeys)
@@ -298,7 +300,7 @@
                                 params: {sectionApi : this.sectionApi, pathApi : this.pathApi, operationApi : this.method}
                             })
                         })
-                        this.pathActionQuery = tmp._actions
+                        pathActions = tmp._actions
                         tree.root.sections[this.sectionApi].paths[this.pathApi]._signature = this.pathData._signature
                     }
                     else{
@@ -307,10 +309,10 @@
                         let pointer = tree.leaf
                         pointer._signature = this.operationData._signature
 
-                        this.operationActionQuery = this.getActions()
+                        operationActions = this.getActions()
 
                         pointer._hasActions = true
-                        pointer._actions = this.operationActionQuery
+                        pointer._actions = operationActions
 
 
                         let callback = this.$refs.request.buildQuery(tree.leaf,pointer.request = {})
@@ -336,17 +338,22 @@
 
                 }//end else
                 console.log(tree)
-                let context = this
-                axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
+
+                callbacks.push(()=>{
+                    ActionExecutorUtil.executeActions(operationData, operationActions)
+                    ActionExecutorUtil.executeActions(pathData.methods, pathActions)
+                })
+
+                axios.put(BASE_PROJECT_URL+'/'+this.projectId,tree.root).then(
                     (response) => {
                         if(response.status === 200){
                             signaturePointer._signature = response.data.new_signature
-                            this.commitChange()
                             callbacks.forEach(fn => fn())
                             this.reloadData()
                         }
                     }
                 ).catch(error => {
+                    console.error(error)
                     this.$bvToast.toast(error.response.data.message + ' , Please refresh the page.', {
                         title: 'Failed',
                         variant: 'danger'

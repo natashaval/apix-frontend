@@ -20,6 +20,7 @@
     import ApixUtil from "@/utils/ApixUtil"
     import BadgeGeneratorUtil from "@/utils/BadgeGeneratorUtil"
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
+    import EditorSwitchMixin from "@/mixins/EditorSwitchMixin";
 
     export default {
         name: "OperationBar",
@@ -30,7 +31,7 @@
             sectionApi : String,
             operationData : Object
         },
-        mixins : [ProjectPrivilegeMixin],
+        mixins : [ProjectPrivilegeMixin, EditorSwitchMixin],
         data : ()=>({
             onHover : false
         }),
@@ -49,14 +50,19 @@
         },
         methods : {
             methodClick : function () {
-                this.$router.push({
-                    name :'operation-editor',
-                    params: {
-                        sectionApi : this.sectionApi,
-                        pathApi : this.pathApi,
-                        operationApi : this.operationApi
-                    }
-                })
+                let callback = () => {
+                    this.$router.push({
+                        name: 'operation-editor',
+                        params: {
+                            sectionApi: this.sectionApi,
+                            pathApi: this.pathApi,
+                            operationApi: this.operationApi
+                        }
+                    })
+                }
+
+                this.$_EditorSwitch_changeRouteHandler(callback)
+
             },
             clientClick: function(){
                 this.$router.push({

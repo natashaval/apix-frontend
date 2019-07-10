@@ -162,6 +162,7 @@
                 return res
             },
             buildQuery : function (responsesPointer) {
+                let callbacks = []
                 if(this.isCreateNew){
                     responsesPointer._actions.push({
                         action : 'put',
@@ -200,7 +201,8 @@
                             delete codePointer.headers
                         }else{
                             isEdited = true
-                            this.commitChangeCallback.push(callback)
+                            // this.commitChangeCallback.push(callback)
+                            callbacks.push(callback)
                         }
                     }
                     if(this.hasBody){
@@ -210,7 +212,8 @@
                         }
                         else{
                             isEdited = true
-                            this.commitChangeCallback.push(callback)
+                            // this.commitChangeCallback.push(callback)
+                            callbacks.push(callback)
                         }
                     }
                     else{
@@ -238,7 +241,7 @@
                     }
 
 
-                    return (isEdited)?this.commitChange : undefined
+                    return (isEdited)?()=>{callbacks.forEach(fn=>fn())}: undefined
                 }
             },
             commitChange : function () {

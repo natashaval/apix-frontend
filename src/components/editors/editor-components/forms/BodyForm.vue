@@ -30,18 +30,18 @@
         </div>
         <HighLvlJsonEditor ref="root"
             v-bind:style="{display : isShow(EDITOR_TYPE_HIGH_LEVEL)}"
-            :schema-data="schemaDataWrapper.data" :nameable="false"
+            :schema-data="schemaDataWrapper" :nameable="false"
             :deleteable="false"
             :editable="editable"
             fixed-name="schema"
             :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         <LowLvlJsonEditor ref="lowLvlEditor"
-            v-if="schemaDataWrapper.data !== undefined"
+            v-if="schemaDataWrapper !== undefined"
             v-bind:style="{
                 display : isShow(EDITOR_TYPE_LOW_LEVEL)
             }"
             :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-            :json-input="schemaDataWrapper.data" class="form-control"/>
+            :json-input="schemaDataWrapper" class="form-control"/>
 
         <b-modal :id="'modal-importer-'+_uid" title="Import From External Json" hide-footer>
             <div class="form-group">
@@ -93,26 +93,20 @@
             EDITOR_TYPE_LOW_LEVEL : false,
             jsonFile : undefined,
             description : '',
-            isEditMode : false,
-            dataFromExternal : false,
-            externalData : undefined,
             isEditing : false,
-            attributesKey : [
-                {key : 'description'}
-            ],
-            commitChangeCallback : [],
-            actionsQuery : [],
-            schemaDataWrapper : {data : undefined},
+            attributesKey : ['description'],
+            schemaDataWrapper : undefined,
             showHighLevelEditor : true
         }),
         methods : {
             makeToast,
-            doImport : function () {
+            doImport : async function () {
                 try{
-                    Vue.delete(this.schemaDataWrapper.data)
-                    Vue.set(this.schemaDataWrapper, 'data', JsonOasUtil.toSwaggerOas(this.$refs.modalJsonInput.getJson()))
-                    this.$_changeObserverMixin_onDataChanged()
+                    this.schemaDataWrapper = JsonOasUtil.toSwaggerOas(this.$refs.modalJsonInput.getJson())
+                    this.$_changeObserverMixin_onDataChanged(true,false)
+                    await this.$nextTick()
                     this.$refs.lowLvlEditor._data.isEdited = true
+                    this.isEdited = true
                     this.$bvModal.hide('modal-importer-'+this._uid)
                     this.makeToast('success',true,'Json file imported.')
                 }
@@ -170,78 +164,66 @@
                 }
             },
             buildQuery : function (requestPointer) {
+                let bodyActions = []
+                let callbacks = []
                 let isEdited = false
+                let bodyData = this.bodyData
+
                 if(requestPointer._hasActions === undefined){
                     requestPointer._hasActions = true
                     requestPointer._actions = []
                 }
-                if(this.$refs.lowLvlEditor.isEdited){
+                if(this.$refs.lowLvlEditor._data.isEdited){
                     let json = this.$refs.lowLvlEditor.getJson()
                     requestPointer._actions.push({
                         action : 'put',
                         key : 'schema',
                         value : json
                     })
-                    this.commitChangeCallback.push(()=>{
-                        Vue.delete(this.bodyData.schema)
-                        Vue.set(this.bodyData, 'schema', json)
-                    })
-                    return this.commitChange
+                    return () => {
+                        Vue.delete(bodyData.schema)
+                        Vue.set(bodyData, 'schema', json)
+                    }
                 }
 
                 requestPointer._actions = requestPointer._actions.concat(
                     ActionBuilderUtil.createActions(this.bodyData,this._data,this.attributesKey)
                 )
 
-                if(this.dataFromExternal){
-                    requestPointer._actions.push({
-                        action : 'put',
-                        key : 'schema',
-                        value : this.$refs.root.getData()
-                    })
+                let callback = this.$refs.root.buildQuery(requestPointer)
+
+                if(callback === undefined){
+                    delete requestPointer.schema
                 }
                 else{
-                    let callback = this.$refs.root.buildQuery(requestPointer)
-
-                    if(callback === undefined){
-                        delete requestPointer.schema
-                    }
-                    else{
-                        isEdited = true
-                        this.commitChangeCallback.push(callback)
-                    }
+                    isEdited = true
+                    callbacks.push(callback)
                 }
 
                 if(requestPointer._actions.length > 0){
                     isEdited = true
-                    this.actionsQuery = requestPointer._actions
+                    bodyActions = requestPointer._actions
                     requestPointer._hasActions = true
+                    callbacks.push(()=>{
+                        ActionExecutorUtil.executeActions(bodyData, bodyActions)
+                    })
                 }
                 else{
                     delete requestPointer._actions
                     delete requestPointer._hasActions
                 }
 
-                return (isEdited)?this.commitChange : undefined
-            },
-            commitChange : function () {
-                ActionExecutorUtil.executeActions(this.bodyData, this.actionsQuery)
-                this.commitChangeCallback.forEach(fn => fn())
-                if(!this.$refs.lowLvlEditor.isEdited){
-                    Vue.delete(this.bodyData.schema)
-                    Vue.set(this.bodyData, 'schema', this.$refs.root.getData())
-                }
+                return (isEdited)? () => {callbacks.forEach(fn => fn())} : undefined
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
-                this.dataFromExternal = false
                 if(this.bodyData !== undefined){
                     let bd = this.bodyData
                     this.description = (bd.description === undefined)?'':bd.description
-                    this.schemaDataWrapper.data = Object.assign({},this.bodyData.schema)
+                    this.schemaDataWrapper = this.bodyData.schema
                 }
                 else{
-                    this.schemaDataWrapper.data = {}
+                    this.schemaDataWrapper = {}
                     this.description = ''
                 }
 
@@ -264,10 +246,10 @@
             },
             showHighLevelEditor : function (after, before) {
                 if(after === this.EDITOR_TYPE_HIGH_LEVEL){
-                    this.schemaDataWrapper.data = this.$refs.lowLvlEditor.getJson()
+                    this.schemaDataWrapper = this.$refs.lowLvlEditor.getJson()
                 }
                 else{
-                    this.schemaDataWrapper.data = this.$refs.root.getData()
+                    this.schemaDataWrapper = this.$refs.root.getData()
                 }
             }
         },

@@ -1,7 +1,7 @@
 <template>
     <div>
-        <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
-                       :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
+        <EditorHeaderComponent :isEdited="true" :editable="$_projectPrivilege_canEdit"
+                               :submit="submit" :cancel="cancel" :name="editorTitle"></EditorHeaderComponent>
         <div class="row">
             <div class="col-md-8 pl-4">
                 <h4>Github Editor</h4>
@@ -115,13 +115,13 @@
     import ChangeObserverMixin from "../../mixins/ChangeObserverMixin";
     import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
     import ActionExecutorUtil from "../../utils/ActionExecutorUtil";
-    import SaveComponent from "./editor-components/EditorHeaderComponent";
+    import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";
     import ProjectPrivilegeMixin from "../../mixins/ProjectPrivilegeMixin";
     import {makeToast} from "../../assets/toast";
 
     export default {
         name: "GithubEditor",
-        components: {SaveComponent, VueEditor},
+        components: {EditorHeaderComponent, VueEditor},
         mixins: [ChangeObserverMixin, ProjectPrivilegeMixin],
         data: function(){
             return {

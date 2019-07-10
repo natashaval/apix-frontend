@@ -1,7 +1,7 @@
 <template>
     <div>
-        <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
-                       :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
+        <EditorHeaderComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
+                               :submit="submit" :cancel="cancel" :name="editorTitle"></EditorHeaderComponent>
         <div class="form-row">
             <div class="col-11 pl-3" v-if="isEditing">
                 <div class="form-row">
@@ -78,13 +78,13 @@
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
     import {NOT_FOUND} from "@/stores/consts/FetchStatus"
-    import SaveComponent from "./editor-components/EditorHeaderComponent"
+    import EditorHeaderComponent from "./editor-components/EditorHeaderComponent"
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin"
     import {BASE_PROJECT_URL} from "@/stores/actions/const"
 
     export default {
         name: "ProjectEditor",
-        components: {SaveComponent, VueEditor},
+        components: {EditorHeaderComponent, VueEditor},
         mixins : [ChangeObserverMixin, ProjectPrivilegeMixin],
         props : ['projectId'],
         data : ()=>({

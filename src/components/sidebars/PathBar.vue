@@ -43,17 +43,17 @@
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
+    import EditorSwitchMixin from "@/mixins/EditorSwitchMixin";
     export default {
         name: "PathBar",
         components: {OperationBar},
+        mixins : [ProjectPrivilegeMixin, EditorSwitchMixin],
         props : {
             projectApi : String,
             sectionApi : String,
             pathApi : String,
             pathData : Object
         },
-
-        mixins : [ProjectPrivilegeMixin],
         data: function(){
             return {
                 isArrow: false,
@@ -84,10 +84,13 @@
         },
         methods : {
             pathClick : function(){
-                this.$router.push({
-                    name :'path-editor',
-                    params: {sectionApi : this.sectionApi, pathApi : this.pathApi}
-                })
+                let callback = () => {
+                    this.$router.push({
+                        name: 'path-editor',
+                        params: {sectionApi: this.sectionApi, pathApi: this.pathApi}
+                    })
+                }
+                this.$_EditorSwitch_changeRouteHandler(callback)
             },
             createOperation : function () {
                 this.$router.push({

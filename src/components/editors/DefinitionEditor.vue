@@ -1,7 +1,7 @@
 <template>
     <div>
-        <SaveComponent :isEdited="isEdited" class="w-100"
-                       :submit="submit" :cancel="cancel" :name="editorTitle" :editable="$_projectPrivilege_canEdit"></SaveComponent>
+        <EditorHeaderComponent :isEdited="isEdited" class="w-100"
+                               :submit="submit" :cancel="cancel" :name="editorTitle" :editable="$_projectPrivilege_canEdit"></EditorHeaderComponent>
 
         <div class="form-row ml-1 mr-1 dot-border">
             <div class="col-11">
@@ -38,7 +38,7 @@
     import ActionBuilderUtil from "@/utils/ActionBuilderUtil";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import * as axios from "axios";
-    import SaveComponent from "./editor-components/EditorHeaderComponent";
+    import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
     import BodyForm from "./editor-components/forms/BodyForm";
@@ -46,7 +46,7 @@
 
     export default {
         name: "DefinitionEditor",
-        components: {BodyForm, SaveComponent},
+        components: {BodyForm, EditorHeaderComponent},
         mixins : [ChangeObserverMixin, ProjectPrivilegeMixin],
         props: {
             definitionApi : {
@@ -124,18 +124,11 @@
                 return res
             },
             getActions : function () {
-                console.log(ActionBuilderUtil.createActions(this.definitionData,this._data,this.attributesKey))
                 return ActionBuilderUtil.createActions(this.definitionData,this._data,this.attributesKey)
-            },
-            commitChange : function () {
-                ActionExecutorUtil.executeActions(this.$store.getters['project/getDefinitions'], this.definitionsRootActions)
-                ActionExecutorUtil.executeActions(this.definitionData, this.definitionActions)
             },
             submit : function () {
                 let tree = undefined
                 let callbacks = []
-                this.definitionActions = []
-                this.definitionsRootActions = []
                 let signaturePointer = undefined
                 if(this.isCreateNew){
                     tree = DeepTreeBuilderUtil.buildDeepTree(['definitions'])
@@ -189,7 +182,6 @@
                     (response) => {
                         if(response.status === 200){
                             signaturePointer._signature = response.data.new_signature
-                            this.commitChange()
                             callbacks.forEach(fn => fn())
                             this.reloadData()
                         }

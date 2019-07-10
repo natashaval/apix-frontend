@@ -1,7 +1,7 @@
 <template>
     <div>
-        <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit" class="w-100"
-                       :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
+        <EditorHeaderComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit" class="w-100"
+                               :submit="submit" :cancel="cancel" :name="editorTitle"></EditorHeaderComponent>
         <div class="row dot-border" style="margin-left: 0.1em;margin-right: 0.5em;">
             <div v-if="isEditing" class="col-11 pl-1">
                 <div class="form-group">
@@ -40,12 +40,12 @@
     import {BASE_PROJECT_URL} from "@/stores/actions/const";
     import uuidv4 from 'uuid/v4';
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
-    import SaveComponent from "./editor-components/EditorHeaderComponent";
+    import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 
     export default {
         name: "SectionEditor",
-        components: {SaveComponent, VueEditor},
+        components: {EditorHeaderComponent, VueEditor},
         mixins : [ChangeObserverMixin, ProjectPrivilegeMixin],
         data: function(){
             return {
@@ -78,6 +78,9 @@
             }
         },
         methods: {
+            lol : function (t){
+                console.log('yay '+t)
+            },
             loadData: function() {
                 this.$_changeObserverMixin_unObserve()
                 this.isEdited = false
@@ -170,8 +173,11 @@
                         _hasActions: true
                     }
 
+                    //copy reference of current section data
+                    //because sectionData can be changed before callback called
+                    let target = this.sectionData
                     callbacks.push(() => {
-                        ActionExecutorUtil.executeActions(this.projectData.sections[this.name].info, sectionQuery)
+                        ActionExecutorUtil.executeActions(target.info, sectionQuery)
                     })
 
                     if (tree.root._signature === undefined) tree.leaf._signature = this.sectionData.info._signature

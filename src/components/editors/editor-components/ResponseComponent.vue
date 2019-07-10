@@ -68,9 +68,8 @@
             componentId : 0,
             responseList : [],
             optionList : HttpStatusCode,
-            actionsQuery : [],
-            commitChangeCallback : [],
-            codeTabsRef: null
+            codeTabsRef: null,
+            deletedChilds : []
         }),
         computed : {
             operationApi : function () {
@@ -102,10 +101,7 @@
             deleteChild : function (childIndex) {
                 if(childIndex === this.activeIndex)this.activeIndex = 0
                 if(this.responseList[childIndex].data !== undefined){
-                    this.actionsQuery.push({
-                        action : 'delete',
-                        key : this.responseList[childIndex].code
-                    })
+                    this.deletedChilds.push(this.responseList[childIndex].code)
                 }
                 this.responseList.splice(childIndex,1)
             },
@@ -119,7 +115,7 @@
                 this.$_changeObserverMixin_unObserve()
                 this.activeIndex = 0
                 this.responseList = []
-                this.actionsQuery = []
+                this.deletedChilds = []
                 for(let respCode in this.responsesData){
                     this.responseList.push({
                         code: respCode,
@@ -131,31 +127,33 @@
                 this.$_changeObserverMixin_initObserver(['responseList.length'])
             },
             buildQuery : function (responsesPointer) {
-                this.commitChangeCallback = []
-
+                let callbacks = []
                 let isEdited = false
 
                 let rl = this.responseList
-                responsesPointer._actions = this.actionsQuery
+                responsesPointer._actions = []
+                this.deletedChilds.forEach(code => responsesPointer._actions.push({
+                    action : 'delete',
+                    key : code
+                }))
                 responsesPointer._hasActions = true
                 for(let i in rl){
                     let callback = this.$refs.responseForm[i].buildQuery(responsesPointer)
                     if(callback !== undefined){
                         isEdited = true
-                        this.commitChangeCallback.push(callback)
+                        callbacks.push(callback)
                     }
                 }
 
                 if(responsesPointer._actions.length > 0){
                     isEdited = true
-                    this.actionsQuery = responsesPointer._actions
+                    let responsesData = this.responsesData
+                    callbacks.push(()=>{
+                        ActionExecutorUtil.executeActions(responsesData, responsesPointer._actions)
+                    })
                 }
 
-                return (isEdited)?this.commitChange : undefined
-            },
-            commitChange : function () {
-                ActionExecutorUtil.executeActions(this.responsesData, this.actionsQuery)
-                this.commitChangeCallback.forEach(fn => fn())
+                return (isEdited)?()=>{callbacks.forEach(fn => fn())} : undefined
             },
             isDuplicateCode : function (i) {
                 let count = 0

@@ -37,9 +37,6 @@
             propertyId : 0,
             //menyimpan property yang didelete, tidak menyimpan property yang baru dibuat lalu dihapus
             deletedProperty : [],
-            commitChangeCallback : [],
-            actionsQuery : []
-
         }),
         computed : {
             projectId : function () {
@@ -86,6 +83,7 @@
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
                 this.propertiesData.length = 0
+                this.deletedProperty = []
                 if (this.schemasData) {
                     let sd = this.schemasData
                     for (let key in sd) {
@@ -100,10 +98,6 @@
                 }
                 this.$_changeObserverMixin_initObserver(['propertiesData.length'])
             },
-            commitChange : function () {
-                ActionExecutorUtil.executeActions(this.schemasData, this.actionsQuery)
-                this.commitChangeCallback.forEach(fn => fn())
-            },
             deleteChild : function (childIndex) {
                 //jika bukan property baru, maka bikin query delete
                 if(this.propertiesData[childIndex].schemaData !== undefined){
@@ -114,14 +108,14 @@
                 this.propertiesData.splice(childIndex,1)
             },
             buildQuery :function (query) {
-                this.commitChangeCallback = []
+                let callbacks = []
                 let isEdited = false
                 for(let i = 0; i < this.propertiesData.length; i++){
                     let id = this.propertiesData[i].id
                     let callback = this.$refs['property-'+id][0].buildQuery(query)
                     if( callback !== undefined ){
                         isEdited = true
-                        this.commitChangeCallback.push(callback)
+                        callbacks.push(callback)
                     }
                 }
                 if(this.deletedProperty.length > 0){
@@ -139,10 +133,14 @@
                     }
                     else{
                         isEdited = true
-                        this.actionsQuery = query._actions
+                        let propertiesActions = query._actions
+                        let schemasData = this.schemasData
+                        callbacks.push(()=>{
+                            ActionExecutorUtil.executeActions(schemasData, propertiesActions)
+                        })
                     }
                 }
-                return (isEdited)?this.commitChange : undefined
+                return (isEdited)?()=>{callbacks.forEach(fn => fn())}: undefined
             }
         },
         watch : {

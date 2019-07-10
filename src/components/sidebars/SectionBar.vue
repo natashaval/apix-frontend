@@ -42,13 +42,14 @@
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
     import {BASE_PROJECT_URL} from "../../stores/actions/const";
+    import EditorSwitchMixin from "../../mixins/EditorSwitchMixin";
 
     export default {
         name: "SectionBar",
         components : {
             PathBar
         },
-        mixins : [ProjectPrivilegeMixin],
+        mixins : [ProjectPrivilegeMixin, EditorSwitchMixin],
         props : {
             projectApi : String,
             sectionApi : String,
@@ -81,10 +82,14 @@
         },
         methods : {
             gotoRoute : function(){
-                this.$router.push({
-                    name :'section-editor',
-                    params: {sectionApi : this.sectionApi}
-                })
+                let callback = () => {
+                    this.$router.push({
+                        name :'section-editor',
+                        params: {sectionApi : this.sectionApi}
+                    })
+                }
+                this.$_EditorSwitch_changeRouteHandler(callback)
+
             },
             createPath : function () {
                 this.$router.push({

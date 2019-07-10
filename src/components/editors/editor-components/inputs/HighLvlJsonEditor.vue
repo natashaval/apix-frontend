@@ -360,6 +360,9 @@
             * */
             buildQuery : function (parentQuery) {
                 this.commitChangeCallback = []
+                let callbacks = []
+                let schemaActions = []
+                let propertiesActions = []
                 let query = {_hasActions : true, _actions : []}
                 let childIsEdited = false
                 if(parentQuery._hasActions === undefined){
@@ -418,7 +421,7 @@
 
                 if(this.type === 'object'){
                     query.properties = {
-                        _actions : this.propertiesActionQuery = [],
+                        _actions : propertiesActions = [],
                         _hasActions : true
                     }
 
@@ -429,7 +432,8 @@
                         let callback = this.$refs['property-'+id][0].buildQuery(query.properties)
                         if(callback !== undefined){
                             childIsEdited = true
-                            this.commitChangeCallback.push(callback)
+                            // this.commitChangeCallback.push(callback)
+                            callbacks.push(callback)
                         }
                     }
 
@@ -449,7 +453,8 @@
                     let callback = this.$refs['arrayItem'].buildQuery(query)
                     if(callback !== undefined){
                         childIsEdited = true
-                        this.commitChangeCallback.push(callback)
+                        // this.commitChangeCallback.push(callback)
+                        callbacks.push(callback)
                     }
                     else{
                         delete query.items
@@ -466,12 +471,24 @@
                         delete query._actions
                     }
                     else{
-                        this.actionsQuery = query._actions
+                        schemaActions = query._actions
                         isEdited = true
                     }
                 }
+                let schemaData = this.schemaData
+                let type = this.type
+                return (isEdited)?()=>{
+                    ActionExecutorUtil.executeActions(schemaData, schemaActions)
+                    if(type === 'object' ){
+                        //execute actions yang ada di properties
+                        ActionExecutorUtil.executeActions(
+                            schemaData.properties,
+                            propertiesActions
+                        )
+                    }
+                    callbacks.forEach(fn => fn())
 
-                return (isEdited)?this.commitChange : undefined
+                } : undefined
             },
             getData : function () {
                 let res = this.$refs.curDataType.getAttributes()

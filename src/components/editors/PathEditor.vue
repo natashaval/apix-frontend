@@ -1,7 +1,7 @@
 <template>
     <div>
-        <SaveComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
-                       :submit="submit" :cancel="cancel" :name="editorTitle"></SaveComponent>
+        <EditorHeaderComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
+                               :submit="submit" :cancel="cancel" :name="editorTitle"></EditorHeaderComponent>
         <div class="form-row dot-border ml-1 mr-1">
             <div v-if="isEditing" class="col-11 pl-1">
                 <div class="form-group">
@@ -11,20 +11,6 @@
                 <div class="form-group">
                     <label class="font-weight-bold">Description:</label>
                     <vue-editor v-model="description"></vue-editor>
-                </div>
-                <div class="form-group">
-                    <label class="font-weight-bold">Path Variables : </label>
-                    <br /><small>Add curly braces in path name</small>
-                    <div class="form-group" v-for="(variable,idx) in variables" v-bind:key="variable.name">
-                        <HighLvlJsonEditor :editable="$_projectPrivilege_canEdit"
-                                           :nameable="true"
-                                           :deleteable="false"
-                                           :schema-data="variable"
-                                           :disable-name="true"
-                                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                                           ref="variables"
-                                           :component-id="idx"/>
-                    </div>
                 </div>
             </div>
             <div v-else class="col-11">
@@ -42,7 +28,7 @@
         </div>
 
         <div class="form-row dot-border mt-3 ml-1 mr-1">
-            <h4 class="font-weight-bold w-100">Path Variables:</h4>
+            <h6 class="font-weight-bold w-100">Path Variables:</h6>
             <div class="w-100" v-for="(variable,idx) in variables" v-bind:key="variable.name">
                 <HighLvlJsonEditor :editable="$_projectPrivilege_canEdit"
                                    :parent-is-editing="false"
@@ -69,12 +55,12 @@
     import TreeBuilder from "@/utils/DeepTreeBuilderUtil";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
-    import SaveComponent from "./editor-components/EditorHeaderComponent";
+    import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 
     export default {
         name: "PathEditor",
-        components: {SaveComponent, VueEditor,HighLvlJsonEditor},
+        components: {EditorHeaderComponent, VueEditor,HighLvlJsonEditor},
         mixins : [ChangeObserverMixin, ProjectPrivilegeMixin],
         computed : {
             projectState : function (){
@@ -115,6 +101,8 @@
             submit : function () {
                 this.isEdited = false
                 let commitFunctions = []
+                let sectionData = this.sectionData
+                let pathData = this.pathData
 
                 let pathQuery = []
                 let tree = TreeBuilder.buildDeepTree(
@@ -128,6 +116,7 @@
                         variableData[variable.name] = variable.getData()
                     })
                 }
+                console.log(variableData)
 
                 let getPath = ()=>{
                     if(this.path[0] !== '/'){
@@ -149,7 +138,7 @@
                     }]
                     tree.leaf._hasActions = true
                     commitFunctions.push(()=>{
-                        ActionExecutorUtil.executeActions(this.sectionData.paths, tree.leaf._actions)
+                        ActionExecutorUtil.executeActions(sectionData.paths, tree.leaf._actions)
                     })
                 }
                 else{
@@ -160,7 +149,7 @@
                             newKey : getPath()
                         }]
                         commitFunctions.push(()=>{
-                            ActionExecutorUtil.executeActions(this.sectionData.paths, tree.leaf._actions)
+                            ActionExecutorUtil.executeActions(sectionData.paths, tree.leaf._actions)
                             this.pathApi = getPath()
                         })
                         tree.leaf._hasActions = true
@@ -177,7 +166,7 @@
                         value : variableData
                     })
 
-                    if(this.description !== this.pathData.description){
+                    if(this.description !== pathData.description){
                         pathQuery.push({
                             action : 'put',
                             key : 'description',
@@ -185,7 +174,7 @@
                         })
                     }
                     commitFunctions.push(()=>{
-                        ActionExecutorUtil.executeActions(this.pathData, pathQuery)
+                        ActionExecutorUtil.executeActions(pathData, pathQuery)
                     })
 
                 }
@@ -194,7 +183,7 @@
                 axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
                     (response) => {
                         if(response.status === 200){
-                            this.sectionData._signature = response.data.new_signature
+                            sectionData._signature = response.data.new_signature
                             commitFunctions.forEach(fn => fn())
                             this.$router.push({
                                 name :'path-editor',
@@ -272,6 +261,7 @@
                 if(pv !== undefined){
                     let keys = this.getVars()
                     keys.forEach(key => {
+                        if(pv[key] === undefined)return []
                         this.variables.push(pv[key])
                     })
                 }
@@ -303,6 +293,7 @@
                     }
                 }
                 else{
+                    console.log(this.variables)
                     for(let i = 0; i < newLen; ++i){
                         let key = this.variables[i].name
                         if(key !== newVars[i]){

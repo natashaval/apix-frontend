@@ -31,10 +31,6 @@
         name: "RequestComponent",
         mixins : [ChangeObserverMixin],
         components: {PropertyForm, BodyForm},
-        data : () => ({
-            commitChangeCallback : [],
-            actionsQuery : [],
-        }),
         props : {
             requestData : {
                 type : Object
@@ -71,13 +67,15 @@
             buildQuery : function (operationPointer,requestPointer) {
                 let isEdited = false
                 let request = requestPointer
+                let requestData = this.requestData
+                let callbacks = []
                 let callback = this.$refs.headers.buildQuery(request.headers = {})
                 if(callback === undefined){
                     delete request.headers
                 }
                 else{
                     isEdited = true
-                    this.commitChangeCallback.push(callback)
+                    callbacks.push(callback)
                 }
 
                 callback = this.$refs.queryParams.buildQuery(request.queryParams = {})
@@ -86,26 +84,24 @@
                 }
                 else{
                     isEdited = true
-                    this.commitChangeCallback.push(callback)
+                    callbacks.push(callback)
                 }
 
                 if(this.$refs.body !== undefined){
                     callback = this.$refs.body.buildQuery(request)
                     if(callback !== undefined){
                         isEdited = true
-                        this.commitChangeCallback.push(callback)
+                        callbacks.push(callback)
                     }
 
 
                 }
                 if(request._actions !== undefined){
-                    this.actionsQuery = request._actions
+                    callbacks.push(()=>{
+                        ActionExecutorUtil.executeActions(requestData, request._actions)
+                    })
                 }
-                return (isEdited)?this.commitChange : undefined
-            },
-            commitChange : function () {
-                ActionExecutorUtil.executeActions(this.requestData, this.actionsQuery)
-                this.commitChangeCallback.forEach(fn => fn())
+                return (isEdited)?()=>{callbacks.forEach(fn => fn())} : undefined
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()

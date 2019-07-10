@@ -15,8 +15,10 @@
 </template>
 
 <script>
+    import {EditorHeader} from "@/utils/GlobalVars";
+
     export default {
-        name: "SaveComponent",
+        name: "EditorHeaderComponent",
         props: {
             submit: {
                 type: Function,
@@ -33,11 +35,20 @@
         },
         methods: {
             onSubmit: function(){
-                let res = this.submit()
+                this.submit()
             },
             onCancel: function(){
                 this.cancel()
             }
+        },
+        watch : {
+            isEdited : function (after, before) {
+                EditorHeader.isEditing = after
+            }
+        },
+        created() {
+            EditorHeader.submit = this.submit
+            EditorHeader.cancel = this.cancel
         }
     }
 </script>
