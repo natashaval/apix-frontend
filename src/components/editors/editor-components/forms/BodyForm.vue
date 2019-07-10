@@ -29,19 +29,19 @@
             </button>
         </div>
         <HighLvlJsonEditor ref="root"
-            v-bind:style="{display : isShow(EDITOR_TYPE_HIGH_LEVEL)}"
-            :schema-data="schemaDataWrapper" :nameable="false"
-            :deleteable="false"
-            :editable="editable"
-            fixed-name="schema"
-            :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
+                           v-bind:style="{display : isShow(EDITOR_TYPE_HIGH_LEVEL)}"
+                           :schema-data="schemaDataWrapper.data" :nameable="false"
+                           :deleteable="false"
+                           :editable="editable"
+                           fixed-name="schema"
+                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         <LowLvlJsonEditor ref="lowLvlEditor"
-            v-if="schemaDataWrapper !== undefined"
-            v-bind:style="{
-                display : isShow(EDITOR_TYPE_LOW_LEVEL)
-            }"
-            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-            :json-input="schemaDataWrapper" class="form-control"/>
+                          v-if="schemaDataWrapper.data !== undefined"
+                          v-bind:style="{
+                              display : isShow(EDITOR_TYPE_LOW_LEVEL)
+                          }"
+                          :$_changeObserverMixin_parent="$_changeObserverMixin_this"
+                          :json-input="schemaDataWrapper.data" class="form-control"/>
 
         <b-modal :id="'modal-importer-'+_uid" title="Import From External Json" hide-footer>
             <div class="form-group">
@@ -54,8 +54,8 @@
             </div>
 
             <LowLvlJsonEditor class="form-control"
-                    ref="modalJsonInput"
-                    v-bind:style="{display: 'block',height: '400px'}"/>
+                              ref="modalJsonInput"
+                              v-bind:style="{display: 'block',height: '400px'}"/>
             <button class="mt-3 btn btn-success" @click="()=>{doImport();}">import</button>
         </b-modal>
     </div>
@@ -91,22 +91,23 @@
         data : () => ({
             EDITOR_TYPE_HIGH_LEVEL : true,
             EDITOR_TYPE_LOW_LEVEL : false,
-            jsonFile : undefined,
-            description : '',
             isEditing : false,
+            description : '',
             attributesKey : ['description'],
-            schemaDataWrapper : undefined,
+            schemaDataWrapper : {data : undefined},
             showHighLevelEditor : true
         }),
         methods : {
             makeToast,
-            doImport : async function () {
+            doImport : function () {
                 try{
-                    this.schemaDataWrapper = JsonOasUtil.toSwaggerOas(this.$refs.modalJsonInput.getJson())
-                    this.$_changeObserverMixin_onDataChanged(true,false)
-                    await this.$nextTick()
+                    Vue.delete(this.schemaDataWrapper.data)
+                    Vue.set(
+                        this.schemaDataWrapper, 'data',
+                        JsonOasUtil.toSwaggerOas(this.$refs.modalJsonInput.getJson())
+                    )
+                    this.$_changeObserverMixin_onDataChanged(true, false)
                     this.$refs.lowLvlEditor._data.isEdited = true
-                    this.isEdited = true
                     this.$bvModal.hide('modal-importer-'+this._uid)
                     this.makeToast('success',true,'Json file imported.')
                 }
@@ -164,9 +165,8 @@
                 }
             },
             buildQuery : function (requestPointer) {
-                let bodyActions = []
-                let callbacks = []
                 let isEdited = false
+                let callbacks = []
                 let bodyData = this.bodyData
 
                 if(requestPointer._hasActions === undefined){
@@ -174,15 +174,23 @@
                     requestPointer._actions = []
                 }
                 if(this.$refs.lowLvlEditor._data.isEdited){
-                    let json = this.$refs.lowLvlEditor.getJson()
-                    requestPointer._actions.push({
-                        action : 'put',
-                        key : 'schema',
-                        value : json
-                    })
-                    return () => {
-                        Vue.delete(bodyData.schema)
-                        Vue.set(bodyData, 'schema', json)
+                    try{
+                        let json = this.$refs.lowLvlEditor.getJson()
+                        requestPointer._actions.push({
+                            action : 'put',
+                            key : 'schema',
+                            value : json
+                        })
+                        return () => {
+                            Vue.delete(bodyData.schema)
+                            Vue.set(bodyData, 'schema', json)
+                            this.$refs.lowLvlEditor._data.isEdited = false
+                        }
+                    }
+                    catch (e) {
+                        this.loadData()
+                        this.makeToast('warning',false,'reload data')
+                        return undefined
                     }
                 }
 
@@ -202,28 +210,36 @@
 
                 if(requestPointer._actions.length > 0){
                     isEdited = true
-                    bodyActions = requestPointer._actions
-                    requestPointer._hasActions = true
                     callbacks.push(()=>{
-                        ActionExecutorUtil.executeActions(bodyData, bodyActions)
+                        ActionExecutorUtil.executeActions(bodyData, requestPointer._actions)
                     })
+                    requestPointer._hasActions = true
                 }
                 else{
                     delete requestPointer._actions
                     delete requestPointer._hasActions
                 }
 
-                return (isEdited)? () => {callbacks.forEach(fn => fn())} : undefined
+                let ref = this.$refs.root
+                return (isEdited)? ()=>{
+                    callbacks.forEach(fn => fn())
+                    Vue.delete(bodyData.schema)
+                    Vue.set(bodyData, 'schema', ref.getData())
+                } : undefined
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
                 if(this.bodyData !== undefined){
                     let bd = this.bodyData
                     this.description = (bd.description === undefined)?'':bd.description
-                    this.schemaDataWrapper = this.bodyData.schema
+                    Vue.delete(this.schemaDataWrapper, 'data')
+                    Vue.set(this.schemaDataWrapper, 'data', Object.assign({},this.bodyData.schema))
+                    if(this.$refs.lowLvlEditor){
+                        this.$refs.lowLvlEditor.setJson(this.schemaDataWrapper.data)
+                    }
                 }
                 else{
-                    this.schemaDataWrapper = {}
+                    this.schemaDataWrapper.data = {}
                     this.description = ''
                 }
 
@@ -246,10 +262,18 @@
             },
             showHighLevelEditor : function (after, before) {
                 if(after === this.EDITOR_TYPE_HIGH_LEVEL){
-                    this.schemaDataWrapper = this.$refs.lowLvlEditor.getJson()
+                    try{
+                        Vue.delete(this.schemaDataWrapper, 'data')
+                        Vue.set(this.schemaDataWrapper, 'data', this.$refs.lowLvlEditor.getJson())
+                    }
+                    catch (e) {
+                        this.makeToast('warning',false,'reload data')
+                        this.loadData()
+                    }
                 }
                 else{
-                    this.schemaDataWrapper = this.$refs.root.getData()
+                    Vue.delete(this.schemaDataWrapper, 'data')
+                    Vue.set(this.schemaDataWrapper, 'data', this.$refs.root.getData())
                 }
             }
         },

@@ -42,7 +42,7 @@
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
     import BodyForm from "./editor-components/forms/BodyForm";
-    import {BASE_PROJECT_URL} from "../../stores/actions/const";
+    import {BASE_PROJECT_URL} from "@/stores/actions/const";
 
     export default {
         name: "DefinitionEditor",
@@ -160,7 +160,9 @@
                     tree.leaf._hasActions = true
 
                     let callback = this.$refs.root.buildQuery(tree.leaf)
-                    if(callback !== undefined)callbacks.push(callback)
+                    if(callback !== undefined){
+                        callbacks.push(callback)
+                    }
                     if(tree.leaf._actions && tree.leaf._actions.length === 0){
                         delete tree.leaf._hasActions
                         delete tree.leaf._actions
@@ -192,8 +194,6 @@
                         variant: 'danger'
                     })
                 })
-
-
             },
             cancel : function () {
                 this.reloadData()

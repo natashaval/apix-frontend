@@ -43,6 +43,35 @@ export default {
         else if(val instanceof Object){
             this._contructOas(output, val)
         }
+    },
+    replaceValueWithKey(target, targetKey, targetValDict){
+        if(target instanceof Object && !(target instanceof Array)){
+            let keys = Object.keys(target)
+            if(keys){
+                keys.forEach(key => {
+                    let val = target[key]
+                    if(key === targetKey){
+                        if(targetValDict[val] !== undefined){
+                            target[key] = targetValDict[val]
+                        }
+                        else{
+                            console.log(key)
+                            console.log(target[key])
+                            console.log(targetValDict[key])
+                            throw 'Invalid $ref'
+                        }
+                    }
+                    else{
+                        if(val instanceof Array){
+                            val.forEach(v => this.replaceValueWithKey(v, targetKey, targetValDict) )
+                        }
+                        else if(val instanceof Object){
+                            this.replaceValueWithKey(val, targetKey, targetValDict)
+                        }
+                    }
+                })
+            }
+        }
     }
 
 }
