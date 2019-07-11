@@ -172,7 +172,7 @@
             methodInvalidFeedback : function () {
                 return this.$_changeObserverMixin_getErrors('method')[0]
             },
-            projectState : function (){
+            projectFetchState : function (){
                 return this.$store.getters['project/getState']
             },
             modelName : function (){
@@ -437,8 +437,8 @@
             },
             projectState : function () {
                 if(
-                    (this.projectState === NOT_FOUND) ||
-                    (this.projectState === COMPLETE && this.operationData === undefined && !this.isCreateNew)
+                    (this.projectFetchState === NOT_FOUND) ||
+                    (this.projectFetchState === COMPLETE && this.operationData === undefined && !this.isCreateNew)
                 ){
                     this.$router.push({
                         name :'project-editor',

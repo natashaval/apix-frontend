@@ -221,10 +221,12 @@
                 }
 
                 let ref = this.$refs.root
-                return (isEdited)? ()=>{
+                return (isEdited)? async ()=>{
                     callbacks.forEach(fn => fn())
                     Vue.delete(bodyData.schema)
                     Vue.set(bodyData, 'schema', ref.getData())
+                    await this.$nextTick()
+                    this.$refs.lowLvlEditor._data.isEdited = false
                 } : undefined
             },
             loadData : function () {
@@ -272,8 +274,9 @@
                     }
                 }
                 else{
-                    Vue.delete(this.schemaDataWrapper, 'data')
-                    Vue.set(this.schemaDataWrapper, 'data', this.$refs.root.getData())
+                    // Vue.delete(this.schemaDataWrapper, 'data')
+                    // Vue.set(this.schemaDataWrapper, 'data', this.$refs.root.getData())
+                    this.$refs.lowLvlEditor.setJson(this.$refs.root.getData())
                 }
             }
         },

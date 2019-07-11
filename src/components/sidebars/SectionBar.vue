@@ -26,11 +26,11 @@
         <b-collapse :id="'section-'+sectionApi" v-model="isArrow" :style="{
             display : (hasActiveChild)?'block':'hidden'
         }">
-                <PathBar ref="pathBars"
-                        v-for="(value,key) in sectionData.paths" v-bind:key="key"
-                         :path-data="value"
-                         :project-api="projectApi"
-                         :section-api="sectionApi" :pathApi="key"/>
+            <PathBar ref="pathBars"
+                    v-for="pathData in orderedPath" v-bind:key="pathData.key"
+                     :path-data="pathData.val"
+                     :project-api="projectApi"
+                     :section-api="sectionApi" :pathApi="pathData.key"/>
         </b-collapse>
     </li>
 </template>
@@ -63,6 +63,19 @@
             }
         },
         computed : {
+            orderedPath : function (){
+                let res = []
+                let paths = this.sectionData.paths
+                if(paths){
+                    let keys = Object.keys(paths).sort()
+                    keys.forEach(key => res.push({
+                            key : key,
+                            val : paths[key]
+                        })
+                    )
+                }
+                return res
+            },
             projectData : function () {
                 return this.$store.getters['project/getProjectData']
             },

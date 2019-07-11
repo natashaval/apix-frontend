@@ -8,7 +8,10 @@
                 <slot v-if="isEditing">
                     <div class="form-group">
                         <label class="font-weight-bold">Name :</label>
-                        <input v-model="name" class="form-control"/>
+                        <b-form-group class="mb-2 w-100"
+                                      :state="definitionState" :invalid-feedback="definitionInvalidFeedback">
+                            <b-input class="form-control w-100" :state="definitionState" trim v-model="name" name="definition-name"></b-input>
+                        </b-form-group>
                     </div>
                 </slot>
                 <slot v-else>
@@ -64,11 +67,17 @@
             definitionActions : []
         }),
         computed: {
+            definitionState : function () {
+                return this.$_changeObserverMixin_isValid('name')
+            },
+            definitionInvalidFeedback : function(){
+                return this.$_changeObserverMixin_getErrors('name')[0]
+            },
             editorTitle : function (){
                 let name = (this.definitionApi)?this.definitionApi:'New Definition'
                 return '<h4><i class="fas fa-cube"></i> '+ name +'</h4>'
             },
-            projectState : function (){
+            projectFetchState : function (){
                 return this.$store.getters['project/getState']
             },
             projectData : function () {
@@ -108,7 +117,21 @@
                     this.description = ''
                     this.isCreateNew = true
                 }
-                this.$_changeObserverMixin_initObserver(['name','description'])
+                this.$_changeObserverMixin_initObserver([{
+                    model : 'name',
+                    validator : () => {
+                        if(this.name === this.definitionApi)return []
+                        let definitions = this.$store.getters['project/getDefinitions']
+                        for(let key in definitions){
+                            if(definitions.hasOwnProperty(key)){
+                                if(definitions[key].name === this.name){
+                                    return ['Model name must be unique']
+                                }
+                            }
+                        }
+                        return []
+                    }
+                },'description'])
             },
             reloadData : function () {
                 this.loadData()
@@ -127,6 +150,15 @@
                 return ActionBuilderUtil.createActions(this.definitionData,this._data,this.attributesKey)
             },
             submit : function () {
+
+                if(!this.$_changeObserverMixin_allIsValid()){
+                    this.$bvToast.toast('Can\'t submit due to invalid input', {
+                        title: 'Failed',
+                        variant: 'danger'
+                    })
+                    return
+                }
+
                 let tree = undefined
                 let callbacks = []
                 let signaturePointer = undefined
@@ -208,8 +240,8 @@
             },
             projectState : function () {
                 if(
-                    (this.projectState === NOT_FOUND) ||
-                    (this.projectState === COMPLETE && this.definitionData === undefined)
+                    (this.projectFetchState === NOT_FOUND) ||
+                    (this.projectFetchState === COMPLETE && this.definitionData === undefined)
                 ){
                     this.$router.push({
                         name :'project-editor',

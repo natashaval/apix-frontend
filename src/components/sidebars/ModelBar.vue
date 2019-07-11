@@ -2,7 +2,7 @@
     <li>
         <div class="sidebar-content row" style="height: 2em;" :class="{'active-bar':isActive}"
              @mouseover="onHover=true" @mouseleave="onHover=false">
-            <p @click="definitionClick" class="col-10 ml-4 mt-1 shrinkable-text" style="font-size: 0.9em;">
+            <p @click="definitionClick" class="col-9 ml-4 mt-1 shrinkable-text" style="font-size: 0.9em;">
                 <i class="fas fa-cube"></i> {{ definitionApi }}
             </p>
             <div v-if="onHover">

@@ -27,8 +27,7 @@
         },
         data : () => ({
             jsonText : '',
-            isEdited : false,
-            unwatchList : []
+            isEdited : false
         }),
         computed : {
             editorOptions : function () {
@@ -61,6 +60,10 @@
         },
         methods : {
             makeToast,
+            $_changeObserverMixin_onDataChanged : function (after,before) {
+                this.isEdited = true
+                ChangeObserverMixin.methods.$_changeObserverMixin_onDataChanged.call(this, after, before)
+            },
             editorInit : function () {
                 require('brace/mode/json');
                 require('@/assets/apix-ace-editor-theme');
@@ -82,7 +85,6 @@
             loadData : function () {
                 if(this.jsonInput !== undefined){
                     this.$_changeObserverMixin_unObserve()
-                    this.unwatchList.forEach(fn => fn())
                     if(this.definitionMap){
                         let copyJson = JSON.parse(JSON.stringify(this.jsonInput))
                         JsonOasUtil.replaceValueWithKey(copyJson, '$ref', this.definitionMap.idToName)
@@ -90,12 +92,7 @@
                     }
                     this.$_changeObserverMixin_initObserver(['jsonText'])
 
-                    this.unwatchList = []
-                    let unwatchTmp = this.$watch('jsonText',()=>{
-                        this.isEdited = true
-                        unwatchTmp()
-                    })
-                    this.unwatchList.push(unwatchTmp)
+
                 }
             },
             setJson : function (json) {
@@ -114,10 +111,6 @@
                         this.jsonText = JSON.stringify(json,null,2)
                     }
                     this.$_changeObserverMixin_initObserver(['jsonText'])
-                    let unwatchTmp = this.$watch('jsonText',()=>{
-                        this.isEdited = true
-                        unwatchTmp()
-                    })
                 }
                 catch (e) {
                     makeToast('danger',false, e.message)
@@ -125,9 +118,6 @@
             }
         },
         watch : {
-            jsonInput : function () {
-                this.loadData()
-            }
         },
         created() {
             this.loadData()

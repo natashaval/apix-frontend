@@ -100,7 +100,7 @@
             isEditing : false
         }),
         computed : {
-            projectState : function (){
+            projectFetchState : function (){
                 return this.$store.getters['project/getState']
             },
             apiData : function () {
@@ -182,7 +182,7 @@
                 this.loadData()
             },
             projectState : function () {
-                if(this.projectState === NOT_FOUND){
+                if(this.projectFetchState === NOT_FOUND){
                     this.$router.push({
                         name :'project-repo'
                     })

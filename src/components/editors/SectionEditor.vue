@@ -6,7 +6,10 @@
             <div v-if="isEditing" class="col-11 pl-1">
                 <div class="form-group">
                     <label class="font-weight-bold">Name:</label>
-                    <input class="form-control" v-model="name" name="section-name"/>
+                    <b-form-group class="mb-2 w-100"
+                                  :state="sectionState" :invalid-feedback="sectionInvalidFeedback">
+                        <b-input class="form-control w-100" :state="sectionState" trim v-model="name" name="section-input"></b-input>
+                    </b-form-group>
                 </div>
                 <div class="form-group">
                     <label class="font-weight-bold">Description:</label>
@@ -60,7 +63,13 @@
             }
         },
         computed : {
-            projectState : function (){
+            sectionState : function () {
+                return this.$_changeObserverMixin_isValid('name')
+            },
+            sectionInvalidFeedback : function (){
+                return this.$_changeObserverMixin_getErrors('name')[0]
+            },
+            projectFetchState : function (){
                 return this.$store.getters['project/getState']
             },
             editorTitle : function (){
@@ -78,9 +87,6 @@
             }
         },
         methods: {
-            lol : function (t){
-                console.log('yay '+t)
-            },
             loadData: function() {
                 this.$_changeObserverMixin_unObserve()
                 this.isEdited = false
@@ -93,13 +99,32 @@
                     this.isCreateNew = true
                     this.isEdited = true
                     this.isEditing = true
+                    this.name = ''
+                    this.description = ''
                 }
                 else if(this.sectionData){
                     this.isCreateNew = false
                     this.name = this.sectionData.info.name
                     this.description = this.sectionData.info.description
                 }
-                this.$_changeObserverMixin_initObserver(['name', 'description'])
+                this.$_changeObserverMixin_initObserver([{
+                    model : 'name',
+                    validator : () => {
+                        if(this.name){
+                            if(this.name === this.sectionApi)return []
+                            let sections = this.$store.getters['project/getProjectData'].sections
+                            if(sections){
+                                for(let section in sections){
+                                    if(section === this.name){
+                                        return ['Section name must be unique']
+                                    }
+                                }
+                            }
+                            return []
+                        }
+                        return ['name can\'t be empty']
+                    },
+                }, 'description'])
             },
             //override
             $_changeObserverMixin_onDataChanged : function (after,before) {
@@ -214,7 +239,7 @@
             cancel: function(){
                 console.log('cancel')
                 this.isEdited = false
-                this.loadData();
+                this.loadData()
             },
         },
         mounted() {
@@ -229,8 +254,8 @@
             },
             projectState : function () {
                 if(
-                    (this.projectState === NOT_FOUND) ||
-                    (this.projectState === COMPLETE && this.sectionData === undefined && !this.isCreateNew)
+                    (this.projectFetchState === NOT_FOUND) ||
+                    (this.projectFetchState === COMPLETE && this.sectionData === undefined && !this.isCreateNew)
                 ){
                     this.$router.push({
                         name :'project-editor',

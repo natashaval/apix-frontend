@@ -6,7 +6,11 @@
             <div v-if="isEditing" class="col-11 pl-1">
                 <div class="form-group">
                     <label class="font-weight-bold">Name:</label>
-                    <input class="form-control" v-model="path" name="path-input" placeholder="/path/{myVariable}/data"/>
+                    <b-form-group class="mb-2 w-100"
+                                  :state="pathState" :invalid-feedback="pathInvalidFeedback">
+                        <b-input class="form-control w-100" :state="pathState" trim v-model="path" name="path-input"
+                                 placeholder="/path/{myVariable}/data"></b-input>
+                    </b-form-group>
                 </div>
                 <div class="form-group">
                     <label class="font-weight-bold">Description:</label>
@@ -63,7 +67,13 @@
         components: {EditorHeaderComponent, VueEditor,HighLvlJsonEditor},
         mixins : [ChangeObserverMixin, ProjectPrivilegeMixin],
         computed : {
-            projectState : function (){
+            pathState : function () {
+                return this.$_changeObserverMixin_isValid('path')
+            },
+            pathInvalidFeedback : function (){
+                return this.$_changeObserverMixin_getErrors('path')[0]
+            },
+            projectFetchState : function (){
                 return this.$store.getters['project/getState']
             },
             sectionData(){
@@ -116,7 +126,6 @@
                         variableData[variable.name] = variable.getData()
                     })
                 }
-                console.log(variableData)
 
                 let getPath = ()=>{
                     if(this.path[0] !== '/'){
@@ -240,7 +249,24 @@
                 if(this.pathData){
                     this.description = this.pathData.description
                 }
-                this.$_changeObserverMixin_initObserver(['path','description'])
+                this.$_changeObserverMixin_initObserver([{
+                    model : 'path',
+                    validator : () => {
+                        if(this.path){
+                            if(this.path === this.pathApi)return []
+                            let paths = this.$store.getters['project/getSectionData'](this.sectionApi).paths
+                            if(paths){
+                                for(let path in paths){
+                                    if(path === this.path){
+                                        return ['Path url must be unique']
+                                    }
+                                }
+                            }
+                            return []
+                        }
+                        return ['Name can\'t be empty']
+                    }
+                },'description'])
             },
             //override
             $_changeObserverMixin_onDataChanged : function () {
@@ -293,7 +319,6 @@
                     }
                 }
                 else{
-                    console.log(this.variables)
                     for(let i = 0; i < newLen; ++i){
                         let key = this.variables[i].name
                         if(key !== newVars[i]){
@@ -304,8 +329,8 @@
             },
             projectState : function () {
                 if(
-                    (this.projectState === NOT_FOUND) ||
-                    (this.projectState === COMPLETE && this.pathData === undefined && !this.isCreateNew)
+                    (this.projectFetchState === NOT_FOUND) ||
+                    (this.projectFetchState === COMPLETE && this.pathData === undefined && !this.isCreateNew)
                 ){
                     this.$router.push({
                         name :'project-editor',

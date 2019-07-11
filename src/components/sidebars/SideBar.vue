@@ -21,11 +21,11 @@
 
         <b-row>
             <b-col style="padding-left: 0em;padding-right: 0" v-if="projectData">
-                <Section v-for="(value,key) in projectData.sections"
-                         v-bind:key="key"
-                         :section-data="value"
+                <Section v-for="section in orderedSection"
+                         v-bind:key="section.info.name"
+                         :section-data="section"
                          :project-api="projectApi"
-                         :section-api="key"/>
+                         :section-api="section.info.name"/>
             </b-col>
         </b-row>
 
@@ -101,6 +101,15 @@
             }
         },
         computed : {
+            orderedSection : function (){
+                let res = []
+                let sections = this.projectData.sections
+                if(sections){
+                    let keys = Object.keys(sections).sort()
+                    keys.forEach(key => res.push(sections[key]))
+                }
+                return res
+            },
             profile() {
                 if (!this.isProfile) {
                     this.$store.dispatch('user/' + USER_REQUEST)

@@ -14,8 +14,10 @@ Vue.use(BootstrapVue)
 
 Vue.config.productionTip = false
 import VueIziToast from 'vue-izitoast'
-import {AUTH_LOGOUT} from "./stores/actions/auth";
 Vue.use(VueIziToast)
+
+import VueLodash from 'vue-lodash'
+Vue.use(VueLodash)
 
 axios.interceptors.request.use(function (config) {
     const apixToken = localStorage.getItem('apix-token')

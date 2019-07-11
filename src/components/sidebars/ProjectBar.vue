@@ -1,6 +1,6 @@
 <template>
-    <div v-if="apiData.info !== undefined" class="my-1">
-        <h4 @click="projectClick" class="text-center">{{apiData.info.title}}</h4>
+    <div class="my-1">
+        <h4 @click="projectClick" class="text-center">{{projectTitle}}</h4>
         <b-button pill variant="outline-info" size="sm" class="offset-4" @click="tryClient">
             <i class="fas fa-paper-plane"></i> Try in Client</b-button>
     </div>
@@ -19,6 +19,15 @@
         data: function(){
             return {
                 fileExportLocation: ''
+            }
+        },
+        computed : {
+            projectTitle : function () {
+                if(this.apiData){
+                    if(this.apiData.info)
+                        return this.apiData.info.title
+                }
+                return undefined
             }
         },
         methods : {
