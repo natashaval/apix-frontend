@@ -16,9 +16,6 @@ Vue.config.productionTip = false
 import VueIziToast from 'vue-izitoast'
 Vue.use(VueIziToast)
 
-import VueLodash from 'vue-lodash'
-Vue.use(VueLodash)
-
 axios.interceptors.request.use(function (config) {
     const apixToken = localStorage.getItem('apix-token')
     if (apixToken) {
@@ -29,9 +26,6 @@ axios.interceptors.request.use(function (config) {
 }, error => {
     return Promise.reject(error);
 })
-
-// response interceptor
-
 
 new Vue({
     router,
