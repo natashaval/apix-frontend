@@ -38,7 +38,7 @@ export default {
             }
         },
         fetchAllUsersData({ commit }){
-            let fetchUsers = () => axios.get(BASE_URL + 'admin/users')
+            let fetchUsers = () => axios.get(BASE_URL + '/admin/users')
                 .then((response) => {
                     commit('LIST_DATA', response.data)
                 })

@@ -11,14 +11,15 @@ import AuthLogin from "../components/auth/AuthLogin";
 import UserProfile from "../components/auth/UserProfile";
 import ProjectsUpload from "../components/projects/ProjectsUpload";
 import GithubEditor from "../components/editors/GithubEditor";
-import TeamCreate from "../components/auth/TeamCreate";
-import TeamViewer from "../components/auth/TeamViewer";
+import TeamCreate from "../components/teams/TeamCreate";
+import TeamViewer from "../components/teams/TeamViewer";
 import ProjectsList from "../components/projects/ProjectsList";
 import UserViewer from "../components/auth/admin-components/UserViewer";
 import ErrorNotFound from "../ErrorNotFound";
 import SettingsEditor from "../components/editors/SettingsEditor";
 import ClientEditor from "../components/editors/ClientEditor";
 import SwaggerClient from "../components/editors/SwaggerClient";
+import TeamList from "../components/teams/TeamList";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -132,10 +133,10 @@ export const router = new VueRouter({
             name: 'auth-login', path: '/login',
             component: AuthLogin
         },
-        {
-            name: 'user-profile', path: '/user/profile',
-            component: UserProfile
-        },
+        // {
+        //     name: 'user-profile', path: '/user/profile',
+        //     component: UserProfile
+        // },
         {
             name: 'team-create', path: '/team/new-team',
             component: TeamCreate, props: true
@@ -143,6 +144,10 @@ export const router = new VueRouter({
         {
             name: 'team-viewer', path: '/team/:name',
             component: TeamViewer, props: true
+        },
+        {
+            name: 'team-list', path: '/teams',
+            component: TeamList
         },
         {
             name: 'user-viewer', path: '/admin/users',

@@ -10,12 +10,13 @@
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav v-if="isAuthenticated">
                     <b-nav-item :to="{name: 'project-repo'}">Projects</b-nav-item>
+                    <b-nav-item :to="{name: 'team-list'}">Teams</b-nav-item>
                     <b-nav-item to="/admin/users" v-if="isAdmin">User Management</b-nav-item>
                 </b-navbar-nav>
 
                 <b-navbar-nav v-if="isAuthenticated" class="ml-auto px-2">
-                    <b-nav-item :to="{name: 'user-profile'}">{{profile.username}}</b-nav-item>
-                    <b-nav-item @click="logout">Logout</b-nav-item>
+                    <b-nav-text><i class="far fa-user-circle"></i> {{profile.username}}</b-nav-text>
+                    <b-nav-item @click="logout" class="ml-3">Logout</b-nav-item>
                 </b-navbar-nav>
 
                 <b-navbar-nav v-else-if="!isAuthenticated" class="ml-auto">
@@ -23,32 +24,6 @@
                 </b-navbar-nav>
             </b-collapse>
         </b-navbar>
-
-<!--        <nav class="nav navbar-expand-lg navbar-light bg-dark">-->
-<!--            <a class="navbar-brand" href="#"><i class="fas fa-fire-alt"></i> APIX</a>-->
-
-<!--            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"-->
-<!--                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">-->
-<!--                <span class="navbar-toggler-icon"></span>-->
-<!--            </button>-->
-<!--            <div class="collapse navbar-collapse" id="navbarNav">-->
-<!--                <ul class="navbar-nav mr-auto text-white" v-if="isAuthenticated">-->
-<!--                    <li class="nav-item">-->
-
-<!--                    </li>-->
-<!--                    <li class="nav-item my-2 my-lg-0">-->
-<!--                        <a class="nav-link" href="/user/profile">{{profile.username}}</a>-->
-<!--                    </li>-->
-
-<!--                </ul>-->
-
-<!--                <ul class="navbar-nav ml-auto" v-else>-->
-<!--                    <li class="nav-item">-->
-<!--                        <a class="nav-link" href="/login"> Login</a>-->
-<!--                    </li>-->
-<!--                </ul>-->
-<!--            </div>-->
-<!--        </nav>-->
     </div>
 </template>
 
@@ -74,7 +49,7 @@
             },
             isAdmin(){
                 if(typeof this.profile.roles === 'undefined' || !this.isProfile) return false;
-                else return this.profile.roles.includes('ROLE_ADMIN');
+                else return this.profile.roles.includes('ROLE_ADMIN') || this.profile.roles.includes('ADMIN');
             }
         },
         methods: {

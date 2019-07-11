@@ -4,7 +4,7 @@
             <div class="col-md-1 ">
                 <b-button v-if="isInvite" :to="{name: 'team-viewer', params: {name: teamInvite.name }}">
                     <i class="fas fa-angle-left"></i> Back</b-button>
-                <b-button v-else variant="outline-info" :to="{name: 'user-profile'}">
+                <b-button v-else variant="outline-info" :to="{name: 'team-list'}">
                     <i class="fas fa-angle-left"></i> Back
                 </b-button>
             </div>
@@ -147,6 +147,7 @@
 
                     if (this.access == 'public') {
                         for (let i = 0; i < this.selectedMember.length; i++) {
+                            if (this.selectedMember[i] == this.profile.username) continue;
                             let member = {
                                 grant: true,
                                 username: this.selectedMember[i]
@@ -155,6 +156,7 @@
                         }
                     } else {
                         for (let i = 0; i < this.selectedMember.length; i++) {
+                            if (this.selectedMember[i] == this.profile.username) continue;
                             let member = {
                                 grant: false,
                                 username: this.selectedMember[i]
@@ -173,6 +175,7 @@
 
                     let members = []
                     for (let i=0; i < this.selectedMember.length; i++) {
+                        if (this.selectedMember[i] == this.profile.username) continue;
                         let member =  {
                             username: this.selectedMember[i],
                             grant: false

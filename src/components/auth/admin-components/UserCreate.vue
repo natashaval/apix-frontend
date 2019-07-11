@@ -18,9 +18,18 @@
 
                         <b-input-group>
                             <b-input-group-text slot="prepend"><i class="fas fa-key"></i></b-input-group-text>
-                            <b-input id="input-password"
+                            <b-input id="input-password" type="password"
                                      placeholder="Password"
                                      v-model="user.password"
+                                     class="mb-2 mr-md-2 mb-sm-0"
+                            ></b-input>
+                        </b-input-group>
+
+                        <b-input-group>
+<!--                            <b-input-group-text slot="prepend"><i class="fas fa-key"></i></b-input-group-text>-->
+                            <b-input id="input-confirm-password" type="password"
+                                     placeholder="Confirm Password"
+                                     v-model="user.confirmPassword"
                                      class="mb-2 mr-md-2 mb-sm-0"
                             ></b-input>
                         </b-input-group>
@@ -59,9 +68,13 @@
                 user: {
                     username: '',
                     password: '',
+                    confirmPassword: '',
                     roles: []
                 },
-                optionRole: ['ROLE_USER', 'ROLE_ADMIN']
+                optionRole: [
+                    {text: 'asAdmin?', value: 'ROLE_ADMIN'},
+                    // {text: 'asUser?', value: 'ROLE_USER'},
+                ]
             }
         },
         computed: {
@@ -74,8 +87,9 @@
             onSubmit: function (evt) {
                 evt.preventDefault()
                 let payload = Object.assign({}, this.user);
-                axios.post(BASE_URL + 'admin/users', payload).then((response) => {
+                axios.post(BASE_URL + '/admin/users', payload).then((response) => {
                     this.makeToast('success', response.data.success, response.data.message)
+                    payload.id = response.data.new_user
                     this.$store.dispatch('user/addUser', payload)
                 }).catch((e) => {
                     console.error(e);

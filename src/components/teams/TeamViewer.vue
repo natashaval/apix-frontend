@@ -1,13 +1,7 @@
 <template>
     <div class="container-fluid">
-        <!--{{team}}-->
-        <!--<div class="row">-->
-        <!--<div class="col-md-6">-->
-
         <div class="row">
-            <!--<label class="col-md-2">Team: </label>-->
             <div class="col-md-12 bg-info text-light">
-                <!--<input type="text" readonly v-model="team.name" id="create-name" class="form-control-plaintext" />-->
                 <p class="font-weight-bold" style="font-size: 1.5em;">
                     <i class="fas fa-users"></i>
                     Team {{team.name}}</p>

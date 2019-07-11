@@ -12,7 +12,8 @@
             <template slot="roles" slot-scope="data">
 <!--                {{ // (data.value.includes('ROLE_ADMIN') ? 'Admin' : 'User Biasa') }}-->
                 <b-badge pill variant="primary" v-if="data.value.includes('ROLE_ADMIN')" class="mr-2">Admin</b-badge>
-                <b-badge pill variant="secondary" v-if="data.value.includes('ROLE_USER')">User</b-badge>
+<!--                <b-badge pill variant="secondary" v-if="data.value.includes('ROLE_USER')">User</b-badge>-->
+                <b-badge pill variant="secondary" v-else>User</b-badge>
             </template>
             <template slot="actions" slot-scope="row">
                 <b-button size="sm" @click="row.toggleDetails">
@@ -26,7 +27,7 @@
                         <b-col md="10">
                             <ul>
 <!--                                <li v-for="(valuekey) in row.item" :key="key"> {{key}}: {{value}}</li>-->
-                                <li>id: {{row.item.id}}</li>
+<!--                                <li>id: {{row.item.id}}</li>-->
                                 <li>username: {{row.item.username}}</li>
                                 <li>roles: {{row.item.roles}}</li>
                                 <li>teams: {{row.item.teams}}</li>
