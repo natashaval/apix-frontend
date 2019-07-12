@@ -3,20 +3,36 @@
         <div class="row justify-content-end" style="margin-left: -10%">
             <div class="col-10 mt-3">
                 <div class="container row">
+                    <p v-if="type === 'object'" class="btn-text"  @click="$bvModal.show(_uid+'-extract-modal')">
+                        <i class="fas fa-cube"></i> Extract datatype
+                    </p>
+                    <b-modal :id="_uid+'-extract-modal'" title="Extract to New Type" hide-footer>
+                        <ExtractDataTypeModal
+                            @extractComplete="(newModelRef)=>{
+                                $_changeObserverMixin_onDataChanged(0,1)
+                                $bvModal.hide(_uid+'-extract-modal')
+                                ref = newModelRef
+                                type = ''
+                                propertiesData = []
+                            }"
+                            :init-name="name" :schema-data="schemaData"></ExtractDataTypeModal>
+                    </b-modal>
+                </div>
+                <div class="container row">
                     <!--kolom kiri-->
                     <div class="col-6">
                         <div v-if="showEdit" class="form-row">
                             <b-form-group v-if="nameable" class="form-row mb-2 w-100"
                                           :state="nameState" :invalid-feedback="nameInvalidFeedback"
                                           label="name * :"
-                                          label-cols="2">
+                                          label-cols="3">
                                 <slot v-if="disableName">
-                                    <b-form-input class="col-10 form-control" disabled v-model="name" :name="_uid+'-name'"/>
+                                    <b-form-input class="form-control" disabled v-model="name" :name="_uid+'-name'"/>
                                 </slot>
                                 <slot v-else>
                                     <b-form-input class="form-control" v-model="name"
                                                   :state="nameState" trim
-                                                  :name="_uid+'-name'" id="target1" ref="yay"/>
+                                                  :name="_uid+'-name'"/>
                                 </slot>
                             </b-form-group>
                             <div class="form-row w-100 mb-2">
@@ -162,6 +178,7 @@
                 </a>
             </div>
         </b-collapse>
+
     </div>
 
 </template>
@@ -177,10 +194,11 @@
     import CustomData from "./typedatas/CustomData";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
+    import ExtractDataTypeModal from "./ExtractDataTypeModal";
 
     export default {
         name: "HighLvlJsonEditor",
-        components: {CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
+        components: {ExtractDataTypeModal, CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
         mixins : [ChangeObserverMixin],
         props : {
             parentFunctions : {//wrapper function dari parent yang bisa diakses child
@@ -230,6 +248,7 @@
             isMoreDisplay : false,
             childCollapseId : Math.random().toString(),
             showChild : 'down',
+            showExtractModal : false,
 
             //data general
             name : '',
