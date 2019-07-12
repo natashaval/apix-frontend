@@ -9,7 +9,6 @@ export default {
     state: {
         status: '',
         profile: {},
-        users: [],
         editingPrivilege: undefined,
         fetchStatus : NOT_START,
     },
@@ -17,7 +16,6 @@ export default {
         getProfile: state => state.profile,
         isProfileLoaded: state => !!state.profile.username,
         hasEditingPrivilege : state => state.editingPrivilege,
-        getUsers: state => state.users,
         getFetchStatus : state => state.fetchStatus
     },
     actions: {
@@ -37,23 +35,7 @@ export default {
                 })
             }
         },
-        fetchAllUsersData({ commit }){
-            let fetchUsers = () => axios.get(BASE_URL + '/admin/users')
-                .then((response) => {
-                    commit('LIST_DATA', response.data)
-                })
-            fetchUsers()
-        },
-        addUser: ({ commit }, payload) => {
-            console.log('dispatch add user', payload)
-            commit('PUSH_DATA', payload)
-        },
         checkEditingPrivilege({commit, state}, payload){
-            // let editable = state.profile.teams.some(x => payload.include(x));
-            // console.log('ACTION USER MODULE EDITPRIV: ', editable)
-            // commit('CHECK_PRIVILEGE', editable)
-            // console.log(state.profile)
-            // console.log('dari usermodule TEAM: ', state.profile.teams)
             let editable = state.profile.teams.some(x => payload.includes(x));
             commit('CHECK_PRIVILEGE', editable)
         }
@@ -74,12 +56,6 @@ export default {
         },
         [AUTH_LOGOUT]: (state) => {
             state.profile = {}
-        },
-        LIST_DATA (state, newData) {
-            state.users = newData
-        },
-        PUSH_DATA (state, newData) {
-            state.users.push(newData)
         },
         CHECK_PRIVILEGE (state, editable) {
             state.editingPrivilege = editable

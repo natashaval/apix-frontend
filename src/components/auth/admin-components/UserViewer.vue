@@ -76,7 +76,7 @@
         },
         computed: {
             users() {
-                return this.$store.getters['user/getUsers']
+                return this.$store.getters['admin/getUsers']
             }
         },
         methods: {
@@ -89,22 +89,42 @@
                 if(item.roles.includes('ROLE_ADMIN')) return 'table-info'
             },
             onDelete(id){
-                // console.log(id);
                 let idx = this.users.findIndex(x => x.id == id)
-                console.log(id, idx);
-                axios.delete(BASE_URL + '/admin/users/' + id).then((response) => {
-                    this.makeToast('danger', response.data.success, response.data.message)
-                    this.users.splice(idx, 1)
-                }).catch((e) => {
-                    console.error(e);
-                })
-                // console.log(this.users)
+                let self = this
+
+                self.$toast.question('Are you sure to delete this user?',
+                    'Confirmation', {
+                        timeout: 20000,
+                        close: false,
+                        overlay: true,
+                        toastOnce: true,
+                        id: 'delete',
+                        zindex: 999,
+                        position: 'center',
+                        buttons: [
+                            ['<button><b>Yes</b></button>', (instance, toast) => {
+                                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                                axios.delete(BASE_URL + '/admin/users/' + id).then((response) => {
+                                    self.makeToast('danger', response.data.success, response.data.message)
+                                    self.users.splice(idx, 1)
+                                }).catch((e) => {
+                                    console.error(e);
+                                    alert(e.response.data.message);
+                                })
+
+                            }, true],
+                            ['<button>No</button>', function (instance, toast) {
+                                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                            }]
+                        ]
+                    })
             },
 
         },
         created() {
             if (this.users.length == 0) {
-                this.$store.dispatch('user/fetchAllUsersData')
+                this.$store.dispatch('admin/fetchAllUsersData')
                 console.log('dispatch user')
             }
             else {

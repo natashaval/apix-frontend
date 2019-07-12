@@ -3,9 +3,23 @@
         <div v-if="assignNew">
             <div class="col-12">
                 <h6>Assign Team</h6>
-                <select class="form-control" v-model="selectedTeamName">
-                    <option v-for="(myTeam, i) in teamAsCreator" :key="i" :value="myTeam.name">{{myTeam.name}}</option>
-                </select>
+                <div class="row">
+                    <div class="col-md-8" v-if="!isNewTeam">
+                        <select class="form-control" v-model="selectedTeamName">
+                            <option value="" disabled selected>-- Select team (where you are the owner) --</option>
+                            <option v-for="(myTeam, i) in teamAsCreator" :key="i" :value="myTeam.name">{{myTeam.name}}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8" v-if="isNewTeam">
+                        <input class="form-control" v-model="inputTeamName" placeholder="Input new team name (you will be the owner)" required />
+                    </div>
+                    <div class="col-md-4">
+                        <b-form-checkbox v-model="isNewTeam" switch>
+                            Create new team?
+                        </b-form-checkbox>
+                    </div>
+                </div>
+
             </div>
         </div>
         <div v-else>
@@ -34,7 +48,9 @@
         data: function(){
             return {
                 teams: [],
-                selectedTeamName: ''
+                selectedTeamName: '',
+                isNewTeam: false,
+                inputTeamName: '',
             }
         },
         props: {

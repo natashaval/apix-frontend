@@ -67,6 +67,7 @@
             </ul>
 
         </b-collapse>
+
         <b-list-group flush v-if="$_projectPrivilege_canEdit" style="">
             <b-list-group-item :to="{name: 'github-editor', params: {projectId: projectApi} }"
                                class="py-1 text-light sidebar-content pl-0" exact-active-class="active-bar"
