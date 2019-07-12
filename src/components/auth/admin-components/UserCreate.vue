@@ -19,14 +19,19 @@
                         <b-input-group class="mb-2 mb-sm-0 mr-sm-2">
                             <b-input-group-text slot="prepend"><i class="fas fa-key"></i></b-input-group-text>
                             <b-form-input id="input-password" :type="(showPassword) ? 'text' : 'password'"
-                                     placeholder="Password"
+                                     placeholder="Password" class="border-right-0"
                                      v-model="user.password"
                             ></b-form-input>
                             <b-input-group-append  v-if="!showPassword">
-                                <b-button variant="outline-secondary" size="sm" @click="showPassword=true"><i class="far fa-eye-slash"></i></b-button>
+                                <b-button variant="outline-secondary" size="sm" @click="showPassword=true"
+                                >
+                                    <i class="far fa-eye-slash"></i>
+                                </b-button>
                             </b-input-group-append>
                             <b-input-group-append  v-if="showPassword">
-                                <b-button variant="outline-secondary" size="sm" @click="showPassword=false"><i class="far fa-eye"></i></b-button>
+                                <b-button variant="outline-secondary" size="sm" @click="showPassword=false">
+                                    <i class="far fa-eye"></i>
+                                </b-button>
                             </b-input-group-append>
                         </b-input-group>
 

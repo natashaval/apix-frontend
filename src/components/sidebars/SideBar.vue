@@ -68,14 +68,21 @@
 
         </b-collapse>
 
-        <b-list-group flush v-if="$_projectPrivilege_canEdit" style="">
+        <b-list-group flush>
+            <b-list-group-item :to="{name: 'team-editor', params: {projectId: projectApi} }"
+                               class="py-1 text-light sidebar-content pl-0" exact-active-class="active-bar"
+                               style="background-color: transparent;">
+                <i class="fas fa-users"></i> Teams
+            </b-list-group-item>
             <b-list-group-item :to="{name: 'github-editor', params: {projectId: projectApi} }"
+                               v-if="$_projectPrivilege_canEdit"
                                class="py-1 text-light sidebar-content pl-0" exact-active-class="active-bar"
                                style="background-color: transparent;">
                 <i class="fab fa-github"></i> Github
             </b-list-group-item>
             <b-list-group-item variant="dark"
                                :to="{name: 'settings-editor', params: {projectId: projectApi} }"
+                               v-if="$_projectPrivilege_canEdit"
                                class="py-1 text-light sidebar-content pl-0" exact-active-class="active-bar"
                                style="background-color: transparent;"><i class="fas fa-cog"></i> Settings</b-list-group-item>
         </b-list-group>

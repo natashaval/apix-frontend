@@ -28,47 +28,56 @@
             </b-row>
 
 
-        <b-table :items="projectFilterByTeam"
-                 :fields="fields"
-                 :busy="isBusy"
-                 :current-page="currentPage"
-                 :per-page="perPage"
-                 :filter="filter"
-                 responsive head-variant="dark" hover small
-                 @filtered="onFiltered"
-                 class="mt-2"
-        >
+            <b-table :items="projectFilterByTeam"
+                     :fields="fields"
+                     :busy="isBusy"
+                     :current-page="currentPage"
+                     :per-page="perPage"
+                     :filter="filter"
+                     responsive head-variant="dark" hover small
+                     @filtered="onFiltered"
+                     class="mt-2"
+            >
 
-            <template slot="info.title" slot-scope="row">
-                <!--<small>{{row.item.id}}</small>-->
-                <!--<h3>{{row.item.info.title}}</h3>-->
-                <b-link :to="{name: 'project-editor', params: {projectId: row.item.id} }">{{row.item.info.title}}</b-link>
-            </template>
+                <template slot="info.title" slot-scope="row">
+                    <!--<small>{{row.item.id}}</small>-->
+                    <!--<h3>{{row.item.info.title}}</h3>-->
+                    <b-link :to="{name: 'project-editor', params: {projectId: row.item.id} }">{{row.item.info.title}}</b-link>
+                </template>
 
-            <div slot="table-busy" class="text-center text-primary my-1">
-                <h5>
-                <b-spinner class="align-middle m-5" type="grow"
-                           label="Loading ..."></b-spinner>
-                <strong> Loading ... </strong>
-                </h5>
-            </div>
-        </b-table>
+                <template slot="githubProject" slot-scope="row">
+                    <a :href="'http://github.com/' + row.item.githubProject.owner + '/' + row.item.githubProject.repo"
+                       target="_blank"
+                       v-if="row.item.githubProject.repo != ''"
+                    >
+                        {{row.item.githubProject.owner}}/{{row.item.githubProject.repo}}
+                    </a>
+                </template>
 
-        <b-row>
-            <b-col md="12" class="my-1">
-                <b-pagination
-                    v-model="currentPage"
-                    :total-rows="totalRows"
-                    :per-page="perPage"
-                    class="my-0"
-                    align="center"
-                >
-                </b-pagination>
-            </b-col>
-            <!--Curr Page: {{currentPage}}-->
-            <!--totalRows: {{totalRows}}-->
-            <!--perPage: {{perPage}}-->
-        </b-row>
+                <div slot="table-busy" class="text-center text-primary my-1">
+                    <h5>
+                        <b-spinner class="align-middle m-5" type="grow"
+                                   label="Loading ..."></b-spinner>
+                        <strong> Loading ... </strong>
+                    </h5>
+                </div>
+            </b-table>
+
+            <b-row>
+                <b-col md="12" class="my-1">
+                    <b-pagination
+                            v-model="currentPage"
+                            :total-rows="totalRows"
+                            :per-page="perPage"
+                            class="my-0"
+                            align="center"
+                    >
+                    </b-pagination>
+                </b-col>
+                <!--Curr Page: {{currentPage}}-->
+                <!--totalRows: {{totalRows}}-->
+                <!--perPage: {{perPage}}-->
+            </b-row>
 
         </b-container>
     </div>
@@ -81,10 +90,10 @@
     export default {
         name: "ProjectsTable",
         props: {
-          team: {
-              type: String,
-              required: false
-          }
+            team: {
+                type: String,
+                required: false
+            }
         },
         data: function () {
             return {
@@ -95,8 +104,15 @@
                         label: 'Api Title',
                         sortable: true
                     },
+                    {
+                        key: 'projectOwner.creator',
+                        label: 'Project Owner'
+                    },
                     'host',
-                    'basePath',
+                    {
+                        key: 'githubProject',
+                        label: 'Repository',
+                    },
                     {
                         key: 'updatedAt',
                         formatter: value => {
@@ -105,10 +121,6 @@
                         },
                         sortable: true
                     }
-                    // {
-                    //     key: 'id',
-                    //     label: 'Actions'
-                    // }
                 ],
                 isBusy: false,
                 filter: null,
@@ -135,7 +147,7 @@
             onFiltered(filteredItems){
                 this.totalRows = filteredItems.length
                 this.currentPage = 1
-            }
+            },
         },
         created() {
             this.loadProjects();

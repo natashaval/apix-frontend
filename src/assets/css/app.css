@@ -20,7 +20,7 @@ li {
 .btn-circle:active { border-style: outset;}
 
 .btn-circle:hover{
-    background-color: rgba(74, 186, 255, 0.24);
+    background-color: rgba(74, 186, 255, 0.44);
 }
 
 .shrinkable-text{

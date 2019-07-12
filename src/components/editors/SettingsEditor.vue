@@ -37,7 +37,6 @@
             </div>
         </div>
 
-        <AssignComponent :project-id="projectId"></AssignComponent>
 
 
     </div>
@@ -51,7 +50,6 @@
 
     export default {
         name: "SettingsEditor",
-        components: {AssignComponent},
         data: function(){
             return {
                 projectId: '',
@@ -131,11 +129,16 @@
                                 self.makeToast('warning', false, 'Wrong type! Use default type')
                             }
                             instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
-
-
                         }, false]
-                    ]
+                    ],
+                    onClosing: function(instance, toast,closedBy) {
+                        self.exportStatus = false
+                    },
+                    onClosed: function (instance, toast, closedBy) {
+                        self.exportStatus = false
+                    }
                 })
+
             },
             deleteOas: function () {
                 let self = this

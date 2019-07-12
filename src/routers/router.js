@@ -20,6 +20,7 @@ import SettingsEditor from "../components/editors/SettingsEditor";
 import ClientEditor from "../components/editors/ClientEditor";
 import SwaggerClient from "../components/editors/SwaggerClient";
 import TeamList from "../components/teams/TeamList";
+import TeamEditor from "../components/editors/TeamEditor";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -118,8 +119,13 @@ export const router = new VueRouter({
             beforeEnter: initProject
         },
         {
-          name: 'swagger-client', path: '/projects/:projectId/swagger',
-          component: SwaggerClient
+            name: 'team-editor', path: '/projects/:projectId/teams',
+            component: TeamEditor, props: true,
+            beforeEnter: initProject
+        },
+        {
+            name: 'swagger-client', path: '/projects/:projectId/swagger',
+            component: SwaggerClient
         },
         {// List of Projects available
             name: 'project-repo', path: '/projects',

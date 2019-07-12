@@ -54,6 +54,9 @@ export default{
         getState(state){
             return state.fetchStatus
         },
+        getProjectOwner(state) {
+            return state.project.projectOwner
+        },
         getTeams(state) {
             return state.project.teams
         }
@@ -80,6 +83,9 @@ export default{
         },
         PUSH_TEAM(state, newTeam) {
             state.project.teams.push(newTeam)
+        },
+        REMOVE_TEAM(state, deleteTeam) {
+
         }
     },
     actions : {
@@ -132,9 +138,14 @@ export default{
         },
 
         assignTeamToProject({state, commit}, payload){
-            console.log('dari project module: ',payload)
+            console.log('assign team')
             if (!state.project.teams.includes(payload)) commit('PUSH_TEAM', payload)
             else console.log('tidak perlu push')
+        },
+        unassignTeamFromProject({state, commit}, payload) {
+            console.log('unassign team')
+            if(state.project.teams.includes(payload)) commit('REMOVE_TEAM', payload)
+            else console.log('tidak ada yang diunassign')
         }
     }
 }

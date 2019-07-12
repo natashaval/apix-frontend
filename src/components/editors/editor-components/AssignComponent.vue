@@ -22,11 +22,12 @@
 
             </div>
         </div>
-        <div v-else>
+        <div v-else class="row">
             <div class="col-5">
                 <h5>Assign My Team to this project</h5>
                 <small>You are required to be the creator of the team</small>
                 <select class="form-control col-10" v-model="selectedTeamName">
+                    <option value="" disabled selected>-- Select team (where you are the owner) -- </option>
                     <option v-for="(myTeam, i) in teamAsCreator" :key="i" :value="myTeam.name">{{myTeam.name}}</option>
                 </select>
             </div>
@@ -70,16 +71,13 @@
                 }
                 return this.$store.getters['user/getProfile']
             },
-            teamAsCreator(){
+            teamAsCreator(){ // list of team where user is the team leader
                 let self = this
                 if (!this.teams) return null;
                 return this.teams.filter((t) => {
                     return t.creator === self.profile.username
                 })
             },
-            teamInProject(){
-                return this.$store.getters['project/getTeams']
-            }
         },
         methods: {
             makeToast,
@@ -93,7 +91,10 @@
             },
             assignTeam(){
                 console.log(this.selectedTeamName)
-                axios.post(BASE_PROJECT_URL +'/'+ this.projectId + '/assign?teamName=' + this.selectedTeamName)
+                axios.post(BASE_PROJECT_URL +'/'+ this.projectId + '/assign', {
+                    assignType: 'grant',
+                    teamName: this.selectedTeamName
+                })
                     .then((response) => {
                         this.makeToast('success', response.data.success, response.data.message)
                         this.$store.dispatch('project/assignTeamToProject', this.selectedTeamName)

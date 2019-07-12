@@ -1,5 +1,8 @@
 <template>
+    <div>
+    <button class="btn btn-outline-light float-left text-dark"><i class="fas fa-angle-left"></i> Back</button>
     <div id="swagger-ui">
+    </div>
     </div>
 </template>
 
