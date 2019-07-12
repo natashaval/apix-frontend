@@ -55,6 +55,7 @@
     import axios from 'axios';
     import {makeToast} from "../../../assets/toast";
     import AssignComponent from "../../editors/editor-components/AssignComponent";
+    import {USER_REQUEST} from "../../../stores/actions/user";
 
     export default {
         name: "ProjectModal",
@@ -127,12 +128,20 @@
                     return
                 }
 
-                let team = this.$refs.assign.selectedTeamName
+                let isNewTeam = this.$refs.assign.isNewTeam;
+                let team = ''
+                if (isNewTeam) {
+                    team = this.$refs.assign.inputTeamName;
+                }
+                else {
+                    team = this.$refs.assign.selectedTeamName;
+                }
 
                 const newProject = {
                     host: this.host.field,
                     basePath: this.basepath.field,
                     team: team,
+                    isNewTeam: isNewTeam,
                     info: {
                         title: this.title.field,
                         version: this.version.field
@@ -147,7 +156,8 @@
 
                             this.newProject.id = response.data.new_project
                             console.log('newProject Id', this.newProject.id)
-                            this.makeToast('success', response.data.success, response.data.message)
+                            this.makeToast('success', response.data.success, response.data.message, 1000)
+                            this.$store.dispatch('user/' + USER_REQUEST)
 
                             setTimeout(() => {
                                 this.$router.push({

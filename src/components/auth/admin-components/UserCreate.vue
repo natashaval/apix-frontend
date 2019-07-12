@@ -16,13 +16,18 @@
                                       trim
                         ></b-form-input>
 
-                        <b-input-group>
+                        <b-input-group class="mb-2 mb-sm-0 mr-sm-2">
                             <b-input-group-text slot="prepend"><i class="fas fa-key"></i></b-input-group-text>
-                            <b-input id="input-password" type="password"
+                            <b-form-input id="input-password" :type="(showPassword) ? 'text' : 'password'"
                                      placeholder="Password"
                                      v-model="user.password"
-                                     class="mb-2 mr-md-2 mb-sm-0"
-                            ></b-input>
+                            ></b-form-input>
+                            <b-input-group-append  v-if="!showPassword">
+                                <b-button variant="outline-secondary" size="sm" @click="showPassword=true"><i class="far fa-eye-slash"></i></b-button>
+                            </b-input-group-append>
+                            <b-input-group-append  v-if="showPassword">
+                                <b-button variant="outline-secondary" size="sm" @click="showPassword=false"><i class="far fa-eye"></i></b-button>
+                            </b-input-group-append>
                         </b-input-group>
 
                         <b-input-group>
@@ -74,7 +79,8 @@
                 optionRole: [
                     {text: 'asAdmin?', value: 'ROLE_ADMIN'},
                     // {text: 'asUser?', value: 'ROLE_USER'},
-                ]
+                ],
+                showPassword: false
             }
         },
         computed: {
@@ -90,7 +96,7 @@
                 axios.post(BASE_URL + '/admin/users', payload).then((response) => {
                     this.makeToast('success', response.data.success, response.data.message)
                     payload.id = response.data.new_user
-                    this.$store.dispatch('user/addUser', payload)
+                    this.$store.dispatch('admin/addUser', payload)
                 }).catch((e) => {
                     console.error(e);
                     this.makeToast('danger', e.response.data.success, e.response.data.message)

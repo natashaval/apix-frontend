@@ -85,7 +85,11 @@
                     formData.append('type', 'oas-swagger2');
                     formData.append('file', postFile['file']);
 
-                    let team = this.$refs.assign.selectedTeamName;
+                    let isNewTeam = this.$refs.assign.isNewTeam;
+                    let team=  '';
+                    if (isNewTeam) team = this.$refs.assign.inputTeamName;
+                    else team = this.$refs.assign.selectedTeamName;
+                    formData.append('isNewTeam', isNewTeam);
                     formData.append('team', team);
 
                     // Validation if file exists and file type is application/json
@@ -142,6 +146,9 @@
             },
             resetFile(){
                 this.files = {};
+                this.$refs.assign.isNewTeam = false;
+                this.$refs.assign.inputTeamName = '';
+                this.$refs.assign.selectedTeamName = '';
             }
         },
         watch: {
