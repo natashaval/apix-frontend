@@ -113,7 +113,7 @@
                     this.$_changeObserverMixin_initObserver(['jsonText'])
                 }
                 catch (e) {
-                    makeToast('danger',false, e.message)
+                    this.makeToast('danger',false, e.message)
                 }
             }
         },

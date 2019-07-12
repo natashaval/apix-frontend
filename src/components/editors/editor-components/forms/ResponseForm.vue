@@ -29,7 +29,7 @@
             <p v-if="editable && !hasBody" @click="hasBody = true"
                     class="text-primary btn-text" style="font-size: 15px"><i class="fas fa-plus"></i> Add</p>
             <p v-if="editable && hasBody" @click="hasBody = false"
-                    class="text-primary btn-text" style="font-size: 15px"><i class="fas fa-plus"></i> Delete</p>
+                    class="text-primary btn-text text-danger" style="font-size: 15px"><i class="fas fa-trash"></i> Delete</p>
             <BodyForm v-if="hasBody" :body-data="responseData" ref="body"
                       :editable="editable"
                       :$_changeObserverMixin_parent="$_changeObserverMixin_this"

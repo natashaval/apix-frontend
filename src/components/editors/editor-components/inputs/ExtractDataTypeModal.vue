@@ -1,14 +1,13 @@
 <template>
-    <div class="modal-content">
-        <b-form-group class="form-row mb-2 w-100"
+    <div>
+        <b-form-group class="form-row mb-2 w-100" style="font-size: 14px"
                       :state="definitionState.length === 0" :invalid-feedback="definitionState[0]"
-                      label="name * :"
-                      label-cols="3">
+                      label="name *:"
+                      label-cols="2">
         <b-input :state="definitionState.length === 0"
                  name="extract-data-name" type="text" v-model="modelName" class="form-control"></b-input>
         </b-form-group>
-
-        <button class="mt-3 btn btn-success" @click="extractModel">extract</button>
+        <button class="mt-3 btn btn-success float-right" @click="extractModel">extract</button>
     </div>
 </template>
 
@@ -18,18 +17,20 @@
     import Vue from 'vue'
     import * as axios from "axios"
     import {BASE_PROJECT_URL} from "@/stores/actions/const";
+    import HighLvlJsonEditor from "./HighLvlJsonEditor"
 
     export default {
         name: "ExtractDataTypeModal",
         props : {
             initName : String,
-            schemaData : {
-                type : Object,
+            highLvlJsonEditor : {
+                type : HighLvlJsonEditor,
                 required : true
             }
         },
         data : ()=>({
-            modelName : ''
+            modelName : '',
+            schemaData : undefined,
         }),
         computed : {
             definitionState : function () {
@@ -54,10 +55,11 @@
 
                 let modelUid = uuidv4()
                 let modelRef ='#/definitions/'+modelUid
-                let schemaData = this.schemaData
+                let schemaData = this.highLvlJsonEditor.getData()
                 let futureDefData = {
                     name : this.modelName,
                     description : '',
+                    _signature : uuidv4(),
                     schema : Object.assign({},schemaData)
                 }
                 callbacks.push(()=>{

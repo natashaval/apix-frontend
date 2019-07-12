@@ -99,7 +99,14 @@
                 this.responseList[childIndex].code = newStatusCode
             },
             deleteChild : function (childIndex) {
-                if(childIndex === this.activeIndex)this.activeIndex = 0
+                if(childIndex === this.activeIndex){
+                    this.setActiveView(this.responseList.length-2)
+                    if(this.activeIndex >= 0){
+                        setTimeout(()=>{
+                            this.$refs.codeTabs[this.activeIndex].click()
+                        },10)
+                    }
+                }
                 if(this.responseList[childIndex].data !== undefined){
                     this.deletedChilds.push(this.responseList[childIndex].code)
                 }
