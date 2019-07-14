@@ -112,7 +112,7 @@
                     validator : () => {
                         if(this.name){
                             if(this.name === this.sectionApi)return []
-                            let sections = this.$store.getters['project/getProjectData'].sections
+                            let sections = this.projectData.sections
                             if(sections){
                                 for(let section in sections){
                                     if(section === this.name){
@@ -237,7 +237,6 @@
                 return tree.root
             },
             cancel: function(){
-                console.log('cancel')
                 this.isEdited = false
                 this.loadData()
             },

@@ -61,6 +61,7 @@
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
     import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
+    import {BASE_PROJECT_URL} from "@/stores/actions/const";
 
     export default {
         name: "PathEditor",
@@ -113,7 +114,7 @@
                 let commitFunctions = []
                 let sectionData = this.sectionData
                 let pathData = this.pathData
-
+                let pathApi = this.pathApi
                 let pathQuery = []
                 let tree = TreeBuilder.buildDeepTree(
                     ['sections',this.sectionApi]
@@ -126,12 +127,12 @@
                         variableData[variable.name] = variable.getData()
                     })
                 }
-
+                let path = this.path
                 let getPath = ()=>{
-                    if(this.path[0] !== '/'){
-                        return '/'+this.path
+                    if(path[0] !== '/'){
+                        return '/'+path
                     }
-                    return this.path
+                    return path
                 }
 
                 if(this.isCreateNew){
@@ -154,7 +155,7 @@
                     if(this.pathApi !== this.path){
                         tree.leaf._actions = [{
                             action : 'rename',
-                            key : this.pathApi,
+                            key : pathApi,
                             newKey : getPath()
                         }]
                         commitFunctions.push(()=>{
@@ -182,14 +183,15 @@
                             value : this.description
                         })
                     }
+
                     commitFunctions.push(()=>{
-                        ActionExecutorUtil.executeActions(pathData, pathQuery)
+                        ActionExecutorUtil.executeActions(sectionData.paths[path], pathQuery)
                     })
 
                 }
 
                 console.log(tree)
-                axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
+                axios.put(BASE_PROJECT_URL+'/'+this.projectId,tree.root).then(
                     (response) => {
                         if(response.status === 200){
                             sectionData._signature = response.data.new_signature
@@ -254,7 +256,7 @@
                     validator : () => {
                         if(this.path){
                             if(this.path === this.pathApi)return []
-                            let paths = this.$store.getters['project/getSectionData'](this.sectionApi).paths
+                            let paths = this.sectionData.paths
                             if(paths){
                                 for(let path in paths){
                                     if(path === this.path){

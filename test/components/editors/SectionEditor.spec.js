@@ -34,8 +34,7 @@ describe('create new tests', () => {
     })
 
     test('should create new query when submitted',()=>{
-        expect(wrapper.vm.$data.isEditing).toBeTruthy()
-        wrapper.find('[name="section-name"]').setValue('MySection')
+        wrapper.vm.$data.name = 'MySection'
         wrapper.vm.$data.description = '<p>myDescription</p>'
 
         let expected = {
@@ -130,7 +129,7 @@ describe('edit tests', () => {
     })
 
     test('should create update query when edited',()=>{
-        wrapper.find('[name="section-name"]').setValue('sectionXY')
+        wrapper.vm.$data.name = 'sectionXY'
         let expected = {
             _signature : 'projectSignature',
             sections : {

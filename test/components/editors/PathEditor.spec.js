@@ -17,7 +17,6 @@ describe('create new tests', () => {
             sectionApi : 'sectionX'
         }
     }
-
     const store = new Vuex.Store({
         modules: {
             project: {
@@ -78,6 +77,7 @@ describe('create new tests', () => {
                                             "name": "id1"
                                         }
                                     },
+                                    "methods" : {},
                                     "_signature": "<random UUID>"
                                 }
                             }
@@ -103,7 +103,7 @@ describe('edit tests', () => {
 
 
     let wrapper
-    beforeEach(async () => {
+    beforeEach(() => {
         const store = new Vuex.Store({
             modules: {
                 project: {
@@ -156,29 +156,28 @@ describe('edit tests', () => {
             stubs: ['router-link','vue-editor'],
             mocks : {$route : $route}
         })
-        wrapper.find('[id="'+wrapper.vm._uid+'-edit-btn"]').trigger('click')
     })
 
     test('should update form when variables added',()=>{
-        wrapper.find('[name="path-input"]').setValue('/hello/{var1}/world/{var2}/{var3}/{var4}')
+        wrapper.vm.$data.path = '/hello/{var1}/world/{var2}/{var3}/{var4}'
         expect(wrapper.vm.$data.variables.length).toEqual(4)
         expect(wrapper.vm.$data.variables[3].name).toEqual('var4')
 
-        wrapper.find('[name="path-input"]').setValue('/{var0}/hello/{var1}/world/{var2}/{var3}/{var4}')
+        wrapper.vm.$data.path = '/{var0}/hello/{var1}/world/{var2}/{var3}/{var4}'
         expect(wrapper.vm.$data.variables.length).toEqual(5)
         expect(wrapper.vm.$data.variables[0].name).toEqual('var0')
 
     })
 
-    test('should update form when variables deleted',()=>{
-        wrapper.find('[name="path-input"]').setValue('/hello/{var1}/world/{var3}')
+    test('should update form when variables deleted', ()=>{
+        wrapper.vm.$data.path = '/hello/{var1}/world/{var3}'
         expect(wrapper.vm.$data.variables.length).toEqual(2)
         expect(wrapper.vm.$data.variables[0].name).toEqual('var1')
         expect(wrapper.vm.$data.variables[1].name).toEqual('var3')
     })
 
     test('should update form when variable renamed',()=>{
-        wrapper.find('[name="path-input"]').setValue('/hello/{id}/world/{var2}/{var3}')
+        wrapper.vm.$data.path = '/hello/{id}/world/{var2}/{var3}'
         expect(wrapper.vm.$data.variables.length).toEqual(3)
         expect(wrapper.vm.$data.variables[0].name).toEqual('id')
         expect(wrapper.vm.$data.variables[1].name).toEqual('var2')
