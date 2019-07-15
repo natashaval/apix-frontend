@@ -1,20 +1,28 @@
 <template>
     <div>
         <b-button v-b-toggle="'collapse-json'" class="m-1" size="sm" variant="outline-info">View Diff</b-button>
-        {{projectId}}
+        <!--{{projectId}}-->
+        <small>Click on each header to view project content</small>
         <b-collapse id="collapse-json">
         <div class="row">
             <div class="col-md-6" v-if="contentProject">
-                <h4>Project OAS</h4>
+                <h4 @click="exportOas" class="clickable text-info">Project OAS
+                    <b-spinner small variant="primary" v-show="exportStatus"></b-spinner>
+                </h4>
                 <vue-json-pretty
                         :data="contentProject"
-                        @click="exportOas"
+
                 >
                 </vue-json-pretty>
             </div>
-            <div class="col-md-6" v-if="contentGithub">
-                <h4>Project OAS in Github</h4>
-                {{github}}
+            <div class="col-md-6" v-if="contentGithub && contentProject">
+                <h4 @click="fetchOas" class="clickable text-info">Project OAS in Github
+                    <b-spinner small variant="danger" v-show="oasLoading"></b-spinner>
+                </h4>
+                <!--<p>{{owner}}</p>-->
+                <!--<p>{{repo}}</p>-->
+                <!--<p>{{branch}}</p>-->
+                <!--<p>{{path}}</p>-->
                 <vue-json-compare :oldData="contentProject" :newData="contentGithub"></vue-json-compare>
             </div>
         </div>
@@ -38,7 +46,10 @@
         },
         props: {
             projectId: String,
-            getData: Function,
+            owner: String,
+            repo: String,
+            branch: String,
+            path: String
         },
         data: () => {
             return {
@@ -54,7 +65,7 @@
                 fileExportLocation: '',
                 exportStatus: false,
                 contentProject: {},
-                github: {}
+                oasLoading: false
             }
         },
         methods: {
@@ -66,7 +77,7 @@
                     .then((response) => {
                         self.makeToast('success', response.data.success, response.data.message)
                         self.fileExportLocation = response.data.file_url
-                        self.exportStatus = false
+                        // self.exportStatus = false
 
                         this.viewOas()
 
@@ -79,19 +90,44 @@
                 if(this.fileExportLocation !== ''){
                     axios.get(BASE_URL +this.fileExportLocation).then((response) => {
                         this.contentProject = response.data
+                        this.exportStatus = false
                     })
                 }
             },
-            getGithubStructure: function () {
-                this.github = this.getData()
-            }
+            fetchOas: function() {
+                // if (this.githubData !== undefined) {
+                if (this.repo !== ''){
+                    console.log('fetch oas')
+                    this.oasLoading = true;
+                    axios.get(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/contents/' + this.path,
+                        {
+                            params: {
+                                ref: this.branch
+                            }
+                        }
+                    )
+                        .then((response) => {
+                            this.oasLoading = false;
+                            // this.initialOas = response.data
+                            this.contentGithub = JSON.parse(response.data.content)
+                        })
+                        .catch((e) => {
+                            console.error(e)
+                        })
+                }
+                else {
+                    console.log("this fetchoas githubapi still empty")
+                }
+            },
+
         },
         created() {
-            this.getGithubStructure()
         }
     }
 </script>
 
 <style scoped>
-
+.clickable {
+    cursor: pointer;
+}
 </style>

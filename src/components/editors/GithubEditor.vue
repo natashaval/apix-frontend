@@ -117,7 +117,12 @@
         <div class="row" v-if="content">
             <div class="col-md-11 m-auto">
 <!--                <vue-editor disabled v-model="content.content"></vue-editor>-->
-                <JsonCompareComponent :project-id="projectId" :get-data="getData"></JsonCompareComponent>
+                <JsonCompareComponent :project-id="projectId"
+                                      :owner="owner"
+                                      :repo="repo"
+                                      :branch="branch"
+                                      :path="path"
+                ></JsonCompareComponent>
             </div>
         </div>
 
