@@ -1,6 +1,9 @@
 <template>
     <div>
-        <p v-if="editable" @click="addProperty" class="text-primary btn-text" style="font-size: 15px"><i class="fas fa-plus"></i> Add</p>
+        <p v-if="editable" @click="addProperty" class="text-primary btn-text" style="font-size: 15px"
+            :id="_uid+'-add-property'">
+            <i class="fas fa-plus"></i> Add
+        </p>
         <div v-for="(property,idx) in propertiesData" v-bind:key="property.id">
             <HighLvlJsonEditor :ref="'property-'+property.id"
                            :parent-is-editing="property.isEditing"
