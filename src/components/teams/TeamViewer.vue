@@ -1,48 +1,59 @@
 <template>
     <div class="container-fluid">
-        <TeamDetail :team="team" :is-creator="isCreator"></TeamDetail>
-        <div class="form-row">
-            <label class="col-md-2">Member List: </label>
-        </div>
-
-        <div v-if="isCreator">
-            <div class="row">
-                <div class="col-md-6">
-                    <button class="btn btn-success" @click="grant">Grant access</button>
-                    <b-form-group>
-                        <b-form-checkbox-group v-model="selectedMember" v-for="(user, i) in team.members" :key="i">
-                            <li v-if="user.grant" class="ml-4 li-creator">{{user.username}}</li>
-                            <b-form-checkbox :value="user.username" v-if="!user.grant">
-                                {{user.username}}
-                            </b-form-checkbox>
-                        </b-form-checkbox-group>
-                    </b-form-group>
-                </div>
-                <div class="col-md-6">
-                    <b-button class="btn btn-info" :to="{name: 'team-create', params: {isInvite: true, teamInvite: team}}">
-                        Invite Member</b-button>
-                </div>
-            </div>
-        </div>
-
-        <div v-else>
-            <!--You are not anything-->
-            <li v-for="(member,i) in team.members" :key="i" class="ml-4 li-member">{{member.username}}</li>
-        </div>
-
         <div class="row">
-            <div class="col-md-12 mb-2">
-                <p class="font-weight-bold" style="font-size: 1.5em;">
-                    <i class="fas fa-book"></i>
-                    Projects</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <ProjectsTable :team="team.name"></ProjectsTable>
-            </div>
-        </div>
+            <div class="col-md-4 border-right" style="background-color: ghostwhite;">
+                <TeamDetail :team="team" :is-creator="isCreator"></TeamDetail>
+                <div class="form-row">
+                    <label class="col-md-2">Member List: </label>
+                </div>
 
+                <div v-if="isCreator">
+                    <div class="row">
+                        <!--                <div class="col-md-6">-->
+                        <!--                    <button class="btn btn-success" @click="grant">Grant access</button>-->
+                        <!--                    <b-form-group>-->
+                        <!--                        <b-form-checkbox-group v-model="selectedMember" v-for="(user, i) in team.members" :key="i">-->
+                        <!--                            <li v-if="user.grant" class="ml-4 li-creator">{{user.username}}</li>-->
+                        <!--                            <b-form-checkbox :value="user.username" v-if="!user.grant">-->
+                        <!--                                {{user.username}}-->
+                        <!--                            </b-form-checkbox>-->
+                        <!--                        </b-form-checkbox-group>-->
+                        <!--                    </b-form-group>-->
+                        <!--                </div>-->
+                        <div class="col-md-6">
+                            <b-button class="btn btn-info" :to="{name: 'team-create', params: {isInvite: true, teamInvite: team}}">
+                                Invite Member</b-button>
+                            <ul v-for="(user, i) in team.members" :key="i" class="fa-ul mb-0">
+                                <!--                    https://fontawesome.com/how-to-use/on-the-web/styling/icons-in-a-list-->
+                                <li v-if="user.grant"><span class="fa-li"><i class="fas fa-check-square"></i></span> {{user.username}}</li>
+                                <li v-if="!user.grant"><span class="fa-li"><i class="far fa-square"></i></span> {{user.username}}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-else>
+                    <!--You are not anything-->
+                    <li v-for="(member,i) in team.members" :key="i" class="ml-4 li-member">{{member.username}}</li>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+<!--                <div class="row">-->
+<!--                    <div class="col-md-12 mb-2">-->
+                        <p class="font-weight-bold" style="font-size: 1.5em;">
+                            <i class="fas fa-book"></i>
+                            Projects</p>
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="row">-->
+<!--                    <div class="col-md-12">-->
+                        <ProjectsTable :team="team.name"></ProjectsTable>
+<!--                    </div>-->
+<!--                </div>-->
+            </div>
+
+        </div>
     </div>
 
 </template>
@@ -126,12 +137,12 @@
 </script>
 
 <style scoped>
-    li{
-        list-style-type: none;
-    }
-    li:before {
-        content: '✓';
-        padding-right: 2px;
-    }
+    /*li{*/
+    /*    list-style-type: none;*/
+    /*}*/
+    /*li:before {*/
+    /*    content: '✓';*/
+    /*    padding-right: 2px;*/
+    /*}*/
 
 </style>

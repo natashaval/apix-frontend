@@ -202,9 +202,8 @@
                     })
                 }
                 else {
-                    // console.log(payload);
-
-                    axios.put(BASE_URL + '/teams', payload).then((res) => {
+                    console.log(payload);
+                    axios.put(BASE_URL + '/teams/' + payload.name , payload).then((res) => {
                         this.makeToast('success', res.data.success, res.data.message)
                     }).catch((e) => {
                         console.error(e)

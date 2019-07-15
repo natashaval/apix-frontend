@@ -104,7 +104,8 @@
                     this.$store.dispatch('admin/addUser', payload)
                 }).catch((e) => {
                     console.error(e);
-                    this.makeToast('danger', e.response.data.success, e.response.data.message)
+                    if (e.response.data.errors) this.makeToast('danger', e.response.data.success, e.response.data.message + " => "  + e.response.data.errors)
+                    else this.makeToast('danger', e.response.data.success, e.response.data.message)
                 })
 
             },
