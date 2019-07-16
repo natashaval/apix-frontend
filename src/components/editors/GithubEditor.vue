@@ -114,11 +114,14 @@
             <!--</div>-->
 
         </div>
-        <!--<div class="row" v-if="content">-->
-            <!--<div class="col-md-11 m-auto">-->
-                <!--<vue-editor disabled v-model="content.content"></vue-editor>-->
-            <!--</div>-->
-        <!--</div>-->
+        <div class="row" v-if="content">
+            <div class="col-md-11 m-auto">
+<!--                <vue-editor disabled v-model="content.content"></vue-editor>-->
+                <JsonCompareComponent :project-id="projectId" :get-data="getData"></JsonCompareComponent>
+            </div>
+        </div>
+
+
 
 
     </div>
@@ -127,7 +130,7 @@
 <script>
     import axios from 'axios'
     import uuidv4 from 'uuid/v4';
-    import { VueEditor } from 'vue2-editor'
+    // import { VueEditor } from 'vue2-editor'
     import {BASE_URL} from "../../stores/actions/const";
     import ChangeObserverMixin from "../../mixins/ChangeObserverMixin";
     import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
@@ -135,10 +138,11 @@
     import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";
     import ProjectPrivilegeMixin from "../../mixins/ProjectPrivilegeMixin";
     import {makeToast} from "../../assets/toast";
+    import JsonCompareComponent from "./editor-components/JsonCompareComponent";
 
     export default {
         name: "GithubEditor",
-        components: {EditorHeaderComponent, VueEditor},
+        components: {JsonCompareComponent, EditorHeaderComponent, },
         mixins: [ChangeObserverMixin, ProjectPrivilegeMixin],
         data: function(){
             return {
@@ -146,6 +150,7 @@
                 repo: '',
                 branch: '',
                 path: 'README.md',
+                githubJson: {},
                 content: {}, // content tidak diganti, langsung dari executor export
                 message: '',
                 branchList: [],
@@ -227,6 +232,7 @@
                 res.repo = this.repo;
                 res.branch = this.branch;
                 res.path = this.path;
+                this.githubJson = res
                 return res;
             },
             getActions: function(){
