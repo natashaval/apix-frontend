@@ -8,6 +8,7 @@
                 <b-col md="9">
                     <b-form inline @submit="onSubmit" @reset="onReset">
                         <b-form-input id="input-username"
+                                      name="username"
                                       placeholder="Username"
                                       v-model="user.username"
                                       :state="nameState"
@@ -18,9 +19,12 @@
 
                         <b-input-group class="mb-2 mb-sm-0 mr-sm-2">
                             <b-input-group-text slot="prepend"><i class="fas fa-key"></i></b-input-group-text>
-                            <b-form-input id="input-password" :type="(showPassword) ? 'text' : 'password'"
-                                     placeholder="Password" class="border-right-0"
-                                     v-model="user.password"
+                            <b-form-input id="input-password"
+                                          :type="(showPassword) ? 'text' : 'password'"
+                                          placeholder="Password"
+                                          name="password"
+                                          class="border-right-0"
+                                          v-model="user.password"
                             ></b-form-input>
                             <b-input-group-append  v-if="!showPassword">
                                 <b-button variant="outline-secondary" size="sm" @click="showPassword=true"
@@ -36,9 +40,10 @@
                         </b-input-group>
 
                         <b-input-group>
-<!--                            <b-input-group-text slot="prepend"><i class="fas fa-key"></i></b-input-group-text>-->
+                            <!--                            <b-input-group-text slot="prepend"><i class="fas fa-key"></i></b-input-group-text>-->
                             <b-input id="input-confirm-password" type="password"
                                      placeholder="Confirm Password"
+                                     name="confirm-password"
                                      v-model="user.confirmPassword"
                                      class="mb-2 mr-md-2 mb-sm-0"
                             ></b-input>
@@ -89,9 +94,9 @@
             }
         },
         computed: {
-          nameState(){
-              return this.user.username.length >= 4 ? true : false
-          }
+            nameState(){
+                return this.user.username.length >= 4 ? true : false
+            }
         },
         methods: {
             makeToast,
