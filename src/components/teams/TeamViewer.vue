@@ -4,7 +4,7 @@
             <div class="col-md-4 border-right" style="background-color: ghostwhite;">
                 <TeamDetail :team="team" :is-creator="isCreator"></TeamDetail>
                 <div class="form-row">
-                    <label class="col-md-2">Member List: </label>
+                    <label class="col-md-2">Member: </label>
                 </div>
 
                 <div v-if="isCreator">

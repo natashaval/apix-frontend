@@ -16,7 +16,7 @@
                 </vue-json-pretty>
             </div>
             <div class="col-md-6" v-if="contentGithub && contentProject">
-                <h4 @click="fetchOas" class="clickable text-info">Project OAS in Github
+                <h4 @click="fetchOas" class="clickable text-danger">Project OAS in Github
                     <b-spinner small variant="danger" v-show="oasLoading"></b-spinner>
                 </h4>
                 <!--<p>{{owner}}</p>-->

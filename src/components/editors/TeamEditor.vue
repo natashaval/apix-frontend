@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="row my-3">
+        <div class="row mb-3">
             <div class="col-11 ml-3" style="background-color: ghostwhite;">
                 <h4>Project Owner</h4>
                 <TeamDetail :team="projectOwnerData"></TeamDetail>
@@ -9,7 +9,8 @@
         <hr />
         <div class="row my-3">
             <div class="col-12 ml-3" v-if="profile.username === projectOwnerData.creator">
-            <AssignComponent :assign-new="false" :project-id="projectId"></AssignComponent>
+            <AssignComponent :assign-new="false"
+                             :project-id="projectId"></AssignComponent>
             </div>
         </div>
         <div class="row">

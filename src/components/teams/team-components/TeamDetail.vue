@@ -8,9 +8,8 @@
             </div>
         </div>
         <div class="form-row">
-            <label for="create-division" class="col-md-2">Division: </label>
-            <div class="col-md-6" v-if="team.division">
-                <input type="text" readonly v-model="team.division" id="create-division" class="form-control-plaintext" />
+            <label class="col-md-2">Division: </label>
+            <div class="col-md-6" v-if="team.division"> {{team.division}}
             </div>
         </div>
         <div class="form-row">

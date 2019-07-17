@@ -5,7 +5,7 @@
                 <h6>Assign Team</h6>
                 <div class="row">
                     <div class="col-md-8" v-if="!isNewTeam">
-                        <select class="form-control" v-model="selectedTeamName">
+                        <select class="form-control" v-model="selectedTeamName" v-if="!assignAllTeam">
                             <option value="" disabled selected>-- Select team (where you are the owner) --</option>
                             <option v-for="(myTeam, i) in teamAsCreator" :key="i" :value="myTeam.name">{{myTeam.name}}</option>
                         </select>
@@ -24,11 +24,11 @@
         </div>
         <div v-else class="row">
             <div class="col-5">
-                <h5>Assign My Team to this project</h5>
-                <small>You are required to be the creator of the team</small>
+                <h5>Assign Team to this project</h5>
+                <!--<small>You are required to be the creator of the team</small>-->
                 <select class="form-control col-10" v-model="selectedTeamName">
-                    <option value="" disabled selected>-- Select team (where you are the owner) -- </option>
-                    <option v-for="(myTeam, i) in teamAsCreator" :key="i" :value="myTeam.name">{{myTeam.name}}</option>
+                    <option value="" disabled selected>-- Select a team -- </option>
+                    <option v-for="(myTeam, i) in teams" :key="i" :value="myTeam.name">{{myTeam.name}}</option>
                 </select>
             </div>
             <div class="col-2">
@@ -60,6 +60,10 @@
                 type: Boolean,
                 default: false
             },
+            assignAllTeam: {
+                type: Boolean,
+                default: false
+            }
         },
         computed: {
             isProfile(){

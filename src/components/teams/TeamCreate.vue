@@ -115,9 +115,6 @@
             isInvite: Boolean,
             teamInvite: Object
         },
-        created(){
-            this.loadUsers();
-        },
         methods: {
             setLayout (layout) {
                 this.$store.commit('layout/SET_LAYOUT', layout);
@@ -229,11 +226,17 @@
         computed: {
             filterUser() {
                 if (!this.users) return null;
-                return this.users.filter(rep => rep.username.toLowerCase().includes(this.searchUser.toLowerCase()));
+                return this.users.filter(rep =>
+                    rep.username.toLowerCase().includes(this.searchUser.toLowerCase())
+                    && rep.username !== this.profile.username
+                );
             },
             profile() {
                 return this.$store.getters['user/getProfile']
             },
+        },
+        created(){
+            this.loadUsers();
         },
         mounted: function() {
             this.$nextTick(function () {

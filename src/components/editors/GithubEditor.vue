@@ -8,12 +8,12 @@
             </div>
             <div class="col-md-4 pr-4">
                 <!--<button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"-->
-                        <!--class="float-right round-button btn mt-2 mr-2" v-bind:id="_uid+'-edit-btn'">-->
-                    <!--<i class="fa fa-pencil-alt"></i>-->
+                <!--class="float-right round-button btn mt-2 mr-2" v-bind:id="_uid+'-edit-btn'">-->
+                <!--<i class="fa fa-pencil-alt"></i>-->
                 <!--</button>-->
                 <!--<button @click="fetchOas" class="float-right btn round-button mt-2 mr-2" type="button"-->
-                        <!--data-toggle="tooltip" data-placement="bottom" title="Sync with Github"-->
-                    <!--<i class="fas fa-sync-alt"></i>-->
+                <!--data-toggle="tooltip" data-placement="bottom" title="Sync with Github"-->
+                <!--<i class="fas fa-sync-alt"></i>-->
                 <!--</button>-->
             </div>
         </div>
@@ -30,7 +30,10 @@
                     <div class="form-group col-7 ml-3">
                         <label>Repo: </label>
                         <div class="autocomplete">
-                            <input class="form-control" v-model="repo" @input="searchRepo" placeholder="Search repositories" />
+                            <input class="form-control"
+                                   v-model="repo"
+                                   @input="searchRepo"
+                                   placeholder="Search repositories" />
                             <ul v-show="isRepoSearch" class="autocomplete-items">
                                 <li v-for="(repoList,r) in filteredRepos" :key="r" @click="setRepo(repoList)">
                                     {{repoList.fullName}}
@@ -40,7 +43,7 @@
                     </div>
                     <div class="form-group col-4">
                         <label>Branch: </label>
-                        <select v-model="branch" class="form-control" @change="fetchOas">
+                        <select v-model="branch" class="form-control">
                             <option v-for="(availBranch,i) in branchList" :key="i">
                                 {{availBranch}}
                             </option>
@@ -50,12 +53,14 @@
                 <div class="form-group ml-3">
                     <label>Path: &nbsp;&nbsp;&nbsp;</label>
                     <!--<span><i v-show="oasLoading" class="fa fa-spinner fa-spin"></i></span>-->
-                    <input v-model="path" class="form-control col-md-11" @change="fetchOas"/>
+                    <input v-model="path" class="form-control col-md-11"/>
                 </div>
                 <hr />
                 <div class="row" style="background-color: ghostwhite;">
                     <div class="form-group col-7 ml-3">
-                        <h5 class="font-weight-bold">Push To Github</h5>
+                        <h5 class="font-weight-bold">Push To Github
+                            <span><i v-show="pushLoading" class="fa fa-spinner fa-spin"></i></span>
+                        </h5>
                         <small>This project OAS will be uploaded to referred file path in Github</small>
                         <input type="text" class="form-control" v-model="message" placeholder="Commit message (required)" required/>
                     </div>
@@ -73,7 +78,7 @@
                 <div class="row mt-2" style="background-color: ghostwhite;">
                     <div class="col-7 ml-3">
                         <h5 class="font-weight-bold">Pull to Project &nbsp;&nbsp;
-                        <span><i v-show="pullLoading" class="fa fa-spinner fa-spin"></i></span>
+                            <span><i v-show="pullLoading" class="fa fa-spinner fa-spin"></i></span>
                         </h5>
                         <small>Oas from Github will be pulled and replaced this project</small>
                     </div>
@@ -82,41 +87,41 @@
                     </div>
                 </div>
                 <!--<div clas="row">-->
-                    <!--<div class="col-8" v-if="pullResponse">-->
-                        <!--<div class="alert alert-primary" role="alert">-->
-                            <!--OAS from Github has been pulled to this project -> {{pullResponse.message}}-->
-                        <!--</div>-->
-                    <!--</div>-->
+                <!--<div class="col-8" v-if="pullResponse">-->
+                <!--<div class="alert alert-primary" role="alert">-->
+                <!--OAS from Github has been pulled to this project -> {{pullResponse.message}}-->
+                <!--</div>-->
+                <!--</div>-->
                 <!--</div>-->
             </div>
 
             <!--<div v-else class="col-11">-->
-                <!--<div class="row">-->
-                    <!--<div class="col-md-12 ml-3" v-if="ownerData">-->
-                        <!--<p class="font-weight-bold">Owner :  <span class="badge badge-secondary">{{owner}}</span></p> <br />-->
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="row">-->
-                    <!--<div class="col-md-5 ml-3">-->
-                        <!--<p class="font-weight-bold">Repo: {{repo}}</p>-->
-                    <!--</div>-->
-                    <!--<div class="col-md-5">-->
-                        <!--<p class="font-italic">Branch: {{branch}}</p><br />-->
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="row">-->
-                    <!--<div class="col-md-12 ml-3">-->
-                        <!--<p class="font-weight-bold">Path: {{ path }} &nbsp;-->
-                        <!--<span><i v-show="oasLoading" class="fa fa-spinner fa-spin"></i></span>-->
-                        <!--</p>-->
-                    <!--</div>-->
-                <!--</div>-->
+            <!--<div class="row">-->
+            <!--<div class="col-md-12 ml-3" v-if="ownerData">-->
+            <!--<p class="font-weight-bold">Owner :  <span class="badge badge-secondary">{{owner}}</span></p> <br />-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="row">-->
+            <!--<div class="col-md-5 ml-3">-->
+            <!--<p class="font-weight-bold">Repo: {{repo}}</p>-->
+            <!--</div>-->
+            <!--<div class="col-md-5">-->
+            <!--<p class="font-italic">Branch: {{branch}}</p><br />-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="row">-->
+            <!--<div class="col-md-12 ml-3">-->
+            <!--<p class="font-weight-bold">Path: {{ path }} &nbsp;-->
+            <!--<span><i v-show="oasLoading" class="fa fa-spinner fa-spin"></i></span>-->
+            <!--</p>-->
+            <!--</div>-->
+            <!--</div>-->
             <!--</div>-->
 
         </div>
         <div class="row" v-if="content">
             <div class="col-md-11 m-auto">
-<!--                <vue-editor disabled v-model="content.content"></vue-editor>-->
+                <!--                <vue-editor disabled v-model="content.content"></vue-editor>-->
                 <JsonCompareComponent :project-id="projectId"
                                       :owner="owner"
                                       :repo="repo"
@@ -172,7 +177,8 @@
                 projectId: undefined,
                 commitResponse: {},
                 pullResponse: {},
-                pullLoading: false
+                pullLoading: false,
+                pushLoading: false
             }
         },
         computed : {
@@ -285,7 +291,7 @@
                 if (this.githubData) payload.githubProject._signature = this.githubData._signature
                 else payload.githubProject._signature = uuidv4();
 
-                console.log('Pendek: ', payload);
+                console.log('Payload: ', payload);
 
 
                 axios.put('http://localhost:8080/projects/'+this.projectId, payload).then(
@@ -303,28 +309,29 @@
                     this.makeToast('danger', error.response.data.success, error.response.data.message + ' , Please refresh the page.')
                 })
             },
-            push: function () {
-                let branchPush = ''
-                if (this.branch == '') branchPush = 'master'
-                else branchPush = this.branch
+            push: async function () {
+                this.pushLoading = true
+                await this.fetchOas();
                 axios.put(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/contents/' + this.path,
                     {
                         message: this.message,
                         projectId: this.projectId,
                         sha: this.content.sha,
-                        branch: branchPush
+                        branch: (this.branch == '') ? 'master' : this.branch
                     })
                     .then((response) => {
                         this.commitResponse = response.data
                         console.log(this.commitResponse)
                         this.makeToast('success', response.data.success, "Success push to github -> " + response.data.message);
+                        this.pushLoading = false
                         // this.$nextTick(() => {
                         //     this.fetchOas();
                         // })
                     })
                     .catch((e) => {
                         console.error(e);
-                        this.makeToast('danger', e.response.data.success, e.response.data.message + ": " + e.response.data.errors[0]);
+                        this.makeToast('danger', e.response.data.success, e.response.data.message + ": " + e.response.data.errors);
+                        this.pushLoading = false
                     })
             },
             pull: function(){
@@ -397,9 +404,7 @@
                     this.oasLoading = true;
                     axios.get(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/contents/' + this.path,
                         {
-                            params: {
-                                ref: this.branch
-                            }
+                            params: { ref: this.branch }
                         }
                     )
                         .then((response) => {
@@ -442,13 +447,17 @@
                 this.owner = result.ownerName;
                 this.isRepoSearch = false;
 
-                this.fetchInitial();
+                // this.fetchInitial();
+                this.fetchBranchList();
             }
         },
         watch: {
             $route: function () {
                 this.loadData();
                 // this.fetchOas();
+            },
+            owner: function(newOwner, oldOwner){
+                if (oldOwner == '') return this.ownerData.login
             }
         },
         mounted() {

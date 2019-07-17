@@ -103,7 +103,7 @@
 
                     } else {
 
-                        axios.post(BASE_PROJECT_URL +'/'+ 'import', formData, {
+                        axios.post(BASE_PROJECT_URL +'/import', formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data'
                             },

@@ -21,6 +21,7 @@ import ClientEditor from "../components/editors/ClientEditor";
 import SwaggerClient from "../components/editors/SwaggerClient";
 import TeamList from "../components/teams/TeamList";
 import TeamEditor from "../components/editors/TeamEditor";
+import ProjectsImport from "../components/projects/ProjectsImport";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -133,7 +134,7 @@ export const router = new VueRouter({
         },
         {
             name: 'project-import', path: '/projects/import',
-            component: ProjectsUpload
+            component: ProjectsImport
         },
         {
             name: 'auth-login', path: '/login',
