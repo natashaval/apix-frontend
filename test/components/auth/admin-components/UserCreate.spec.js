@@ -1,8 +1,11 @@
-import {shallowMount, createLocalVue} from "@vue/test-utils";
+import {shallowMount, createLocalVue, mount} from "@vue/test-utils";
 import UserCreate from "@/components/auth/admin-components/UserCreate.Vue"
 import BootstrapVue from "bootstrap-vue";
 import Vuex from "vuex";
-import ApixUtil from "../../../../src/utils/ApixUtil";
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import {BASE_URL} from "@/stores/actions/const";
+import AdminModule from "@/stores/modules/AdminModule";
 
 // https://vuejs.org/v2/cookbook/unit-testing-vue-components.html
 
@@ -11,9 +14,27 @@ const localVue = createLocalVue()
 localVue.use(BootstrapVue)
 localVue.use(Vuex)
 
+const store = new Vuex.Store({
+    modules: {
+        admin: {
+            namespaced: true,
+            state: {
+                users: []
+            },
+            getters: AdminModule.getters,
+            actions: {
+                addUser: () => {
+                    jest.fn(() => Promise.resolve());
+                }
+            }
+        }
+    }
+})
+
 const factory = (values = {}) => {
-    return shallowMount(UserCreate, {
+    return mount(UserCreate, {
         localVue,
+        store,
         data() {
             return {
                 values
@@ -22,34 +43,54 @@ const factory = (values = {}) => {
     })
 }
 
-describe('Create User tests', () => {
+describe('display users test', () => {
     test('will create with no username', () => {
         const wrapper = factory()
         expect(wrapper.find('#input-live-feedback').text()).toEqual('Enter at least 4 letters')
     })
+})
 
-    test.skip('should submit user', () => {
-        const wrapper = factory({
+describe('try axios in submit', () => {
+    let http;
+    beforeAll(() => {
+        http = new MockAdapter(axios);
+    })
+    afterEach(() => {
+        http.reset()
+    })
+    afterAll(() => {
+        http.restore()
+    })
+
+    test('will submit user', async () => {
+        let payload = {
             'username' : 'username',
             'password': 'password',
             'confirmPassword': 'password'
-        })
+        }
+        const wrapper = factory()
         let expected = {
             success: true,
             message: 'User is created!'
         }
-        // wrapper.find('[name=username]').setValue('username')
-        // wrapper.find('[name=password]').setValue('password')
-        // wrapper.find('[name=confirm-password]').setValue('password')
-
-        wrapper.find('#input-username').setValue('username')
-        wrapper.find('#input-password').setValue('password')
-        wrapper.find('#input-confirm-password').setValue('password')
+        wrapper.find('[name=username]').setValue('username')
+        wrapper.find('[name=password]').setValue('password')
+        wrapper.find('[name=confirm-password]').setValue('password')
         wrapper.find('[type=submit]').trigger('click')
 
         const event = Object.assign(jest.fn(), {preventDefault: () => {}})
+        http.onPost(BASE_URL + '/admin/users').reply(200, {data: {
+                success: true,
+                message: 'User is created!',
+                new_user: '123'
+            }
+        })
+
         let res = wrapper.vm.onSubmit(event)
-        console.log(res)
-        expect(ApixUtil.isEqualObject(res, expected)).toBeTruthy()
+        console.log(store.getters['admin/getUsers'])
+        // wrapper.vm.$nextTick(() => {
+        //     console.log(store.getters['admin/getUsers'])
+        // })
+        // expect(ApixUtil.isEqualObject(res, expected)).toBeTruthy()
     })
 })

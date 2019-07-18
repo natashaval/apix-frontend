@@ -13,7 +13,7 @@ export default {
 
             let keys = Object.keys(input)
             keys.forEach(key => {
-                this._assignVal(output[key] = {}, input[key])
+                this._assignVal(output[key] = {name: key}, input[key])
             })
         }
         else{
