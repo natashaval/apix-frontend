@@ -41,13 +41,10 @@
                 const {username, password} = this
                 this.$store.dispatch ('auth/' + AUTH_REQUEST, {username, password})
                     .then(() => {
-                        // this.$store.dispatch('user/' + USER_REQUEST)
                         this.$router.push({path: '/projects'})
-
                     }, (err) => {
                         console.log('login', err)
                     })
-
             }
         },
         mounted: function() {

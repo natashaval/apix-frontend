@@ -8,6 +8,7 @@ import {BASE_URL} from "@/stores/actions/const";
 import AdminModule from "@/stores/modules/AdminModule";
 
 // https://vuejs.org/v2/cookbook/unit-testing-vue-components.html
+// https://medium.com/@lachlanmiller_52885/mocking-vuex-in-vue-unit-tests-b6eda1c4d301
 
 const localVue = createLocalVue()
 
@@ -19,12 +20,27 @@ const store = new Vuex.Store({
         admin: {
             namespaced: true,
             state: {
-                users: []
+                users: [
+                    {
+                        id: '123',
+                        username: 'admin',
+                        roles: ['ROLE_ADMIN'],
+                        teams: []
+                    }
+                ]
             },
             getters: AdminModule.getters,
             actions: {
+                fetchAllUsersData: ({commit}) => {
+
+                },
                 addUser: () => {
                     jest.fn(() => Promise.resolve());
+                }
+            },
+            mutations: {
+                LIST_DATA(state, {users}) {
+                    state.users = users
                 }
             }
         }

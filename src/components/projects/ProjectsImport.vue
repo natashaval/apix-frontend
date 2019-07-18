@@ -3,6 +3,7 @@
         <vue-dropzone ref="dropzone" id="drop1"
                       :options="dropOptions"
         ></vue-dropzone>
+<!--        {{// (token) ? 'adatoken': 'tidakada'}}-->
         <button @click="reset">Reset</button>
     </div>
 </template>
@@ -17,7 +18,7 @@
         components: {
             vueDropzone
         },
-        data: () => {
+        data: function() {
             return {
                 dropOptions: {
                     url: BASE_PROJECT_URL + '/import',
@@ -30,19 +31,38 @@
                     dictDefaultMessage: '<h3><i class="fas fa-file-download"></i> Import project json here ... </h3>',
                     dictInvalidFileType: 'File type should be application/json!',
                     dictFileTooBig: 'File size is too large!',
-
-                    // }
+                    headers: {
+                        'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'Authorization': 'Bearer ' + localStorage.getItem('apix-token')
+                    }
                 },
-                // langSettings: {
-                //     dictDefaultMessage: '<i class="fas fa-cloud-download">Import Projects</i>'
-                // }
+                apixToken: ''
             }
         },
         methods: {
             reset: () => {
                 this.$refs.dropzone.removeAllFiles()
+            },
+            getToken: () => {
+                // if(this.apixToken) {
+                //     this.apixToken = localStorage.getItem('apix-token')
+                //     console.log('get token from local storage')
+                // } else {
+                //     console.log('do nothing')
+                // }
+                console.log(localStorage.getItem('apix-token'))
+                // this.apixToken = localStorage.getItem('apix-token')
+                // console.log('apixToken', this.apixToken)
             }
-        }
+        },
+        created() {
+            this.getToken();
+        },
+        // watch: {
+        //     apixToken: function (newValue, oldValue) {
+        //         console.log('watch', oldValue, newValue)
+        //     }
+        // }
     }
 </script>
 

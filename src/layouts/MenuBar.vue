@@ -9,18 +9,18 @@
 
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav v-if="isAuthenticated">
-                    <b-nav-item :to="{name: 'project-repo'}">Projects</b-nav-item>
-                    <b-nav-item :to="{name: 'team-list'}">Teams</b-nav-item>
-                    <b-nav-item to="/admin/users" v-if="isAdmin">Users</b-nav-item>
+                    <b-nav-item :to="{name: 'project-repo'}" id="menu-projects">Projects</b-nav-item>
+                    <b-nav-item :to="{name: 'team-list'}" id="menu-teams">Teams</b-nav-item>
+                    <b-nav-item :to="{name:'user-viewer'}" v-if="isAdmin" id="menu-users">Users</b-nav-item>
                 </b-navbar-nav>
 
                 <b-navbar-nav v-if="isAuthenticated" class="ml-auto px-2">
-                    <b-nav-text><i class="far fa-user-circle"></i> {{profile.username}}</b-nav-text>
-                    <b-nav-item @click="logout" class="ml-3">Logout</b-nav-item>
+                    <b-nav-text id="profile-username"><i class="far fa-user-circle"></i> {{profile.username}}</b-nav-text>
+                    <b-nav-item id="profile-logout" @click="logout" class="ml-3">Logout</b-nav-item>
                 </b-navbar-nav>
 
                 <b-navbar-nav v-else-if="!isAuthenticated" class="ml-auto">
-                    <b-nav-item :to="{name: 'auth-login'}">Login</b-nav-item>
+                    <b-nav-item id="profile-login" :to="{name: 'auth-login'}">Login</b-nav-item>
                 </b-navbar-nav>
             </b-collapse>
         </b-navbar>
@@ -60,15 +60,7 @@
                     console.log('login', err)
                 })
             }
-        },
-        /*
-        watch: {
-            isProfile() {
-                    if(!this.isProfile()) this.$store.dispatch('user/' + USER_REQUEST)
-            }
         }
-        */
-
     }
 </script>
 

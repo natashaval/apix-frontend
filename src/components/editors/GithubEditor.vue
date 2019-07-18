@@ -65,7 +65,7 @@
                         <input type="text" class="form-control" v-model="message" placeholder="Commit message (required)" required/>
                     </div>
                     <div class="col-4 ml-3">
-                        <button class="btn btn-dark mt-2" @click="push">Push to Github</button>
+                        <button class="btn btn-dark mt-2" @click="push" :disabled="isEdited">Push to Github</button>
                     </div>
                 </div>
                 <div clas="row">
@@ -83,7 +83,7 @@
                         <small>Oas from Github will be pulled and replaced this project</small>
                     </div>
                     <div class="col-4 ml-3">
-                        <button class="btn btn-dark mt-2" @click="pull">Pull to Project</button>
+                        <button class="btn btn-dark mt-2" @click="pull" :disabled="isEdited">Pull to Project</button>
                     </div>
                 </div>
                 <!--<div clas="row">-->
@@ -235,7 +235,7 @@
                     else {console.log('there nothing you can do')}
                 }
 
-                this.$_changeObserverMixin_initObserver(['owner','repo', 'branch', 'path', 'message'])
+                this.$_changeObserverMixin_initObserver(['owner','repo', 'branch', 'path'])
             },
             getData: function(){
                 let res = {};
