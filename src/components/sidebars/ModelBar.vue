@@ -2,14 +2,12 @@
     <li>
         <div class="sidebar-content row" style="height: 2em;" :class="{'active-bar':isActive}"
              @mouseover="onHover=true" @mouseleave="onHover=false">
-            <p @click="definitionClick" class="col-9 ml-4 mt-1 shrinkable-text" style="font-size: 0.9em;">
+            <p @click="definitionClick" class="ml-5 mt-1 shrinkable-text" style="font-size: 0.9em;">
                 <i class="fas fa-cube"></i> {{ definitionApi }}
             </p>
-            <div v-if="onHover">
-                <button v-if="$_projectPrivilege_canEdit" class="btn-circle" @click="deleteDefinition">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
+            <button v-if="onHover && editable" class="btn-circle ml-auto mr-3" @click="deleteDefinition">
+                <i class="fas fa-trash"></i>
+            </button>
         </div>
     </li>
 </template>
@@ -18,15 +16,14 @@
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
     import axios from "axios"
     import {makeToast} from "@/assets/toast"
-    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
 
     export default {
         name: "ModelBar",
-        mixins : [ProjectPrivilegeMixin],
         props: {
             definitionApi: String,
             definitionKey: String,
-            projectApi: String
+            projectApi: String,
+            editable : Boolean
         },
         data: function(){
             return {
@@ -99,9 +96,6 @@
                             }]
                         ]
                     })
-            },
-            dumpDef: function () {
-                console.log(this.definitionKey)
             }
         }
     }
@@ -112,17 +106,5 @@
         list-style-type: none;
     }
 
-    /*https://stackoverflow.com/questions/46083220/how-to-vuejs-router-link-active-style
 
-    li.router-link-exact-active {
-        background-color: #17a2b8;
-    }
-
-    li:hover {
-        background-color: #17a2b8;
-        opacity: 1;
-        color: white;
-        cursor: pointer;
-    }
-     */
 </style>

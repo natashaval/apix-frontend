@@ -36,9 +36,11 @@
         methods: {
             onSubmit: function(){
                 this.submit()
+                EditorHeader.isEditing = false
             },
             onCancel: function(){
                 this.cancel()
+                EditorHeader.isEditing = false
             }
         },
         watch : {
@@ -47,8 +49,8 @@
             }
         },
         created() {
-            EditorHeader.submit = this.submit
-            EditorHeader.cancel = this.cancel
+            EditorHeader.submit = this.onSubmit
+            EditorHeader.cancel = this.onCancel
         }
     }
 </script>

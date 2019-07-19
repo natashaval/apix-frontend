@@ -28,6 +28,11 @@ li {
     white-space: nowrap;
     overflow: hidden;
 }
+
+.sidebar-content{
+    display: flex;
+    flex-direction: row;
+}
 .sidebar-content:hover{
     background-color: #204154;
 }

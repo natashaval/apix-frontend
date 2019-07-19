@@ -9,10 +9,10 @@
                 <i class="fas fa-caret-right" v-show="!isArrow"></i>
                 <i class="fas fa-caret-down" v-show="isArrow"></i>
             </button>
-            <span @click="gotoRoute" style="font-size: 1.2em;width: 68%;">
+            <span @click="gotoRoute" style="font-size: 1.2em;width: 70%;" class="shrinkable-text">
                 <i class="fas fa-folder-open" style="font-size: 16px"></i> {{ sectionApi }}
             </span>
-            <div v-if="onHover && $_projectPrivilege_canEdit">
+            <div v-if="onHover && editable" class="ml-auto" style="margin-right: 1.8em">
                 <button class="btn-circle" @click="deleteSection">
                     <i style="font-size: 13px;" class="fas fa-trash"></i>
                 </button>
@@ -28,6 +28,7 @@
         }">
             <PathBar ref="pathBars"
                     v-for="pathData in orderedPath" v-bind:key="pathData.key"
+                     :editable="editable"
                      :path-data="pathData.val"
                      :project-api="projectApi"
                      :section-api="sectionApi" :pathApi="pathData.key"/>
@@ -40,7 +41,6 @@
     import PathBar from './PathBar'
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
-    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
     import {BASE_PROJECT_URL} from "../../stores/actions/const";
     import EditorSwitchMixin from "../../mixins/EditorSwitchMixin";
 
@@ -49,11 +49,12 @@
         components : {
             PathBar
         },
-        mixins : [ProjectPrivilegeMixin, EditorSwitchMixin],
+        mixins : [EditorSwitchMixin],
         props : {
             projectApi : String,
             sectionApi : String,
-            sectionData : Object
+            sectionData : Object,
+            editable : Boolean
         },
         data: function() {
             return {

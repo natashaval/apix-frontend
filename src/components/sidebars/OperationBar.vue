@@ -1,16 +1,17 @@
 <template>
-    <div class="sidebar-content" @mouseover="onHover=true" @mouseleave="onHover=false" style="height: 2em;"
-         :class="{'active-bar':isActive}">
-        <li style="padding-left: 4em;font-size: 14px" class="row">
+    <li>
+        <div @mouseover="onHover=true" @mouseleave="onHover=false"
+             style="padding-left: 4em;font-size: 14px;height: 2em;" class="row sidebar-content"
+             :class="{'active-bar':isActive}">
             <div class="col-2" style="margin-top: 0.3em" v-html="operationBadge" @click="methodClick" ></div>
             <span class="shrinkable-text col-8" style="margin-top: 0.35em;" @click="methodClick">
                 {{operationData.summary}}</span>
-            <button v-if="$_projectPrivilege_canEdit" class="btn-circle ml-0" @click="deleteOperation"
+            <button v-if="editable" class="btn-circle ml-auto" style="margin-right: 2em" @click="deleteOperation"
                     :class="onHover ? 'visible': 'invisible' ">
                 <i style="font-size: 13px;" class="fas fa-trash"></i>
             </button>
-        </li>
-    </div>
+        </div>
+    </li>
 </template>
 
 <script>
@@ -19,7 +20,6 @@
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
     import ApixUtil from "@/utils/ApixUtil"
     import BadgeGeneratorUtil from "@/utils/BadgeGeneratorUtil"
-    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
     import EditorSwitchMixin from "@/mixins/EditorSwitchMixin";
 
     export default {
@@ -29,9 +29,10 @@
             operationApi : String,
             pathApi : String,
             sectionApi : String,
-            operationData : Object
+            operationData : Object,
+            editable : Boolean
         },
-        mixins : [ProjectPrivilegeMixin, EditorSwitchMixin],
+        mixins : [EditorSwitchMixin],
         data : ()=>({
             onHover : false
         }),

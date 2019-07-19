@@ -1,12 +1,7 @@
 <template>
-    <div class="container-fluid">
-
-        <aside class="sidebar text-white pt-0" style="background: #1d2225;">
-            <nav>
-                <SideBar :apiData="apiData" />
-            </nav>
-        </aside>
-        <section class="main">
+    <div class="layout-wrapper">
+        <SideBar :apiData="apiData" class="sidebar"/>
+        <section class="main-content">
             <router-view></router-view>
         </section>
     </div>
@@ -28,29 +23,32 @@
 
 <style scoped>
     /*https://codepen.io/peruvianidol/pen/oeFDd*/
-
-    .sidebar, .main {
+    .layout-wrapper {
+        width: 100%;
+        min-width: 900px;
+        padding: 0;
+        right: 0;
+        /* set flex on parent */
+        display: flex;
+        flex-direction: row;
+        bottom:0;
+    }
+    .sidebar, .main-content {
         top: 0;
-        bottom: 0;
-        position: absolute;
-        /*overflow: scroll;*/
-        /*overflow-y: scroll;*/
-        /*overflow-x: hidden;*/
+        overflow-y: auto;
+        height: 100vh;
+    }
+    .main-content {
+        width: 75%;
+        right: 0;
+        padding-right: 0;
     }
     .sidebar {
         width: 25%;
-        left: 0;
-        overflow-y: auto;
-        overflow-x: hidden;
+        min-width: 25em;
+        color: white;
         padding: 0.25em 0.5em;
-    }
-    .main {
-        left: 25%;
-        min-width: 75%;
-        right: 0;
-        padding-left: 0;
-        padding-right: 0;
-        overflow-y: auto;
         overflow-x: hidden;
+        background: #1d2225;
     }
 </style>
