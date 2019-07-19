@@ -35,9 +35,6 @@
                     url: 'http://localhost:8080' + this.fileUrl,
                 })
             },
-            setLayout (layout) {
-                this.$store.commit('layout/SET_LAYOUT', layout);
-            },
             loadData: function () {
                 let p = this.$route.params
                 this.projectId = p.projectId
@@ -45,9 +42,6 @@
             }
         },
         mounted: function() {
-            this.$nextTick(function () {
-                this.setLayout('all-layout');
-            });
             this.loadSwagger();
         },
         created() {

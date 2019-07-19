@@ -6,9 +6,10 @@
 </template>
 
 <script>
-    import SingleLayout from "./layouts/SingleLayout";
-    import AllLayout from "./layouts/AllLayout";
+    import EditorLayout from "./layouts/EditorLayout";
+    import DefaultLayout from "./layouts/DefaultLayout";
     import axios from 'axios'
+    import {DEFAULT_LAYOUT, EDITOR_LAYOUT} from "./consts/LayoutMode"
 
     export default {
         name: 'app',
@@ -18,8 +19,8 @@
             }
         },
         components: {
-            'single-layout': SingleLayout,
-            'all-layout': AllLayout
+            [DEFAULT_LAYOUT]: DefaultLayout,
+            [EDITOR_LAYOUT]: EditorLayout
         },
         computed : {
             layout: function () {

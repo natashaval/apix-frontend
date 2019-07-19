@@ -9,7 +9,7 @@
 <script>
     import SideBar from "../components/sidebars/SideBar";
     export default {
-        name: "SingleLayout",
+        name: "EditorLayout",
         components: {
             SideBar
         },

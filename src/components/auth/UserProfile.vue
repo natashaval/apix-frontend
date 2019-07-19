@@ -35,9 +35,6 @@
 
         },
         methods: {
-            setLayout (layout) {
-                this.$store.commit('layout/SET_LAYOUT', layout);
-            },
             logout: function () {
                 this.$store.dispatch('auth/' + AUTH_LOGOUT).then(() => {
                     this.$router.push({path: '/login'});
@@ -45,12 +42,7 @@
                     console.log('login', err)
                 })
             },
-        },
-        mounted: function() {
-            this.$nextTick(function () {
-                this.setLayout('all-layout');
-            });
-        },
+        }
     }
 </script>
 

@@ -111,9 +111,6 @@
             }
         },
         methods: {
-            setLayout (layout) {
-                this.$store.commit('layout/SET_LAYOUT', layout);
-            },
             loadData: function () {
                 if(this.apiData && this.apiData.info){
                     this.isEdited = false
@@ -190,9 +187,6 @@
             }
         },
         mounted: function () {
-            this.$nextTick(function () {
-                this.setLayout('single-layout');
-            });
             this.loadData()
         }
     }

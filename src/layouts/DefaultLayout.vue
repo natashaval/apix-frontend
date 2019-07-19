@@ -9,7 +9,7 @@
 <script>
     import MenuBar from "./MenuBar";
     export default {
-        name: "AllLayout",
+        name: "DefaultLayout",
         components: {MenuBar},
     }
 </script>

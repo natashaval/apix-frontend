@@ -34,9 +34,6 @@
             }
         },
         methods: {
-            setLayout (layout) {
-                this.$store.commit('layout/SET_LAYOUT', layout);
-            },
             login: function () {
                 const {username, password} = this
                 this.$store.dispatch ('auth/' + AUTH_REQUEST, {username, password})
@@ -46,11 +43,6 @@
                         console.log('login', err)
                     })
             }
-        },
-        mounted: function() {
-            this.$nextTick(function () {
-                this.setLayout('all-layout');
-            });
         },
         created() {
             // to reset login status

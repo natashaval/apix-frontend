@@ -131,9 +131,6 @@
             }
         },
         methods: {
-            setLayout (layout) {
-                this.$store.commit('layout/SET_LAYOUT', layout);
-            },
             loadProjects(){
                 this.isBusy = true
                 axios.get(BASE_PROJECT_URL +'/'+ 'all/info').then((response) => {
@@ -151,11 +148,6 @@
         },
         created() {
             this.loadProjects();
-        },
-        mounted: function() {
-            this.$nextTick(function () {
-                this.setLayout('all-layout');
-            });
         },
         computed: {
             totalRows(){

@@ -117,9 +117,6 @@
                     this.makeToast('danger', e.response.data.success, e.response.data.message)
                 })
             },
-            setLayout (layout) {
-                this.$store.commit('layout/SET_LAYOUT', layout);
-            },
             makeToast(variant, success, message){
                 this.$bvToast.toast(message, {
                     title: (success) ? 'Success' : 'Failed',
@@ -129,9 +126,6 @@
         },
         mounted() {
             this.loadData();
-            this.$nextTick(function () {
-                this.setLayout('all-layout');
-            });
         }
     }
 </script>

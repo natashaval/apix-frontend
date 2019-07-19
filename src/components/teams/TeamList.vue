@@ -89,9 +89,6 @@
             }
         },
         methods: {
-            setLayout (layout) {
-                this.$store.commit('layout/SET_LAYOUT', layout);
-            },
             loadTeam(){
                 console.log('load team')
                 axios.get(BASE_URL + "/teams/my-team").then((response) => {
@@ -102,9 +99,6 @@
             },
         },
         mounted: function() {
-            this.$nextTick(function () {
-                this.setLayout('all-layout');
-            });
             this.loadTeam();
         },
     }

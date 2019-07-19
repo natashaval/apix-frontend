@@ -116,9 +116,6 @@
             teamInvite: Object
         },
         methods: {
-            setLayout (layout) {
-                this.$store.commit('layout/SET_LAYOUT', layout);
-            },
             makeToast,
             loadUsers: function(){
                 axios.get(BASE_URL + '/admin/users').then((response) => {
@@ -237,11 +234,6 @@
         },
         created(){
             this.loadUsers();
-        },
-        mounted: function() {
-            this.$nextTick(function () {
-                this.setLayout('all-layout');
-            });
         }
     }
 </script>

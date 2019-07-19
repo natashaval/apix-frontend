@@ -81,9 +81,6 @@
         },
         methods: {
             makeToast,
-            setLayout (layout) {
-                this.$store.commit('layout/SET_LAYOUT', layout);
-            },
             rowAdmin(item, type){
                 if(!item) return
                 if(item.roles.includes('ROLE_ADMIN')) return 'table-info'
@@ -130,11 +127,6 @@
             else {
                 console.log('already there')
             }
-        },
-        mounted() {
-            this.$nextTick(function () {
-                this.setLayout('all-layout');
-            });
         }
     }
 </script>
