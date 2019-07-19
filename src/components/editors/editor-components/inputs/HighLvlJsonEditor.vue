@@ -1,8 +1,8 @@
 <template>
-    <div class="dot-border">
+    <div :class="isSubArray?'':'dot-border'">
         <div class="row justify-content-end" style="margin-left: -10%">
             <div class="col-10 mt-3">
-                <div class="container row">
+                <div v-if="editable" class="container row">
                     <p v-if="type === 'object'" class="btn-text"  @click="$bvModal.show(_uid+'-extract-modal')">
                         <i class="fas fa-cube"></i> Extract datatype
                     </p>
@@ -22,20 +22,23 @@
                     <!--kolom kiri-->
                     <div class="col-6">
                         <div v-if="showEdit" class="form-row">
-                            <b-form-group v-if="nameable" class="form-row mb-2 w-100"
-                                          :state="nameState" :invalid-feedback="nameInvalidFeedback"
-                                          label="name * :"
-                                          label-class="shrinkable-text"
-                                          label-cols="2">
-                                <slot v-if="disableName">
-                                    <b-form-input class="form-control" disabled v-model="name" :name="_uid+'-name'"></b-form-input>
-                                </slot>
-                                <slot v-else>
-                                    <b-form-input class="form-control" v-model="name"
-                                                  :state="nameState" trim
-                                                  :name="_uid+'-name'"></b-form-input>
-                                </slot>
-                            </b-form-group>
+                            <div class="form-row">
+                                <b-form-group v-if="nameable" class="form-row mb-2 w-100 pr-0"
+                                              :state="nameState" :invalid-feedback="nameInvalidFeedback"
+                                              label="name * :"
+                                              label-class="shrinkable-text"
+                                              label-cols="2">
+                                    <slot v-if="disableName">
+                                        <b-form-input trim class="form-control" disabled v-model="name"
+                                                      :name="_uid+'-name'"></b-form-input>
+                                    </slot>
+                                    <slot v-else>
+                                        <b-form-input v-model="name" class="w-100"
+                                                      :state="nameState" trim
+                                                      :name="_uid+'-name'"></b-form-input>
+                                    </slot>
+                                </b-form-group>
+                            </div>
                             <div class="form-row w-100 mb-2">
                                 <label class="shrinkable-text col-2 mt-auto">{{(isSubArray)?'Of :':'Type :'}}</label>
                                 <b-select class="form-control col-10" :name="_uid+'-select-type'" v-model="selectedType">
