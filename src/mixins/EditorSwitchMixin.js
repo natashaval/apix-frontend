@@ -17,6 +17,7 @@ export default {
                         buttons: [
                             ['<button>Discard changes</button>', (instance, toast) => {
                                 instance.hide({ transitionOut: 'fadeOut' }, toast, 'button')
+                                EditorHeader.cancel()
                                 changeRouteCallback()
                             }, true],
                             ['<button><b>Save and continue</b></button>', function (instance, toast) {

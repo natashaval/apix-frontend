@@ -22,7 +22,7 @@ export default {
             return false
         }
     },
-    beforeCreated() {
+    beforeCreate() {
         this.$store.dispatch('user/' + USER_REQUEST)
     }
 }

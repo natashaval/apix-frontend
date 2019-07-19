@@ -21,8 +21,9 @@
 
         <b-row>
             <b-col style="padding-left: 0em;padding-right: 0" v-if="projectData">
-                <Section v-for="section in orderedSection"
+                <SectionBar v-for="section in orderedSection"
                          v-bind:key="section.info.name"
+                         :editable="$_projectPrivilege_canEdit"
                          :section-data="section"
                          :project-api="projectApi"
                          :section-api="section.info.name"/>
@@ -31,35 +32,33 @@
 
         <hr style="background-color: white"/>
 
-        <b-row>
-            <b-col md="10" style="padding-left: 1.25em;">
-                <span size="sm"
-                        :class = "collapseModel ? 'collapsed' : null"
-                        :aria-expanded="collapseModel ? 'true' : 'false' "
-                        aria-controls="collapse-model"
-                        @click="collapseModel = !collapseModel" class="text-white"
-                      style="cursor: pointer !important;"
-                >
-                    <i class="fas fa-caret-down" v-show="collapseModel"></i>
-                    <i class="fas fa-caret-right" v-show="!collapseModel"></i>
-                     <span class="ml-2"><i class="fas fa-archive" style="font-size: 16px"></i> Models</span>
-                </span>
-            </b-col>
-            <b-col md="2">
-                <b-button v-if="$_projectPrivilege_canEdit" :to="{name: 'definition-create'}" pill size="sm" variant="outline-light"
-                          v-b-tooltip.hover title="new definition"
-                          class="float-right"
-                >
-                    <i class="fa fa-plus-circle"></i>
-                </b-button>
-            </b-col>
-        </b-row>
+        <div class="row flex">
+            <button size="sm"
+                    :class = "collapseModel ? 'collapsed' : null"
+                    :aria-expanded="collapseModel ? 'true' : 'false' "
+                    aria-controls="collapse-model"
+                    @click="collapseModel = !collapseModel" class="text-white btn-circle ml-2"
+                    style="cursor: pointer !important;"
+            >
+                <i class="fas fa-caret-down" v-show="collapseModel"></i>
+                <i class="fas fa-caret-right" v-show="!collapseModel"></i>
+
+            </button>
+            <span class="mt-1"><i class="fas fa-archive" style="font-size: 16px"></i> Models</span>
+            <b-button v-if="$_projectPrivilege_canEdit" :to="{name: 'definition-create'}" pill size="sm" variant="outline-light"
+                      v-b-tooltip.hover title="new definition"
+                      class="float-right ml-auto mr-3"
+            >
+                <i class="fa fa-plus-circle"></i>
+            </b-button>
+        </div>
 
         <b-collapse id="collapse-model" v-model="collapseModel" class="mt-2" v-if="projectData">
 
             <ul class="list-group">
                 <ModelBar v-for="(value, key) in projectData.definitions"
                       v-bind:key="key"
+                          :editable="$_projectPrivilege_canEdit"
                           :definition-key="key"
                           :definition-api="value.name"
                           :project-api="projectApi"
@@ -92,7 +91,7 @@
 
 
 <script>
-    import Section from "./SectionBar";
+    import SectionBar from "./SectionBar";
     import ProjectBar from "./ProjectBar";
     import ModelBar from "./ModelBar";
     import {USER_REQUEST} from "@/stores/actions/user";
@@ -100,7 +99,7 @@
 
     export default {
         name: "SideBar",
-        components: {ModelBar, ProjectBar, Section},
+        components: {ModelBar, ProjectBar, SectionBar},
         mixins : [ProjectPrivilegeMixin],
         data: function(){
             return {

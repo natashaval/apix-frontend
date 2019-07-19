@@ -1,9 +1,6 @@
 <template>
-    <div id="app" class="container-fluid">
-        <b-row>
+    <div id="app">
             <component v-bind:is="layout"></component>
-        </b-row>
-
     </div>
 
 </template>
@@ -56,33 +53,20 @@
     @import "https://use.fontawesome.com/releases/v5.7.1/css/all.css";
     @import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
 
+    body {
+        padding: 0;
+        margin: 0;
+        width: 100%;
+    }
     #app {
         /*font-family: 'Avenir', Helvetica, Arial, sans-serif;*/
         font-family: 'Roboto', sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        left: 0;
         /*text-align: justify;*/
         /*color: #2c3e50;*/
     }
-
-    #app{
-        /*border: aqua 1px solid;*/
-        height: 100%;
-        width: 100%;
-    }
-
-    .sidebar{
-        position: fixed;
-        overflow: auto;
-        height: 100vh;
-    }
-
-    .main-view{
-        border: greenyellow 1px solid;
-        height: 100vh;
-        overflow: auto;
-    }
-
     .blue-frame{
         border: 1px solid blue;
     }

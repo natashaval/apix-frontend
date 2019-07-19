@@ -1,6 +1,6 @@
 <template>
     <li>
-        <div class="row sidebar-content" style="padding-left: 2.5em;height: 2em;"
+        <div class="row sidebar-content row" style="padding-left: 2.5em;height: 2em;"
              :class="{'active-bar':isActive}"
              @mouseover="onHover=true" @mouseleave="onHover=false">
             <button class="btn-circle"
@@ -11,12 +11,12 @@
                 <i class="fas fa-caret-down" v-show="isArrow"></i>
             </button>
 
-            <p @click="pathClick" class="shrinkable-text col-9"
-               style="font-size: 0.9em;margin-left: -1em;margin-top: 0.3em;">
+            <span @click="pathClick" class="shrinkable-text ml-1"
+               style="width: 68%;font-size: 0.9em;margin-left: -1em;margin-top: 0.3em;">
                 <i class="fas fa-link" style="font-size: 16px"></i> {{ pathApi }}
-            </p>
-            <div v-if="onHover && $_projectPrivilege_canEdit" class="row">
-                <button class="btn-circle" @click="deletePath" style="z-index: 90">
+            </span>
+            <div v-if="onHover && editable" class="ml-auto" style="margin-right: 1.8em">
+                <button class="btn-circle" @click="deletePath" style="">
                     <i style="font-size: 13px;" class="fas fa-trash"></i>
                 </button>
                 <button class="btn-circle" @click="createOperation">
@@ -30,6 +30,7 @@
             <OperationBar ref="operationBars"
                     v-for="(value,key) in pathData.methods" v-bind:key="key"
                           :project-api="projectApi"
+                          :editable="editable"
                           :section-api="sectionApi" :path-api="pathApi"
                           :operation-data="value"
                           :operation-api="key"/>
@@ -42,17 +43,18 @@
     import DeepTreeBuilderUtil from "@/utils/DeepTreeBuilderUtil"
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
-    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
     import EditorSwitchMixin from "@/mixins/EditorSwitchMixin";
+    import {EditorHeader} from "../../utils/GlobalVars"
     export default {
         name: "PathBar",
         components: {OperationBar},
-        mixins : [ProjectPrivilegeMixin, EditorSwitchMixin],
+        mixins : [EditorSwitchMixin],
         props : {
             projectApi : String,
             sectionApi : String,
             pathApi : String,
-            pathData : Object
+            pathData : Object,
+            editable : Boolean
         },
         data: function(){
             return {
@@ -80,7 +82,7 @@
                     }) !== undefined
                 }
                 return false
-            }
+            },
         },
         methods : {
             pathClick : function(){
