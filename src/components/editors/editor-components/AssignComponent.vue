@@ -24,7 +24,7 @@
         </div>
         <div v-else class="row">
             <div class="col-5">
-                <h5>Assign Team to this project</h5>
+                <h5>Invite Team to this project</h5>
                 <!--<small>You are required to be the creator of the team</small>-->
                 <select class="form-control col-10" v-model="selectedTeamName">
                     <option value="" disabled selected>-- Select a team -- </option>
