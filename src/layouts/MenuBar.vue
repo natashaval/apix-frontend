@@ -10,7 +10,7 @@
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav v-if="isAuthenticated">
                     <b-nav-item :to="{name: 'project-repo'}" id="menu-projects">Projects</b-nav-item>
-                    <b-nav-item :to="{name: 'project-server'}" id="menu-server">Server</b-nav-item>
+                    <!--<b-nav-item :to="{name: 'project-server'}" id="menu-server">Server</b-nav-item>-->
                     <b-nav-item :to="{name: 'team-list'}" id="menu-teams">Teams</b-nav-item>
                     <b-nav-item :to="{name:'user-viewer'}" v-if="isAdmin" id="menu-users">Users</b-nav-item>
                 </b-navbar-nav>

@@ -10,7 +10,8 @@
 
             <b-row>
                 <b-col md="12">
-                    <ProjectsTable></ProjectsTable>
+                    <!--<ProjectsTable></ProjectsTable>-->
+                    <ProjectsTablePagination></ProjectsTablePagination>
                 </b-col>
             </b-row>
 
@@ -21,9 +22,10 @@
 <script>
     import ProjectModal from "./projects-components/ProjectModal";
     import ProjectsTable from "./projects-components/ProjectsTable";
+    import ProjectsTablePagination from "./projects-components/ProjectsTablePagination";
     export default {
         name: "ProjectsList",
-        components: {ProjectsTable, ProjectModal}
+        components: {ProjectsTablePagination, ProjectsTable, ProjectModal}
     }
 </script>
 

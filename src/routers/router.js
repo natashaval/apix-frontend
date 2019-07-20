@@ -138,10 +138,10 @@ let routeLayoutConfigs = [
                 name: 'project-repo', path: '/projects',
                 component: ProjectsList
             },
-            { // (TRIAL) for pagination table testing
-              name: 'project-server', path: '/server',
-              component: ProjectsTablePagination
-            },
+            // { // (TRIAL) for pagination table testing
+            //   name: 'project-server', path: '/server',
+            //   component: ProjectsTablePagination
+            // },
             {
                 name: 'project-import', path: '/projects/import',
                 component: ProjectsImport

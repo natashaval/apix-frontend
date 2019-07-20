@@ -1,36 +1,24 @@
 <template>
     <div>
-        <div class="row">
-            <div class="col-md-12">
-                Current Page: {{pageable.page}}
-                Current Size: {{pageable.size}}
-                Current Direction: {{pageable.direction}}
-                Current Sort: {{pageable.sort}}
-                <hr />
-                Total Page: {{totalPages}}
-                Total Elements: {{totalElements}}
-                {{responsePageable}}
-            </div>
-        </div>
 
         <div class="row my-2">
             <div class="col-md-4">
                 <form class="form-inline">
                     <label class="mr-3">Per page</label>
                     <select class="custom-select form-control" v-model="pageable.size" @change="clickSize()">
-                        <option value="2">2</option>
                         <option value="5">5</option>
                         <option value="15">15</option>
                         <option value="30">30</option>
                     </select>
                 </form>
             </div>
-            <div class="col-md-4"></div>
-            <div class="col-md-4">
+            <div class="col-md-2"></div>
+            <div class="col-md-6">
                 <div class="input-group">
                     <input type="text" v-model="search" class="form-control" placeholder="Search ...">
                     <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button"> <i class="fa fa-search"></i> </button>
+                        <button class="btn btn-outline-success" type="button" @click="clickSearch()"> <i class="fa fa-search"></i> Search</button>
+                        <button class="btn btn-outline-secondary" type="button" @click="clickReset()"> <i class="fa fa-times"></i> Reset</button>
                     </div>
                 </div>
             </div>
@@ -45,9 +33,13 @@
                 <th>Updated At</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody v-if="projects.length > 0">
             <tr v-for="project in projects" :key="project.id">
-                <td>{{(project.info) ? project.info.title : ''}}</td>
+                <td>
+                    <router-link :to="{name: 'project-editor', params: {projectId: project.id} }">
+                        {{(project.info) ? project.info.title : ''}}
+                    </router-link>
+                </td>
                 <td>{{ (project.projectOwner) ? project.projectOwner.name : '' }}</td>
                 <td>{{ (project.host) ? project.host : '' }}</td>
                 <td>
@@ -61,7 +53,16 @@
                 <td>{{ localDate(project.updatedAt) }}</td>
             </tr>
             </tbody>
-
+            <tbody v-else>
+                <td class="jumbotron jumbotron-fluid" colspan="5">
+                    <div class="container-fluid">
+                        <h4 class="text-center">
+                            <b-spinner class="align-middle mr-3 my-5" type="grow"
+                                       label="Loading ..."></b-spinner>
+                            Loading Projects ...</h4>
+                    </div>
+                </td>
+            </tbody>
             <!--https://www.thetechieshouse.com/vue-js-pagination-example-with-bootstrap-server-side-pagination/-->
         </table>
 
@@ -79,15 +80,14 @@
                                 <span class="sr-only">Previous</span>
                             </a>
                         </li>
-                        <!--<span v-for="idx in totalPages" :key="idx">-->
-                            <li class="page-item" v-for="idx in totalPages" :key="idx"
-                                :class="(idx === (responsePageable.pageNumber + 1)) ? 'active' : ''">
-                                <a href="#"
-                                   class="page-link"
-                                @click="clickPagination(idx)">
-                                    {{idx}}
-                                </a>
-                            </li>
+                        <li class="page-item" v-for="idx in totalPages" :key="idx"
+                            :class="(idx === (responsePageable.pageNumber + 1)) ? 'active' : ''">
+                            <a href="#"
+                               class="page-link"
+                               @click="clickPagination(idx)">
+                                {{idx}}
+                            </a>
+                        </li>
                         <!--</span>-->
                         <li class="page-item" :class="(responsePageable.last) ? 'disabled' : ''">
                             <a class="page-link" href="#" :tabindex="(responsePageable.last) ? '-1' : ''" aria-label="Next">
@@ -112,7 +112,7 @@
             return {
                 pageable: {
                     page: 0,
-                    size: 2,
+                    size: 5,
                     direction: 'desc',
                     sort: 'updatedAt',
                 },
@@ -127,12 +127,15 @@
                 totalPages: 0,
                 totalElements: 0,
                 projects: [],
-                search: ''
+                search: '',
+                isSearch: false,
+                isLoading: false
             }
         },
         methods: {
             fetchData: function() {
                 if(this.pageable) {
+                    this.isLoading = true
                     axios.get(BASE_PROJECT_URL, {
                         params: this.pageable
                     }).then((response) => {
@@ -145,10 +148,37 @@
                         this.responsePageable.numberOfElements = response.data.numberOfElements
                         this.responsePageable.last = response.data.last
                         this.responsePageable.first = response.data.first
+                        this.isLoading = false
                     }).catch((e) => {
                         console.error(e);
+                        this.isLoading = false
                     })
                 }
+            },
+            fetchSearch: function(){
+                this.isLoading = true
+                axios.get(BASE_PROJECT_URL + '/search', {
+                    params: {
+                        page: this.pageable.page,
+                        size: this.pageable.size,
+                        search: this.search
+                    }
+                }).then((response) => {
+                    this.projects = response.data.content
+                    this.totalPages = response.data.totalPages
+                    this.totalElements = response.data.totalElements
+                    this.responsePageable.offset = response.data.pageable.offset
+                    this.responsePageable.pageSize = response.data.pageable.pageSize
+                    this.responsePageable.pageNumber = response.data.pageable.pageNumber
+                    this.responsePageable.numberOfElements = response.data.numberOfElements
+                    this.responsePageable.last = response.data.last
+                    this.responsePageable.first = response.data.first
+
+                    this.isLoading = false
+                }).catch((e) => {
+                    console.error(e);
+                    this.isLoading = false
+                })
             },
             localDate: (value) => {
                 let d = new Date(value);
@@ -157,22 +187,30 @@
             clickPagination: function(idx){
                 console.log(idx, this.responsePageable.pageNumber)
                 this.pageable.page = idx - 1
-                this.fetchData();
-                // console.log((idx == this.responsePageable.pageNumber)? 'sama' : 'beda')
+                if(!this.isSearch) this.fetchData();
+                else if (this.isSearch) this.fetchSearch();
             },
             clickSize: function() {
                 console.log(this.pageable.size)
+                if(!this.isSearch) this.fetchData();
+                else if (this.isSearch) this.fetchSearch();
+            },
+            clickSearch: function(){
+                console.log(this.search)
+                this.isSearch = true
+                this.fetchSearch();
+            },
+            clickReset: function () {
+                this.search = ''
+                this.pageable.page = 0
+                this.pageable.size = 5
+                this.isSearch = false
                 this.fetchData()
             }
         },
         created() {
             this.fetchData();
-        },
-        // watch: {
-        //     pageable: function(newData, oldData){
-        //         console.log(newData, oldData);
-        //     }
-        // }
+        }
     }
 </script>
 
