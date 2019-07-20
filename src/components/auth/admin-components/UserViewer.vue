@@ -63,9 +63,6 @@
                     {
                         key: 'roles'
                     },
-                    // {
-                    //     key: 'teams'
-                    // },
                     {
                         key: 'actions',
                         label: 'Actions'
