@@ -1,7 +1,12 @@
 <template>
     <div>
         <b-button v-b-modal="'project-modal'" variant="primary" class="mr-2">New Project</b-button>
-        <b-button variant="secondary" :to="{name: 'project-import'}">Import Projects</b-button>
+        <b-button v-b-modal="'project-upload'" variant="secondary">Import Projects</b-button>
+
+
+        <b-modal id="project-upload" hide-footer>
+            <ProjectsUpload></ProjectsUpload>
+        </b-modal>
 
         <b-modal id="project-modal" ref="modal" size="lg"
                  title="Create New Project"
@@ -56,10 +61,11 @@
     import {makeToast} from "../../../assets/toast";
     import AssignComponent from "../../editors/editor-components/AssignComponent";
     import {USER_REQUEST} from "../../../stores/actions/user";
+    import ProjectsUpload from "../ProjectsUpload";
 
     export default {
         name: "ProjectModal",
-        components: {AssignComponent},
+        components: {ProjectsUpload, AssignComponent},
         data: function () {
             return {
                 title: {

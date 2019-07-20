@@ -143,10 +143,6 @@ let routeLayoutConfigs = [
             //   component: ProjectsTablePagination
             // },
             {
-                name: 'project-import', path: '/projects/import',
-                component: ProjectsImport
-            },
-            {
                 name: 'auth-login', path: '/login',
                 component: AuthLogin
             },
