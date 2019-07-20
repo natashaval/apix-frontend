@@ -116,7 +116,7 @@
                     {
                         key: 'updatedAt',
                         formatter: value => {
-                            var d = new Date(value);
+                            let d = new Date(value);
                             return d.toLocaleString();
                         },
                         sortable: true

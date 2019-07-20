@@ -21,6 +21,7 @@ import TeamList from "../components/teams/TeamList";
 import TeamEditor from "../components/editors/TeamEditor";
 import ProjectsImport from "../components/projects/ProjectsImport";
 import {DEFAULT_LAYOUT, EDITOR_LAYOUT} from "../consts/LayoutMode"
+import ProjectsTablePagination from "../components/projects/projects-components/ProjectsTablePagination";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -136,6 +137,10 @@ let routeLayoutConfigs = [
             {// List of Projects available
                 name: 'project-repo', path: '/projects',
                 component: ProjectsList
+            },
+            { // (TRIAL) for pagination table testing
+              name: 'project-server', path: '/server',
+              component: ProjectsTablePagination
             },
             {
                 name: 'project-import', path: '/projects/import',
