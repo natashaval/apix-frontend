@@ -106,7 +106,6 @@
                 axios.post(BASE_URL + '/admin/users', payload).then((response) => {
                     this.makeToast('success', response.data.success, response.data.message)
                     payload.id = response.data.new_user
-                    this.$store.dispatch('admin/addUser', payload)
                 }).catch((e) => {
                     console.error(e);
                     if (e.response.data.errors) this.makeToast('danger', e.response.data.success, e.response.data.message + " => "  + e.response.data.errors)

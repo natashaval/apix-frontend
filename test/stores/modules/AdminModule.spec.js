@@ -3,7 +3,7 @@ import { createLocalVue } from "@vue/test-utils";
 import Vuex from 'vuex'
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import {BASE_URL} from "../../../src/stores/actions/const";
+import {BASE_URL} from "@/stores/actions/const";
 
 const localVue = createLocalVue()
 localVue.use(Vuex)

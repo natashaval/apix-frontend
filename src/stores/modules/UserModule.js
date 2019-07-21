@@ -9,13 +9,11 @@ export default {
     state: {
         status: '',
         profile: {},
-        editingPrivilege: undefined,
         fetchStatus : NOT_START,
     },
     getters: {
         getProfile: state => state.profile,
         isProfileLoaded: state => !!state.profile.username,
-        hasEditingPrivilege : state => state.editingPrivilege,
         getFetchStatus : state => state.fetchStatus
     },
     actions: {
@@ -34,10 +32,6 @@ export default {
                         dispatch('auth/' + AUTH_LOGOUT, null, {root: true})
                 })
             }
-        },
-        checkEditingPrivilege({commit, state}, payload){
-            let editable = state.profile.teams.some(x => payload.includes(x));
-            commit('CHECK_PRIVILEGE', editable)
         }
     },
     mutations: {
@@ -56,10 +50,6 @@ export default {
         },
         [AUTH_LOGOUT]: (state) => {
             state.profile = {}
-        },
-        CHECK_PRIVILEGE (state, editable) {
-            state.editingPrivilege = editable
         }
-
     }
 }
