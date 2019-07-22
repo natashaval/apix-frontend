@@ -35,17 +35,12 @@
                     <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.name" readonly />
                     <input v-else type="text" class="form-control" v-model="name" id="create-name" required />
                 </div>
-                <div class="form-group col-md-3 mb-2">
-                    <label for="create-division">Division: </label>
-                    <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.division" readonly/>
-                    <input v-else type="text" v-model="division" id="create-division" class="form-control" />
-                </div>
                 <div class="form-group col-md-2 mb-2">
                     <label for="create-access">Access: </label>
                     <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.access" readonly/>
                     <select v-else v-model="access" id="create-access" class="form-control">
-                        <option value="public">Public</option>
-                        <option value="private">Private</option>
+                        <option value="PUBLIC">Public</option>
+                        <option value="PRIVATE">Private</option>
                     </select>
                 </div>
                 <div class="form-group col-md-1 mb-2">
@@ -97,8 +92,7 @@
         data: function(){
             return {
                 name: '',
-                division: '',
-                access: 'public',
+                access: 'PUBLIC',
                 users: [],
                 searchUser: '',
                 selectedMember: [],
@@ -127,35 +121,22 @@
             dump: function () {
                 let res = {}
                 if (!this.isInvite) {
-                    res.name = this.name
+                    res.teamName = this.name
                     res.access = this.access
-                    res.division = this.division
                     res.creator = this.profile.username
-                    console.log(res)
 
                     let members = []
-                    members.push({ // add creator as member
-                        grant: true,
-                        username: this.profile.username
-                    })
+                    members.push(this.profile.username)
 
-                    if (this.access == 'public') {
+                    if (this.access == 'PUBLIC') {
                         for (let i = 0; i < this.selectedMember.length; i++) {
                             if (this.selectedMember[i] == this.profile.username) continue;
-                            let member = {
-                                grant: true,
-                                username: this.selectedMember[i]
-                            }
-                            members.push(member)
+                            members.push(this.selectedMember[i])
                         }
                     } else {
                         for (let i = 0; i < this.selectedMember.length; i++) {
                             if (this.selectedMember[i] == this.profile.username) continue;
-                            let member = {
-                                grant: false,
-                                username: this.selectedMember[i]
-                            }
-                            members.push(member)
+                            members.push(this.selectedMember[i])
                         }
                     }
                     res.members = members
@@ -164,17 +145,12 @@
                 else {
                     res.name = this.teamInvite.name
                     res.access = this.teamInvite.access
-                    res.division = this.teamInvite.division
                     res.creator = this.teamInvite.creator
 
                     let members = []
                     for (let i=0; i < this.selectedMember.length; i++) {
                         if (this.selectedMember[i] == this.profile.username) continue;
-                        let member =  {
-                            username: this.selectedMember[i],
-                            grant: false
-                        }
-                        members.push(member)
+                        members.push(this.selectedMember[i])
                     }
                     res.members = members
                     return res
@@ -208,8 +184,7 @@
             reset: function(evt){
                 evt.preventDefault();
                 this.name = ''
-                this.division = ''
-                this.access = 'public'
+                this.access = 'PUBLIC'
                 this.searchUser = ''
                 this.selectedMember = []
 

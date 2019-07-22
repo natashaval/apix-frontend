@@ -33,7 +33,7 @@
                 <th>Updated At</th>
             </tr>
             </thead>
-            <tbody v-if="projects.length > 0">
+            <tbody v-if="!isLoading">
             <tr v-for="project in projects" :key="project.id">
                 <td>
                     <router-link :to="{name: 'project-editor', params: {projectId: project.id} }">
@@ -104,7 +104,7 @@
 
 <script>
     import axios from "axios";
-    import {BASE_PROJECT_URL} from "../../../stores/actions/const";
+    import {BASE_PROJECT_URL} from "@/stores/actions/const";
 
     export default {
         name: "ProjectsTablePagination",

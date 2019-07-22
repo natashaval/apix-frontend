@@ -25,7 +25,7 @@
     import ProjectsTablePagination from "./projects-components/ProjectsTablePagination";
     export default {
         name: "ProjectsList",
-        components: {ProjectsTablePagination, ProjectsTable, ProjectModal}
+        components: {ProjectsTablePagination, ProjectModal}
     }
 </script>
 
