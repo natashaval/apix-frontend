@@ -7,6 +7,7 @@ import {BASE_URL} from "@/stores/actions/const";
 import {COMPLETE, IN_PROCESS, NOT_START} from "@/stores/consts/FetchStatus";
 import {USER_REQUEST, USER_ERROR, USER_SUCCESS} from "@/stores/actions/user.js";
 import { AUTH_LOGOUT } from "@/stores/actions/auth.js";
+import flushPromises from "flush-promises";
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
@@ -64,5 +65,49 @@ describe('user module test', () => {
         store.commit('AUTH_LOGOUT')
         expect(store.state.profile).toEqual({})
         expect(store.getters.isProfileLoaded).toEqual(false)
+    })
+
+    test('action user request and should success', async () => {
+        store.state.status = NOT_START
+        expect(store.state.profile).toEqual({})
+        let http = new MockAdapter(axios);
+        let expected = {
+                success: true,
+                message: 'User is authenticated!',
+                username: 'bebek',
+                roles: ['ROLE_USER'],
+                teams: ['TEAMS']
+        }
+
+        http.onGet(BASE_URL + '/user/profile').reply(200, {
+            data: expected
+        });
+        // const commit = jest.fn()
+        store.dispatch('USER_REQUEST');
+        await flushPromises();
+        expect(store.state.profile).toEqual({data: expected})
+        expect(store.state.fetchStatus).toEqual(COMPLETE)
+        http.reset();
+        http.restore();
+    })
+
+    test('action user request and give error',async () => {
+        store.state.status = NOT_START
+        expect(store.state.profile).toEqual({})
+        let http = new MockAdapter(axios);
+        http.onGet(BASE_URL + '/user/profile').reply(403, {
+            data: {
+                "status": 403,
+                "error": "Forbidden",
+                "message": "Access Denied",
+                "path": "/user/profile"
+            }
+        });
+        store.dispatch('USER_REQUEST');
+        await flushPromises();
+        expect(store.state.status).toEqual('error')
+        expect(store.state.fetchStatus).toEqual(COMPLETE)
+        http.reset();
+        http.restore();
     })
 })

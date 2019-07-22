@@ -1,7 +1,7 @@
 export default {
     namespaced: true,
     state: {
-        layout: 'all-layout'
+        layout: ''
     },
     mutations: {
         SET_LAYOUT (state, payload) {
