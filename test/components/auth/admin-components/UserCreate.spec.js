@@ -4,6 +4,7 @@ import BootstrapVue from "bootstrap-vue";
 import Vuex from "vuex";
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
+import flushPromises from 'flush-promises';
 import {BASE_URL} from "@/stores/actions/const";
 import AdminModule from "@/stores/modules/AdminModule";
 
@@ -15,34 +16,29 @@ const localVue = createLocalVue()
 localVue.use(BootstrapVue)
 localVue.use(Vuex)
 
+let actions = {
+    fetchAllUsersData: jest.fn(),
+    addUser: jest.fn()
+}
+let state = {
+    users: [
+        {
+            id: '123',
+            username: 'admin',
+            roles: ['ROLE_ADMIN'],
+            teams: []
+        }
+    ]
+}
+
 const store = new Vuex.Store({
     modules: {
         admin: {
             namespaced: true,
-            state: {
-                users: [
-                    {
-                        id: '123',
-                        username: 'admin',
-                        roles: ['ROLE_ADMIN'],
-                        teams: []
-                    }
-                ]
-            },
+            state: state,
             getters: AdminModule.getters,
-            actions: {
-                fetchAllUsersData: ({commit}) => {
-
-                },
-                addUser: () => {
-                    jest.fn(() => Promise.resolve());
-                }
-            },
-            mutations: {
-                LIST_DATA(state, {users}) {
-                    state.users = users
-                }
-            }
+            actions: actions,
+            mutations: AdminModule.mutations
         }
     }
 })
@@ -55,21 +51,54 @@ const factory = (values = {}) => {
             return {
                 values
             }
-        }
+        },
+        // computed: {
+        //     nameState: () => {
+        //         return values.user.username.length >= 4 ? true : false
+        //     }
+        // }
     })
 }
 
 describe('display users test', () => {
-    test('will create with no username', () => {
+    test('input empty username and show input invalid length < 4', () => {
         const wrapper = factory()
+        expect(wrapper.vm.nameState).toBeFalsy()
         expect(wrapper.find('#input-live-feedback').text()).toEqual('Enter at least 4 letters')
+    })
+
+    test('input username with length > 4', () => {
+        const wrapper = factory({user: {username: ''}});
+        wrapper.find('[name=username]').setValue('username')
+        expect(wrapper.vm.nameState).toBeTruthy()
     })
 })
 
 describe('try axios in submit', () => {
     let http;
+    /*
+    let adminStore;
+    let adminActions = {
+        fetchAllUsersData: jest.fn(),
+        addUser: jest.fn()
+    }
+    let adminState = {
+        users: [{
+            id: 'user-id',
+            username: 'username',
+            roles: ['ROLE_USER', 'ROLE_ADMIN'],
+            teams: ['TEAMS']
+        }]
+    }
+    */
     beforeAll(() => {
         http = new MockAdapter(axios);
+        // adminStore = new Vuex.Store({
+        //     state: adminState,
+        //     actions: adminActions,
+        //     getters: AdminModule.getters,
+        //     mutations: AdminModule.mutations
+        // })
     })
     afterEach(() => {
         http.reset()
@@ -79,16 +108,7 @@ describe('try axios in submit', () => {
     })
 
     test('will submit user', async () => {
-        let payload = {
-            'username' : 'username',
-            'password': 'password',
-            'confirmPassword': 'password'
-        }
         const wrapper = factory()
-        let expected = {
-            success: true,
-            message: 'User is created!'
-        }
         wrapper.find('[name=username]').setValue('username')
         wrapper.find('[name=password]').setValue('password')
         wrapper.find('[name=confirm-password]').setValue('password')
@@ -98,15 +118,13 @@ describe('try axios in submit', () => {
         http.onPost(BASE_URL + '/admin/users').reply(200, {data: {
                 success: true,
                 message: 'User is created!',
-                new_user: '123'
+                new_user: '456'
             }
         })
 
-        let res = wrapper.vm.onSubmit(event)
-        console.log(store.getters['admin/getUsers'])
-        // wrapper.vm.$nextTick(() => {
-        //     console.log(store.getters['admin/getUsers'])
-        // })
-        // expect(ApixUtil.isEqualObject(res, expected)).toBeTruthy()
+        wrapper.vm.onSubmit(event)
+        await flushPromises();
+        expect(actions.addUser).toHaveBeenCalled()
+        // console.log(store.getters['admin/getUsers'])
     })
 })

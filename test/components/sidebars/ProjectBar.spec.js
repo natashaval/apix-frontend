@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount, mount} from "@vue/test-utils";
+import {createLocalVue, shallowMount} from "@vue/test-utils";
 import BootstrapVue from "bootstrap-vue";
 import VueRouter from "vue-router";
 import ProjectBar from "@/components/sidebars/ProjectBar.vue"
