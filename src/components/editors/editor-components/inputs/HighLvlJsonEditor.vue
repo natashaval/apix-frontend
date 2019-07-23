@@ -6,17 +6,6 @@
                     <p v-if="type === 'object'" class="btn-text"  @click="$bvModal.show(_uid+'-extract-modal')">
                         <i class="fas fa-cube"></i> Extract datatype
                     </p>
-                    <b-modal :id="_uid+'-extract-modal'" ref="extractModal" title="Extract to New Type" hide-footer>
-                        <ExtractDataTypeModal
-                            @extractComplete="(newModelRef)=>{
-                                $_changeObserverMixin_onDataChanged(0,1)
-                                $bvModal.hide(_uid+'-extract-modal')
-                                ref = newModelRef
-                                type = ''
-                                propertiesData = []
-                            }"
-                            :init-name="name" :high-lvl-json-editor="this"></ExtractDataTypeModal>
-                    </b-modal>
                 </div>
                 <div class="container row">
                     <!--kolom kiri-->
@@ -40,6 +29,9 @@
                                 </b-form-group>
                             </div>
                             <div class="form-row w-100 mb-2">
+                                <p v-if="type === 'object' && isSubArray" class="btn-text w-100" @click="$bvModal.show(_uid+'-extract-modal')">
+                                    <i class="fas fa-cube"></i> Extract datatype
+                                </p>
                                 <label class="shrinkable-text col-2 mt-auto">{{(isSubArray)?'Of :':'Type :'}}</label>
                                 <b-select class="form-control col-10" :name="_uid+'-select-type'" v-model="selectedType">
                                     <optgroup label="Data Type"></optgroup>
@@ -183,7 +175,11 @@
                 </a>
             </div>
         </b-collapse>
-
+        <b-modal :id="_uid+'-extract-modal'" ref="extractModal" title="Extract to New Type" hide-footer>
+            <ExtractDataTypeModal
+                    @extractComplete="onExtractComplete"
+                    :init-name="name" :high-lvl-json-editor="this"></ExtractDataTypeModal>
+        </b-modal>
     </div>
 
 </template>
@@ -347,6 +343,15 @@
             },
             clickMoreDisplay : function(){
                 this.isMoreDisplay = ! this.isMoreDisplay
+            },
+            onExtractComplete : function(newModelRef){
+                this.$_changeObserverMixin_onDataChanged(0,1)
+                this.$bvModal.hide(this._uid+'-extract-modal')
+                this.ref = newModelRef
+                this.type = ''
+                this.selectedType = this.ref
+                this.propertiesData = []
+                console.log(this.ref)
             },
             getActions : function () {
                 let tmp = this.schemaData
