@@ -24,11 +24,12 @@
             <button @click="showHighLevelEditor = !showHighLevelEditor" class="btn btn-primary" style="font-size: 12px;">
                 <i class="fas fa-edit"></i> switch editor
             </button>
-            <button v-if="editable" v-b-modal="'modal-importer-'+_uid" class="btn btn-success" style="font-size: 12px;margin-left: 1em;">
+            <button v-if="editable" v-b-modal="'modal-importer-'+_uid" class="btn btn-success"
+                    style="font-size: 12px;margin-left: 1em;" :id="_uid+'-btn-import'">
                 <i class="fas fa-download"></i> import from external json
             </button>
         </div>
-        <HighLvlJsonEditor ref="root"
+        <HighLvlJsonEditor ref="highLvlEditor"
                            v-bind:style="{display : isShow(EDITOR_TYPE_HIGH_LEVEL)}"
                            :schema-data="schemaDataWrapper.data" :nameable="false"
                            :deleteable="false"
@@ -49,8 +50,10 @@
                 <input type="file" v-on:change="jsonFileLoaded">
             </div>
             <div class="form-group">
-                <button class="btn btn-outline-primary btn-sm" @click="fillWithExampleJson">click for example json</button>
-
+                <button class="btn btn-outline-primary btn-sm" @click="fillWithExampleJson"
+                    :id="_uid+'-btn-example-json'">
+                    click for example json
+                </button>
             </div>
 
             <LowLvlJsonEditor class="form-control"
@@ -92,6 +95,7 @@
             EDITOR_TYPE_HIGH_LEVEL : true,
             EDITOR_TYPE_LOW_LEVEL : false,
             isEditing : false,
+            isImportJson : false,
             description : '',
             attributesKey : ['description'],
             schemaDataWrapper : {data : undefined},
@@ -107,9 +111,11 @@
                         JsonOasUtil.toSwaggerOas(this.$refs.modalJsonInput.getJson())
                     )
                     this.$_changeObserverMixin_onDataChanged(true, false)
-                    this.$refs.lowLvlEditor._data.isEdited = true
                     this.$bvModal.hide('modal-importer-'+this._uid)
                     this.makeToast('success',true,'Json file imported.')
+                    this.$refs.lowLvlEditor.setJson(this.schemaDataWrapper.data)
+                    this.$refs.lowLvlEditor._data.isEdited = true
+                    this.isImportJson = true
                 }
                 catch (e) {
                     this.makeToast('danger',false,'Invalid Json!')
@@ -161,7 +167,7 @@
             getData : function () {
                 return {
                     description : this.description,
-                    schema : this.$refs.root.getData()
+                    schema : this.$refs.highLvlEditor.getData()
                 }
             },
             buildQuery : function (requestPointer) {
@@ -173,7 +179,7 @@
                     requestPointer._hasActions = true
                     requestPointer._actions = []
                 }
-                if(this.$refs.lowLvlEditor._data.isEdited){
+                if(this.isImportJson || this.$refs.lowLvlEditor._data.isEdited){
                     try{
                         let json = this.$refs.lowLvlEditor.getJson()
                         requestPointer._actions.push({
@@ -182,6 +188,7 @@
                             value : json
                         })
                         return () => {
+                            this.isImportJson = false
                             Vue.delete(bodyData.schema)
                             Vue.set(bodyData, 'schema', json)
                             this.$refs.lowLvlEditor._data.isEdited = false
@@ -198,7 +205,7 @@
                     ActionBuilderUtil.createActions(this.bodyData,this._data,this.attributesKey)
                 )
 
-                let callback = this.$refs.root.buildQuery(requestPointer)
+                let callback = this.$refs.highLvlEditor.buildQuery(requestPointer)
 
                 if(callback === undefined){
                     delete requestPointer.schema
@@ -220,7 +227,7 @@
                     delete requestPointer._hasActions
                 }
 
-                let ref = this.$refs.root
+                let ref = this.$refs.highLvlEditor
                 return (isEdited)? async ()=>{
                     callbacks.forEach(fn => fn())
                     Vue.delete(bodyData.schema)
@@ -231,6 +238,7 @@
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
+                this.isImportJson = false
                 if(this.bodyData !== undefined){
                     let bd = this.bodyData
                     this.description = (bd.description === undefined)?'':bd.description
@@ -252,7 +260,7 @@
             },
             reloadData : function () {
                 this.loadData()
-                this.$refs.root.reloadData()
+                this.$refs.highLvlEditor.reloadData()
                 if(this.$refs.lowLvlEditor){
                     this.$refs.lowLvlEditor.reloadData()
                 }
@@ -274,9 +282,7 @@
                     }
                 }
                 else{
-                    // Vue.delete(this.schemaDataWrapper, 'data')
-                    // Vue.set(this.schemaDataWrapper, 'data', this.$refs.root.getData())
-                    this.$refs.lowLvlEditor.setJson(this.$refs.root.getData())
+                    this.$refs.lowLvlEditor.setJson(this.$refs.highLvlEditor.getData())
                 }
             }
         },
