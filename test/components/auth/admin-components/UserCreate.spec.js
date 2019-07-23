@@ -93,12 +93,6 @@ describe('try axios in submit', () => {
     */
     beforeAll(() => {
         http = new MockAdapter(axios);
-        // adminStore = new Vuex.Store({
-        //     state: adminState,
-        //     actions: adminActions,
-        //     getters: AdminModule.getters,
-        //     mutations: AdminModule.mutations
-        // })
     })
     afterEach(() => {
         http.reset()

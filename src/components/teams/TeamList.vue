@@ -15,7 +15,7 @@
         <div class="row">
             <div class="col-12">
                 <b-card-group columns class="mb-2">
-                    <TeamCard :teams="ungrantUser" :isGrant="false" @update="loadTeam"></TeamCard>
+                    <TeamCard :teams="ungrantUser" :isGrant="false" @update="loadTeam" name="ungrantUser"></TeamCard>
                 </b-card-group>
             </div>
         </div>
@@ -39,7 +39,7 @@
         <!--{{grantUser}}-->
 
         <b-card-group columns class="mb-2">
-            <TeamCard :teams="filterTeam" :isGrant="true"></TeamCard>
+            <TeamCard :teams="filterTeam" :isGrant="true" name="grantUser"></TeamCard>
         </b-card-group>
     </div>
 </template>
