@@ -9,7 +9,7 @@
                         Owner: {{team.creator}}
                     </b-card-text>
                 </b-card-body>
-                <button slot="footer" class="btn btn-primary" v-if="!isGrant" @click="confirm(team.name)">Confirm</button>
+                <button slot="footer" class="btn btn-primary confirm-team" v-if="!isGrant" @click="confirm(team.name)">Confirm</button>
             </b-card>
 
             <b-card class="mb-2 team-header" no-body header-bg-variant="light" v-else>
@@ -19,7 +19,7 @@
                         Owner: {{team.creator}}
                     </b-card-text>
                 </b-card-body>
-                <button slot="footer" class="btn btn-primary" v-if="!isGrant" @click="confirm(team.name)">Confirm</button>
+                <button slot="footer" class="btn btn-primary confirm-team" v-if="!isGrant" @click="confirm(team.name)">Confirm</button>
             </b-card>
         </div>
     </div>
@@ -32,11 +32,9 @@
 
     export default {
         name: "TeamCard",
-        props: ['teams', 'isGrant'],
-        data: function(){
-            return {
-
-            }
+        props: {
+            teams: Array,
+            isGrant: Boolean
         },
         computed: {
             profile() {
@@ -63,6 +61,7 @@
                     console.error(e);
                     this.makeToast('danger', e.response.data.success, e.response.data.message);
                 })
+                return grantList
             },
             viewTeam: function(teamName) {
                 this.$router.push({
@@ -76,9 +75,9 @@
 </script>
 
 <style scoped>
-.team-header:hover {
-    box-shadow: 5px 5px 5px grey;
-}
+    .team-header:hover {
+        box-shadow: 5px 5px 5px grey;
+    }
     .team-title:hover {
         cursor: pointer;
     }

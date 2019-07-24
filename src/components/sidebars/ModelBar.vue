@@ -2,7 +2,7 @@
     <li>
         <div class="sidebar-content row" style="height: 2em;" :class="{'active-bar':isActive}"
              @mouseover="onHover=true" @mouseleave="onHover=false">
-            <p @click="definitionClick" class="ml-5 mt-1 shrinkable-text" style="font-size: 0.9em;">
+            <p @click="definitionClick" class="ml-5 mt-1 shrinkable-text" style="font-size: 0.9em;" name="definitionApi">
                 <i class="fas fa-cube"></i> {{ definitionApi }}
             </p>
             <button v-if="onHover && editable" class="btn-circle ml-auto mr-3" @click="deleteDefinition">
@@ -45,10 +45,14 @@
                 // this.hover = true
                 this.$router.push({
                     name: 'definition-editor',
-                    params: {definitionApi: this.definitionApi }
+                    params: {
+                        projectId: this.projectApi,
+                        definitionApi: this.definitionApi
+                    }
                 })
             },
-            deleteDefinition: function () {
+            deleteDefinition: function (){
+            let tree
                 this.$toast.question('Are you sure to delete model \''+this.definitionApi+'\' ?',
                     'Confirmation', {
                         timeout: 20000,
@@ -61,7 +65,7 @@
                         buttons: [
                             ['<button><b>YES</b></button>', (instance, toast) => {
                                 instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
-                                let tree = {_signature: this.projectData._signature, definitions : {}}
+                                tree = {_signature: this.projectData._signature, definitions : {}}
                                 tree.definitions._actions = [{
                                     action: 'delete',
                                     key: this.definitionKey
@@ -96,6 +100,7 @@
                             }]
                         ]
                     })
+                return tree.root
             }
         }
     }
