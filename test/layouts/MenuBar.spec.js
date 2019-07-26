@@ -11,6 +11,7 @@ import ProjectsList from "../../src/components/projects/ProjectsList";
 import TeamList from "../../src/components/teams/TeamList";
 import UserViewer from "../../src/components/auth/admin-components/UserViewer";
 import AuthLogin from "../../src/components/auth/AuthLogin";
+import {USER_REQUEST} from "../../src/stores/actions/user";
 
 // https://lmiller1990.github.io/vue-testing-handbook/vuex-in-components.html#using-createlocalvue-to-test-store-state
 const localVue = createLocalVue()
@@ -34,16 +35,26 @@ const store = new Vuex.Store({
                 status: 'success',
                 token: 'token'
             },
-            getters: AuthModule.getters,
-            actions: {
-                AUTH_REQUEST: () => {
-                    jest.fn(() => Promise.resolve());
-                },
-                AUTH_LOGOUT: () => {
-                    jest.fn(() => Promise.resolve());
-                }
+            getters: {
+                isAuthenticated: () => true,
             }
         },
+        user: {
+            namespaced: true,
+            getters: {
+                getProfile: function () {
+                    return {
+                        "username": "test",
+                        "roles": ["ROLE_USER", "ROLE_ADMIN"],
+                        "teams": ["TEAMS"]
+                    }
+                },
+                isProfile: () => true
+            },
+            actions: {
+                [USER_REQUEST]: jest.fn()
+            }
+        }
     }
 })
 
@@ -54,20 +65,20 @@ describe('menu bar tests', () => {
             localVue,
             router,
             store,
-            computed: {
-                isAdmin: () => true,
-                isAuthenticated: () => true,
-                isProfile: () => true,
-                profile: () => {
-                    return {
-                        'success': true,
-                        'message': 'User is authenticated!',
-                        'username': 'test',
-                        'roles': ['ROLE_USER', 'ROLE_ADMIN'],
-                        'teams': ['team-test']
-                    }
-                }
-            },
+            // computed: {
+            //     isAdmin: () => true,
+            //     isAuthenticated: () => true,
+            //     isProfile: () => true,
+            //     profile: () => {
+            //         return {
+            //             'success': true,
+            //             'message': 'User is authenticated!',
+            //             'username': 'test',
+            //             'roles': ['ROLE_USER', 'ROLE_ADMIN'],
+            //             'teams': ['team-test']
+            //         }
+            //     }
+            // },
             stubs: {
                 'route-link': true
             },

@@ -63,6 +63,7 @@
     import axios from 'axios'
     import ProjectsTable from "../projects/projects-components/ProjectsTable";
     import TeamDetail from "./team-components/TeamDetail";
+    import {makeToast} from "../../assets/toast";
 
     export default {
         name: "TeamViewer",
@@ -86,6 +87,7 @@
 
         },
         methods: {
+            makeToast,
             loadData: function () {
                 let p = this.$route.params
                 this.name = p.name
@@ -115,12 +117,6 @@
                 }).catch((e) => {
                     console.error(e);
                     this.makeToast('danger', e.response.data.success, e.response.data.message)
-                })
-            },
-            makeToast(variant, success, message){
-                this.$bvToast.toast(message, {
-                    title: (success) ? 'Success' : 'Failed',
-                    variant: variant
                 })
             }
         },
