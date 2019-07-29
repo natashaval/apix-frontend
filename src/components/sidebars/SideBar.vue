@@ -56,12 +56,12 @@
         <b-collapse id="collapse-model" v-model="collapseModel" class="mt-2" v-if="projectData">
 
             <ul class="list-group">
-                <ModelBar v-for="(value, key) in projectData.definitions"
-                      v-bind:key="key"
-                          :editable="$_projectPrivilege_canEdit"
-                          :definition-key="key"
-                          :definition-api="value.name"
-                          :project-api="projectApi"
+                <ModelBar v-for="model in orderedModel"
+                      v-bind:key="model.key"
+                      :editable="$_projectPrivilege_canEdit"
+                      :definition-key="model.key"
+                      :definition-api="model.value.name"
+                      :project-api="projectApi"
                 />
             </ul>
 
@@ -108,12 +108,33 @@
             }
         },
         computed : {
+            modelsData : function(){
+                if(this.projectData){
+                    return this.projectData.definitions
+                }
+                return undefined
+            },
             orderedSection : function (){
                 let res = []
                 let sections = this.projectData.sections
                 if(sections){
                     let keys = Object.keys(sections).sort()
                     keys.forEach(key => res.push(sections[key]))
+                }
+                return res
+            },
+            orderedModel : function (){
+                let res = []
+
+                if(this.modelsData){
+                    let modelsData = this.modelsData
+                    let keys = Object.keys(modelsData).sort((a,b) => {
+                        return modelsData[a].name > modelsData[b].name
+                    })
+                    keys.forEach(key => res.push({
+                        key : key,
+                        value : modelsData[key]
+                    }))
                 }
                 return res
             },

@@ -2,7 +2,8 @@
     <li>
         <div class="sidebar-content row" style="height: 2em;" :class="{'active-bar':isActive}"
              @mouseover="onHover=true" @mouseleave="onHover=false">
-            <p @click="definitionClick" class="ml-5 mt-1 shrinkable-text" style="font-size: 0.9em;" name="definitionApi">
+            <p @click="definitionClick" class="ml-5 mt-1 shrinkable-text" style="width:75%;font-size: 0.9em;"
+               name="definitionApi">
                 <i class="fas fa-cube"></i> {{ definitionApi }}
             </p>
             <button v-if="onHover && editable" class="btn-circle ml-auto mr-3" @click="deleteDefinition">
