@@ -3,7 +3,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <h3>Files Upload</h3>
+<!--                <h3>Files Upload</h3>-->
                 <input type="file" id="file" ref="file" multiple @change="handleFileUpload()"/>
 
                 <div class="btn-group mb-2" role="group" aria-label="files upload">
@@ -17,7 +17,7 @@
 
                 <div v-for="(existFile,i) in files" :key="i">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-8">
                             <p class="font-weight-bold">{{ existFile.file.name }}</p>
                         </div>
                         <div class="col-md-4">
@@ -26,7 +26,7 @@
                     </div>
                     <!--                                <progress max="100" :value.prop="existFile.uploadPercentage"></progress>-->
                     <div class="row">
-                        <div class="col-md-1">
+                        <div class="col-md-2">
                             <p>Validation: </p>
                         </div>
                         <div class="col-md-6">
@@ -145,6 +145,7 @@
                 console.log(this.files);
             },
             resetFile(){
+                // this.$refs.file.files = [];
                 this.files = {};
                 this.$refs.assign.isNewTeam = false;
                 this.$refs.assign.inputTeamName = '';

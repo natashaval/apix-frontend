@@ -4,7 +4,11 @@
         <b-button v-b-modal="'project-upload'" variant="secondary">Import Projects</b-button>
 
 
-        <b-modal id="project-upload" hide-footer>
+        <b-modal id="project-upload"
+                 hide-footer
+                 title="Files Upload"
+                 size="lg"
+        >
             <ProjectsUpload></ProjectsUpload>
         </b-modal>
 

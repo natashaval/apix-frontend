@@ -15,10 +15,10 @@
             <div class="col-md-2"></div>
             <div class="col-md-6">
                 <div class="input-group">
-                    <input type="text" v-model="search" class="form-control" placeholder="Search ...">
+                    <input type="text" v-model="search" class="form-control" placeholder="Search ..." @change="clickSearch()">
                     <div class="input-group-append">
-                        <button class="btn btn-outline-success" type="button" @click="clickSearch()"> <i class="fa fa-search"></i> Search</button>
-                        <button class="btn btn-outline-secondary" type="button" @click="clickReset()"> <i class="fa fa-times"></i> Reset</button>
+                        <button class="btn btn-outline-secondary" type="button" @click="clickReset()" > <i class="fa fa-times"></i> Reset</button>
+                        <button class="btn btn-primary" type="button" @click="clickSearch()"> <i class="fa fa-search"></i> Search</button>
                     </div>
                 </div>
             </div>
