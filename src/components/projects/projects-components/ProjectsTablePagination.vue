@@ -108,6 +108,12 @@
 
     export default {
         name: "ProjectsTablePagination",
+        props: {
+          team: {
+              type: String,
+              required: false
+          }
+        },
         data: function() {
             return {
                 pageable: {
@@ -134,9 +140,16 @@
         },
         methods: {
             fetchData: function() {
+                let url
+                if (this.team != null) {
+                    console.log('team name', this.team)
+                    url = BASE_PROJECT_URL + '/team/' + this.team
+                }
+                else url = BASE_PROJECT_URL
                 if(this.pageable) {
                     this.isLoading = true
-                    axios.get(BASE_PROJECT_URL, {
+                    console.log('url', url.toString())
+                    axios.get(url, {
                         params: this.pageable
                     }).then((response) => {
                         this.projects = response.data.contents

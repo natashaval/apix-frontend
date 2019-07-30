@@ -1,84 +1,88 @@
 <template>
     <div>
         <div class="row mb-3">
-            <div class="col-md-1 ">
-                <b-button v-if="isInvite" :to="{name: 'team-viewer', params: {name: teamInvite.name }}">
+            <div class="">
+                <b-button v-if="isInvite" :to="{name: 'team-viewer', params: {name: teamInvite.name }}" size="sm" variant="outline-secondary">
                     <i class="fas fa-angle-left"></i> Back</b-button>
-                <b-button v-else variant="outline-info" :to="{name: 'team-list'}">
+                <b-button v-else :to="{name: 'team-list'}" size="sm" variant="outline-secondary">
                     <i class="fas fa-angle-left"></i> Back
                 </b-button>
             </div>
-            <div class="col-md-6 mx-0">
-                <div v-if="isInvite">
-                    <h3>Invite Members of <span class="font-italic">{{ teamInvite.name }}</span></h3>
-                </div>
-                <div v-else>
-                    <h3>Create Team</h3>
-                </div>
+
+            <div class="col-md-11 mt-2">
+                <form id="create-team" @submit.prevent="submit" @reset="reset" v-if="show">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div v-if="isInvite">
+                                <h3>Invite Members of <span class="font-italic">{{ teamInvite.name }}</span></h3>
+                            </div>
+                            <div v-else>
+                                <h3>Create Team</h3>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-1 mb-2">
+                            <!--                    <label for="create-submit" class="invisible">Submit</label>-->
+                            <button type="submit" id="create-submit"
+                                    class="btn btn-info btn-block">Submit</button>
+                        </div>
+                        <div class="form-group col-md-1 mb-2">
+                            <!--                    <label for="create-submit" class="invisible">Reset</label>-->
+                            <button type="reset" id="create-reset"
+                                    class="btn btn-outline-secondary btn-block">Reset</button>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6 mb-2">
+                            <label for="create-name">Name: </label>
+                            <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.name" readonly />
+                            <input v-else type="text" class="form-control" v-model="name" id="create-name" required />
+                        </div>
+                        <div class="form-group col-md-2 mb-2">
+                            <label for="create-access">Access: </label>
+                            <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.access.toLowerCase()" readonly/>
+                            <select v-else v-model="access" id="create-access" class="form-control">
+                                <option value="PUBLIC">Public</option>
+                                <option value="PRIVATE">Private</option>
+                            </select>
+                        </div>
+                        <!--                <div class="form-group col-md-1 mb-2">-->
+                        <!--                    <label for="create-submit" class="invisible">Submit</label>-->
+                        <!--                    <button type="submit" id="create-submit"-->
+                        <!--                            class="btn btn-info btn-block">Submit</button>-->
+                        <!--                </div>-->
+                        <!--                <div class="form-group col-md-1 mb-2">-->
+                        <!--                    <label for="create-submit" class="invisible">Reset</label>-->
+                        <!--                    <button type="reset" id="create-reset"-->
+                        <!--                            class="btn btn-outline-danger btn-block">Reset</button>-->
+                        <!--                </div>-->
+
+                    </div>
+
+                    <div class="form-row">
+                        <label>Member List: </label>
+                        <div class="input-group mb-2 form-row">
+                            <input class="form-control col-md-8 ml-2" type="text"
+                                   v-model="searchUser" placeholder="Search member name ..."/>
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fa fa-search"></i> </span>
+                            </div>
+                        </div>
+                        <div class="col-md-12 custom-control custom-checkbox">
+                            <ul class="ul-user">
+                                <li v-for="(user, i) in filterUser" :key="i">
+                                    <input type="checkbox" class="custom-control-input"
+                                           :id="user.username" :value="user.username"
+                                           v-model="selectedMember" />
+                                    <label class="custom-control-label"
+                                           :for="user.username">{{user.username}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!--<span>Selected Members: {{selectedMember}}</span>-->
+                </form>
             </div>
         </div>
-
-        <form id="create-team" @submit.prevent="submit" @reset="reset" v-if="show">
-            <!--div class="row" v-show="response.show">
-                <div v-if="response.success">
-                    <div class="alert alert-primary">{{response.message}}</div>
-                </div>
-                <div v-else>
-                    <div class="alert alert-danger">{{response.message}}</div>
-                    <small v-for="(error, i) in response.errors" :key="i">{{error}}</small>
-                </div>
-            </div>
-            <br /-->
-            <div class="form-row">
-                <div class="form-group col-md-5 mb-2">
-                    <label for="create-name">Name: </label>
-                    <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.name" readonly />
-                    <input v-else type="text" class="form-control" v-model="name" id="create-name" required />
-                </div>
-                <div class="form-group col-md-2 mb-2">
-                    <label for="create-access">Access: </label>
-                    <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.access" readonly/>
-                    <select v-else v-model="access" id="create-access" class="form-control">
-                        <option value="PUBLIC">Public</option>
-                        <option value="PRIVATE">Private</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-1 mb-2">
-                    <label for="create-submit" class="invisible">Submit</label>
-                    <button type="submit" id="create-submit"
-                            class="btn btn-info btn-block">Submit</button>
-                </div>
-                <div class="form-group col-md-1 mb-2">
-                    <label for="create-submit" class="invisible">Reset</label>
-                    <button type="reset" id="create-reset"
-                            class="btn btn-outline-danger btn-block">Reset</button>
-                </div>
-
-            </div>
-
-            <div class="form-row">
-                <label>Member List: </label>
-                <div class="input-group mb-2">
-                    <input class="form-control" type="text"
-                       v-model="searchUser" placeholder="Search member name ..."/>
-                    <div class="input-group-append">
-                        <span class="input-group-text"><i class="fa fa-search"></i> </span>
-                    </div>
-                </div>
-                <div class="col-md-12 custom-control custom-checkbox">
-                    <ul class="ul-user">
-                        <li v-for="(user, i) in filterUser" :key="i">
-                            <input type="checkbox" class="custom-control-input"
-                                   :id="user.username" :value="user.username"
-                                   v-model="selectedMember" />
-                            <label class="custom-control-label"
-                                    :for="user.username">{{user.username}}</label>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <!--<span>Selected Members: {{selectedMember}}</span>-->
-        </form>
     </div>
 </template>
 
