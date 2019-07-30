@@ -15,7 +15,7 @@
             <div class="col-md-2"></div>
             <div class="col-md-6">
                 <div class="input-group">
-                    <input type="text" v-model="search" class="form-control" placeholder="Search ..." @change="clickSearch()">
+                    <input type="text" v-model="pageable.search" class="form-control" placeholder="Search ..." @change="clickSearch()">
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="button" @click="clickReset()" > <i class="fa fa-times"></i> Reset</button>
                         <button class="btn btn-primary" type="button" @click="clickSearch()"> <i class="fa fa-search"></i> Search</button>
@@ -37,17 +37,17 @@
             <tr v-for="project in projects" :key="project.id">
                 <td>
                     <router-link :to="{name: 'project-editor', params: {projectId: project.id} }">
-                        {{(project.info) ? project.info.title : ''}}
+                        {{project.title}}
                     </router-link>
                 </td>
-                <td>{{ (project.projectOwner) ? project.projectOwner.name : '' }}</td>
+                <td>{{ (project.owner) ? project.owner : '' }}</td>
                 <td>{{ (project.host) ? project.host : '' }}</td>
                 <td>
-                    <a :href="'http://github.com/' + project.githubProject.owner + '/' + project.githubProject.repo"
+                    <a :href="'http://github.com/' + project.githubUsername + '/' + project.repository"
                        target="_blank"
-                       v-if="project.githubProject.repo != ''"
+                       v-if="project.repository != ''"
                     >
-                        {{project.githubProject.owner}}/{{project.githubProject.repo}}
+                        {{project.githubUsername}}/{{project.repository}}
                     </a>
                 </td>
                 <td>{{ localDate(project.updatedAt) }}</td>
@@ -114,7 +114,8 @@
                     page: 0,
                     size: 5,
                     direction: 'desc',
-                    sort: 'updatedAt',
+                    sort: 'updated_at',
+                    search : ''
                 },
                 responsePageable: {
                     offset: 0,
@@ -128,7 +129,6 @@
                 totalElements: 0,
                 projects: [],
                 search: '',
-                isSearch: false,
                 isLoading: false
             }
         },
@@ -139,12 +139,12 @@
                     axios.get(BASE_PROJECT_URL, {
                         params: this.pageable
                     }).then((response) => {
-                        this.projects = response.data.content
+                        this.projects = response.data.contents
                         this.totalPages = response.data.totalPages
                         this.totalElements = response.data.totalElements
-                        this.responsePageable.offset = response.data.pageable.offset
-                        this.responsePageable.pageSize = response.data.pageable.pageSize
-                        this.responsePageable.pageNumber = response.data.pageable.pageNumber
+                        this.responsePageable.offset = response.data.offset
+                        this.responsePageable.pageSize = response.data.pageSize
+                        this.responsePageable.pageNumber = response.data.pageNumber
                         this.responsePageable.numberOfElements = response.data.numberOfElements
                         this.responsePageable.last = response.data.last
                         this.responsePageable.first = response.data.first
@@ -155,56 +155,29 @@
                     })
                 }
             },
-            fetchSearch: function(){
-                this.isLoading = true
-                axios.get(BASE_PROJECT_URL + '/search', {
-                    params: {
-                        page: this.pageable.page,
-                        size: this.pageable.size,
-                        search: this.search
-                    }
-                }).then((response) => {
-                    this.projects = response.data.content
-                    this.totalPages = response.data.totalPages
-                    this.totalElements = response.data.totalElements
-                    this.responsePageable.offset = response.data.pageable.offset
-                    this.responsePageable.pageSize = response.data.pageable.pageSize
-                    this.responsePageable.pageNumber = response.data.pageable.pageNumber
-                    this.responsePageable.numberOfElements = response.data.numberOfElements
-                    this.responsePageable.last = response.data.last
-                    this.responsePageable.first = response.data.first
-
-                    this.isLoading = false
-                }).catch((e) => {
-                    console.error(e);
-                    this.isLoading = false
-                })
-            },
             localDate: (value) => {
                 let d = new Date(value);
                 return d.toLocaleString();
             },
             clickPagination: function(idx){
-                console.log(idx, this.responsePageable.pageNumber)
+                console.log('click pagination', idx, this.responsePageable.pageNumber)
                 this.pageable.page = idx - 1
-                if(!this.isSearch) this.fetchData();
-                else if (this.isSearch) this.fetchSearch();
+                this.fetchData()
             },
             clickSize: function() {
                 console.log(this.pageable.size)
-                if(!this.isSearch) this.fetchData();
-                else if (this.isSearch) this.fetchSearch();
+                this.pageable.page = 0
+                this.fetchData()
             },
             clickSearch: function(){
                 console.log(this.search)
-                this.isSearch = true
-                this.fetchSearch();
+                this.pageable.page = 0
+                this.fetchData()
             },
             clickReset: function () {
-                this.search = ''
+                this.pageable.search = ''
                 this.pageable.page = 0
                 this.pageable.size = 5
-                this.isSearch = false
                 this.fetchData()
             }
         },

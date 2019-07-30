@@ -6,16 +6,6 @@
             <div class="col-md-8 pl-4">
                 <h4>Github Editor</h4>
             </div>
-            <div class="col-md-4 pr-4">
-                <!--<button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"-->
-                <!--class="float-right round-button btn mt-2 mr-2" v-bind:id="_uid+'-edit-btn'">-->
-                <!--<i class="fa fa-pencil-alt"></i>-->
-                <!--</button>-->
-                <!--<button @click="fetchOas" class="float-right btn round-button mt-2 mr-2" type="button"-->
-                <!--data-toggle="tooltip" data-placement="bottom" title="Sync with Github"-->
-                <!--<i class="fas fa-sync-alt"></i>-->
-                <!--</button>-->
-            </div>
         </div>
         <div class="row">
             <div v-if="showEdit" class="col-11" style="border-color: crimson">
@@ -216,10 +206,9 @@
         methods: {
             makeToast,
             loadData: function(){
-                this.$_changeObserverMixin_unObserve();
-                this.projectId = this.$route.params.projectId;
-                // if (this.githubData !== null) {
-                if (this.githubData.owner !== '' && this.githubData.repo !== ''){
+                this.$_changeObserverMixin_unObserve()
+                this.projectId = this.$route.params.projectId
+                if (this.githubData && this.githubData.owner !== '' && this.githubData.repo !== ''){
                     console.log('github ada')
                     this.owner = this.githubData.owner;
                     this.repo = this.githubData.repo;
@@ -458,6 +447,9 @@
             },
             owner: function(newOwner, oldOwner){
                 if (oldOwner == '') return this.ownerData.login
+            },
+            githubData : function () {
+                this.loadData()
             }
         },
         mounted() {
