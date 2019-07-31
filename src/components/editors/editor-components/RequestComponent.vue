@@ -1,21 +1,23 @@
 <template>
-    <div class="green-frame container" >
-        <div>
-            <h1>ini headers</h1>
+    <div class="dot-border pl-2">
+        <div class="mb-3">
+            <h6 class="font-weight-bold">Headers:</h6>
             <PropertyForm ref="headers" :schemas-data="headersData"
                           :editable="editable"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         </div>
-        <div>
-            <h1>ini query param</h1>
+        <div class="mb-3">
+            <h6 class="font-weight-bold">Query Parameters:</h6>
             <PropertyForm ref="queryParams" :schemas-data="queryParamsData"
                           :editable="editable"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         </div>
-
-        <BodyForm v-if="hasBody" ref="body" :body-data="requestData"
-                  :editable="editable"
-                  :$_changeObserverMixin_parent="$_changeObserverMixin_this" style="padding-left: 10%"/>
+        <div class="mb-3 pr-1">
+            <h6 class="font-weight-bold">Body:</h6>
+            <BodyForm v-if="hasBody" ref="body" :body-data="requestData"
+                      :editable="editable"
+                      :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
+        </div>
     </div>
 </template>
 
@@ -29,10 +31,6 @@
         name: "RequestComponent",
         mixins : [ChangeObserverMixin],
         components: {PropertyForm, BodyForm},
-        data : () => ({
-            commitChangeCallback : [],
-            actionsQuery : [],
-        }),
         props : {
             requestData : {
                 type : Object
@@ -69,13 +67,15 @@
             buildQuery : function (operationPointer,requestPointer) {
                 let isEdited = false
                 let request = requestPointer
+                let requestData = this.requestData
+                let callbacks = []
                 let callback = this.$refs.headers.buildQuery(request.headers = {})
                 if(callback === undefined){
                     delete request.headers
                 }
                 else{
                     isEdited = true
-                    this.commitChangeCallback.push(callback)
+                    callbacks.push(callback)
                 }
 
                 callback = this.$refs.queryParams.buildQuery(request.queryParams = {})
@@ -84,26 +84,24 @@
                 }
                 else{
                     isEdited = true
-                    this.commitChangeCallback.push(callback)
+                    callbacks.push(callback)
                 }
 
                 if(this.$refs.body !== undefined){
                     callback = this.$refs.body.buildQuery(request)
                     if(callback !== undefined){
                         isEdited = true
-                        this.commitChangeCallback.push(callback)
+                        callbacks.push(callback)
                     }
 
 
                 }
                 if(request._actions !== undefined){
-                    this.actionsQuery = request._actions
+                    callbacks.push(()=>{
+                        ActionExecutorUtil.executeActions(requestData, request._actions)
+                    })
                 }
-                return (isEdited)?this.commitChange : undefined
-            },
-            commitChange : function () {
-                ActionExecutorUtil.executeActions(this.requestData, this.actionsQuery)
-                this.commitChangeCallback.forEach(fn => fn())
+                return (isEdited)?()=>{callbacks.forEach(fn => fn())} : undefined
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()

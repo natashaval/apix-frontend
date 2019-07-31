@@ -17,9 +17,7 @@ export default {
                 }
             }
             else if(val1 instanceof Object){
-                if(!this.isEqualObject(val1, val2, ignoredField)){
-                    return false
-                }
+                if(!this.isEqualObject(val1, val2, ignoredField))return false
             }
             else if(val1 !== val2){
                 return false
@@ -32,7 +30,12 @@ export default {
         let keys2 = Object.keys(obj2)
         keys1 = keys1.filter(key => !(ignoredField.includes(key)))
         keys2 = keys1.filter(key => !(ignoredField.includes(key)))
-        if(keys1.length !== keys2.length)return false
+        if(keys1.length !== keys2.length){
+            console.error('key : '+key)
+            console.error('obj1['+key+'] = '+val1)
+            console.error('obj2['+key+'] = '+val2)
+            return false
+        }
 
         let keyLen = keys1.length
         for(let i = 0; i < keyLen; i++){
@@ -40,18 +43,33 @@ export default {
             let val1 = obj1[key]
             let val2 = obj2[key]
             if(val1 === undefined ^ val2 === undefined){
+                console.error('key : '+key)
+                console.error('obj1['+key+'] = '+val1)
+                console.error('obj2['+key+'] = '+val2)
+
                 return false
             }
             if(typeof val1 !== typeof val2){
+                console.error('key : '+key)
+                console.error('obj1['+key+'] = '+val1)
+                console.error('obj2['+key+'] = '+val2)
                 return false
             }
             else if(val1 instanceof Array){
                 if(!this.isEqualArray(val1,val2, ignoredField)){
+                    console.error('key : '+key)
+                    console.error('obj1['+key+'] = '+val1)
+                    console.error('obj2['+key+'] = '+val2)
+
                     return false
                 }
             }
             else if(val1 instanceof Object){
                 if(!this.isEqualObject(val1, val2, ignoredField)){
+                    console.error('key : '+key)
+                    console.error('obj1['+key+'] = '+val1)
+                    console.error('obj2['+key+'] = '+val2)
+
                     return false
                 }
             }
@@ -63,6 +81,13 @@ export default {
                     return false
                 }
             }
+        }
+        return true
+    },
+
+    isEqualObjectByKeys : function (obj1, obj2, keys) {
+        for(let key of keys){
+            if(obj1[key] !== obj2[key])return false
         }
         return true
     }

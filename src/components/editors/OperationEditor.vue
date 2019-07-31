@@ -1,86 +1,95 @@
 <template>
-    <div>
-        <ul v-if="isEdited">
-            <li><button @click="submit">Save</button></li>
-            <li><button @click="cancel">Cancel</button></li>
-        </ul>
-        <div class="row">
-        <div v-if="showEdit" class="col-11">
-            <div class="row">
-                <label class="col-2">Summary :</label>
-                <b-input v-model="summary" class="col"></b-input>
-            </div>
-            <div class="row">
-                <div class="col-4">
-                    <label class="col-4">Method :</label>
-                    <b-select class="col-8" v-model="method" :options="selectMethodOptions"></b-select>
-                    <p v-for="(error,i) in $_changeObserverMixin_getErrors('method')"
-                       v-bind:key="i"
-                       class="error-message">{{error}}</p>
+    <div class="pb-5">
+        <EditorHeaderComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
+                               :submit="submit" :cancel="cancel" :name="editorTitle"></EditorHeaderComponent>
+        <div class="form-row w-100 dot-border mb-4">
+            <div v-if="showEdit" class="col-11 pl-2">
+                <div class="form-group">
+                    <label class="font-weight-bold">Summary : </label>
+                    <input v-model="summary" class="col form-control" name="operation-summary">
                 </div>
-                <div class="col-8">
-                    <label class="col-5 float-left">Path :</label>
-                    <b-input class="col-7" v-model="pathApi" disabled></b-input>
+                <div class="form-row">
+                    <div class="form-group col-3">
+                        <label  class="font-weight-bold">Method :</label>
+                        <b-form-group class="mb-2 w-100"
+                                      :state="methodState" :invalid-feedback="methodInvalidFeedback">
+                            <b-select class="form-control w-100" :state="methodState" trim v-model="method"
+                                      :options="selectMethodOptions" name="operation-method"></b-select>
+                        </b-form-group>
+                    </div>
+                    <div class="form-group col-9">
+                        <label class="font-weight-bold">Path :</label>
+                        <b-input class="form-control" v-model="pathApi" disabled></b-input>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <label class="col-2">Operation Id :</label>
-                <b-input v-model="operationId" class="col"></b-input>
-            </div>
-            <div class="row">
-                <label>Description:</label>
-                <vue-editor v-model="description"></vue-editor>
-            </div>
-            <div class="row">
-                <label>Consumes :</label>
-                <v-select multiple v-model="consumes" class="w-100" :options="options">
-                </v-select>
-            </div>
-            <div class="row">
-                <label>Produces :</label>
-                <v-select multiple v-model="produces" class="w-100" :options="options">
-                </v-select>
-            </div>
-        </div>
-        <div v-else class="col-11">
-                <div class="row">
-                    <p>Summary : {{summary}}</p>
+                <div class="form-group">
+                    <label class="font-weight-bold">Operation Id :</label>
+                    <input v-model="operationId" class="form-control" name="operation-id"></input>
                 </div>
-                <div class="row">
-                    <p>Method :{{method}}</p>
+                <div class="form-group">
+                    <div class="form-group">
+                        <label class="font-weight-bold">Description:</label>
+                        <vue-editor v-model="description"></vue-editor>
+                    </div>
                 </div>
-                <div class="row">
-                    <p>Path : {{pathApi}}</p>
+                <div class="form-group">
+                    <label class="font-weight-bold">Consumes :</label>
+                    <v-select multiple v-model="consumes" class="w-100" :options="options"
+                              name="operation-consumes"></v-select>
                 </div>
-                <div class="row">
-                    <p>Operation Id :{{operationId}}</p>
-                </div>
-                <div class="row">
-                    <p>Description:</p>
-                    <p v-html="description"></p>
-                </div>
-                <div class="row">
-                    <p>Consumes :</p>
-                    <p v-for="consume in consumes" v-bind:key="consume">{{consume}}</p>
-                </div>
-                <div class="row">
-                    <p>Produces :</p>
-                    <p v-for="produce in produces" v-bind:key="produce">{{produce}}</p>
+                <div class="form-group">
+                    <label class="font-weight-bold">Produces :</label>
+                    <v-select multiple v-model="produces" class="w-100" :options="options"
+                              name="operation-produces">
+                    </v-select>
                 </div>
             </div>
-            <button v-if="editable" @click="isEditing = !isEditing"
-                class="col-1 float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
-            <i class="fa fa-pencil-alt"></i>
-        </button>
+            <div v-else class="col-11 pl-3">
+                <div class="form-row">
+                    <p class="font-weight-bold">Summary : </p>
+                    <p class="ml-2">{{summary}}</p>
+                </div>
+                <div class="form-row">
+                    <p class="font-weight-bold">Method : </p>
+                    <p class="ml-2">{{method}}</p>
+                </div>
+                <div class="form-row">
+                    <p class="font-weight-bold">Path : </p>
+                    <p class="ml-2">{{pathApi}}</p>
+                </div>
+                <div class="form-row">
+                    <p class="font-weight-bold">Operation Id : </p>
+                    <p class="ml-2">{{operationId}}</p>
+                </div>
+                <div class="form-row">
+                    <p class="font-weight-bold w-100">Description:</p>
+                    <br>
+                    <p v-html="description" class="dot-border w-100"></p>
+                </div>
+                <div class="form-row">
+                    <p class="font-weight-bold w-100">Consumes :</p>
+                    <p v-for="consume in consumes" v-bind:key="consume" class="mr-2 btn-outline-primary btn btn-sm">{{consume}}</p>
+                </div>
+                <div class="form-row">
+                    <p class="font-weight-bold w-100">Produces :</p>
+                    <p v-for="produce in produces" v-bind:key="produce" class="mr-2 btn-outline-primary btn btn-sm">{{produce}}</p>
+                </div>
+            </div>
+            <div class="col-1 pr-0">
+                <button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"
+                        class="float-right round-button btn mt-2 mr-2" v-bind:id="_uid+'-edit-btn'">
+                    <i class="fa fa-pencil-alt"></i>
+                </button>
+            </div>
         </div>
 
         <RequestComponent ref="request"
                           :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                          :editable="editable"
+                          :editable="$_projectPrivilege_canEdit"
                           :request-data="requestData" :operation-api="method"/>
-        <ResponseComponent ref="response"
+        <ResponseComponent ref="response" class="pl-2"
                            :responses-data="responsesData"
-                           :editable="editable"
+                           :editable="$_projectPrivilege_canEdit"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
 
     </div>
@@ -97,11 +106,16 @@
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import ActionBuilder from "@/utils/ActionBuilderUtil";
     import vSelect from 'vue-select';
+    import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
+    import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";
+    import BadgeGeneratorUtil from "@/utils/BadgeGeneratorUtil";
+    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
+    import {BASE_PROJECT_URL} from "../../stores/actions/const";
 
     export default {
         name: "OperationEditor",
-        components: {ResponseComponent, RequestComponent,VueEditor,vSelect},
-        mixins : [ChangeObserverMixin],
+        components: {EditorHeaderComponent, ResponseComponent, RequestComponent, VueEditor,vSelect},
+        mixins : [ChangeObserverMixin, ProjectPrivilegeMixin],
         data : () => ({
             isCreateNew : false,
             projectId : undefined,
@@ -143,21 +157,29 @@
                 {key : 'consumes'},
                 {key : 'produces'}
             ],
-
             operationActionQuery : [],
-            pathActionQuery : [],
+            pathActionQuery : []
         }),
         computed : {
+            editorTitle : function (){
+                return '<h4><span class="'
+                    + BadgeGeneratorUtil.getBadgeClassOfOperation(this.method)+' mr-3">'+this.method+'</span>'
+                    + this.pathApi+'</h4>'
+            },
+            methodState : function (){
+                return this.$_changeObserverMixin_isValid('method')
+            },
+            methodInvalidFeedback : function () {
+                return this.$_changeObserverMixin_getErrors('method')[0]
+            },
+            projectFetchState : function (){
+                return this.$store.getters['project/getState']
+            },
             modelName : function (){
                 return this.testModel.name
             },
-            editable : function () {
-                let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
-                if(hasEditingPrivilege === undefined)return false
-                return hasEditingPrivilege
-            },
             showEdit : function () {
-                if(!this.editable){
+                if(!this.$_projectPrivilege_canEdit){
                     return false
                 }
                 return this.isEditing
@@ -199,142 +221,148 @@
                 res.operationId = this.operationId
                 res.request = this.$refs.request.getData()
                 res.responses = this.$refs.response.getData()
-                res.consumes = this.consumes
-                res.produces = this.produces
+                res.consumes = (this.consumes === '')?[]:this.consumes
+                res.produces = (this.produces === '')?[]:this.produces
                 return res
             },
             getActions : function () {
                 return ActionBuilder.createActions(this.operationData, this._data, this.attributesKey)
             },
-            commitChange : function () {
-                ActionExecutorUtil.executeActions(this.operationData, this.operationActionQuery)
-                ActionExecutorUtil.executeActions(this.pathData.methods, this.pathActionQuery)
-            },
             submit : function () {
-                try{
 
-                    if(!this.$_changeObserverMixin_allIsValid()){
-                        console.log('can\'t submit due to unvalid field')
-                        return
-                    }
+                if(!this.$_changeObserverMixin_allIsValid()){
+                    this.$bvToast.toast('Can\'t submit due to invalid input', {
+                        title: 'Failed',
+                        variant: 'danger'
+                    })
+                    return
+                }
 
-                    let callbacks = []
-                    let signaturePointer = undefined
-                    let tree = undefined
-                    if(this.isCreateNew){//jika baru dibuat
+                let callbacks = []
+                let signaturePointer = undefined
+                let operationActions = []
+                let pathActions = []
+                let tree = undefined
+                let operationData = this.operationData
+                let pathData = this.pathData
+
+                if(this.isCreateNew){//jika baru dibuat
+                    signaturePointer = this.pathData
+
+                    let data = this.getData()
+                    data._signature = uuidv4()
+
+                    tree = TreeBuilder.buildDeepTree(
+                        ['sections',this.sectionApi, 'paths',this.pathApi]
+                    )
+
+                    tree.leaf._signature = this.pathData._signature
+
+                    let leaf = tree.leaf.methods = {}
+                    leaf._hasActions = true
+                    leaf._actions = [{
+                        action : 'put',
+                        key : this.method,
+                        value : data
+                    }]
+                    callbacks.push(()=>{
+                        this.$router.push({
+                            name :'operation-editor',
+                            params: {sectionApi : this.sectionApi, pathApi : this.pathApi, operationApi : this.method}
+                        })
+                    })
+                    pathActions = leaf._actions
+                }
+                else{//jika edit data
+                    tree = TreeBuilder.buildDeepTree(this.treeKeys)
+                    //jika ganti method
+                    if(this.operationApi !== this.method){
                         signaturePointer = this.pathData
 
+                        let tmp = tree.root.sections[this.sectionApi].paths[this.pathApi].methods
+                        tmp._hasActions = true
                         let data = this.getData()
                         data._signature = uuidv4()
-
-                        tree = TreeBuilder.buildDeepTree(
-                            ['sections',this.sectionApi, 'paths',this.pathApi]
-                        )
-
-                        tree.leaf._signature = this.pathData._signature
-
-                        let leaf = tree.leaf.methods = {}
-                        leaf._hasActions = true
-                        leaf._actions = [{
-                            action : 'put',
-                            key : this.method,
-                            value : data
-                        }]
+                        tmp._actions = [
+                            {
+                                action : 'delete',
+                                key : this.operationApi
+                            },
+                            {
+                                action : 'put',
+                                key : this.method,
+                                value : data
+                            }
+                        ]
                         callbacks.push(()=>{
                             this.$router.push({
                                 name :'operation-editor',
                                 params: {sectionApi : this.sectionApi, pathApi : this.pathApi, operationApi : this.method}
                             })
                         })
-                        this.pathActionQuery = leaf._actions
+                        pathActions = tmp._actions
+                        tree.root.sections[this.sectionApi].paths[this.pathApi]._signature = this.pathData._signature
                     }
-                    else{//jika edit data
-                        tree = TreeBuilder.buildDeepTree(this.treeKeys)
-                        //jika ganti method
-                        if(this.operationApi !== this.method){
-                            signaturePointer = this.pathData
+                    else{
+                        signaturePointer = this.operationData
 
-                            let tmp = tree.root.sections[this.sectionApi].paths[this.pathApi].methods
-                            tmp._hasActions = true
-                            let data = this.getData()
-                            data._signature = uuidv4()
-                            tmp._actions = [
-                                {
-                                    action : 'delete',
-                                    key : this.operationApi
-                                },
-                                {
-                                    action : 'put',
-                                    key : this.method,
-                                    value : data
-                                }
-                            ]
-                            callbacks.push(()=>{
-                                this.$router.push({
-                                    name :'operation-editor',
-                                    params: {sectionApi : this.sectionApi, pathApi : this.pathApi, operationApi : this.method}
-                                })
-                            })
-                            this.pathActionQuery = tmp._actions
-                            tree.root.sections[this.sectionApi].paths[this.pathApi]._signature = this.pathData._signature
+                        let pointer = tree.leaf
+                        pointer._signature = this.operationData._signature
+
+                        operationActions = this.getActions()
+
+                        pointer._hasActions = true
+                        pointer._actions = operationActions
+
+
+                        let callback = this.$refs.request.buildQuery(tree.leaf,pointer.request = {})
+                        if(callback === undefined){
+                            delete pointer.request
                         }
                         else{
-                            signaturePointer = this.operationData
-
-                            let pointer = tree.leaf
-                            pointer._signature = this.operationData._signature
-
-                            this.operationActionQuery = this.getActions()
-
-                            pointer._hasActions = true
-                            pointer._actions = this.operationActionQuery
-
-                            let callback = this.$refs.request.buildQuery(tree.leaf,pointer.request = {})
-                            if(callback === undefined){
-                                delete pointer.request
-                            }
-                            else{
-                                callbacks.push(callback)
-                            }
-
-                            callback = this.$refs.response.buildQuery(pointer.responses = {})
-                            if(callback === undefined){
-                                delete pointer.responses
-                            }
-                            else{
-                                callbacks.push(callback)
-                            }
-
-
-
-                            if(pointer._actions.length === 0){
-                                delete pointer._actions
-                                delete pointer._hasActions
-                            }
+                            callbacks.push(callback)
+                        }
+                        callback = this.$refs.response.buildQuery(pointer.responses = {})
+                        if(callback === undefined){
+                            delete pointer.responses
+                        }
+                        else{
+                            callbacks.push(callback)
                         }
 
-                    }//end else
-                    console.log(tree)
-                    axios.put('http://localhost:8080/projects/'+this.projectId,tree.root).then(
-                        (response) => {
-                            if(response.status === 200){
-                                signaturePointer._signature = response.data.new_signature
-                                this.commitChange()
-                                callbacks.forEach(fn => fn())
-                                this.reloadData()
-                            }
+                        if(pointer._actions.length === 0){
+                            delete pointer._actions
+                            delete pointer._hasActions
                         }
-                    ).catch(function (error) {
-                        console.log(error);
+                    }
+
+                }//end else
+                console.log(tree)
+
+                callbacks.push(()=>{
+                    ActionExecutorUtil.executeActions(operationData, operationActions)
+                    ActionExecutorUtil.executeActions(pathData.methods, pathActions)
+                })
+
+                axios.put(BASE_PROJECT_URL+'/'+this.projectId,tree.root).then(
+                    (response) => {
+                        if(response.status === 200){
+                            signaturePointer._signature = response.data.new_signature
+                            callbacks.forEach(fn => fn())
+                            this.reloadData()
+                        }
+                    }
+                ).catch(error => {
+                    console.error(error)
+                    this.$bvToast.toast(error.response.data.message + ' , Please refresh the page.', {
+                        title: 'Failed',
+                        variant: 'danger'
                     })
+                })
 
 
-                    this.isEdited = false
-
-                }
-                catch (e) {
-                    console.log(e)
-                }
+                this.isEdited = false
+                return tree.root
             },
             cancel : function () {
                 this.reloadData()
@@ -359,6 +387,8 @@
                 }
                 else{
                     this.isCreateNew = true
+                    this.isEdited = true
+                    this.isEditing = true
                 }
                 let od = this.operationData
                 if(od !== undefined){
@@ -367,9 +397,15 @@
                     this.operationId = od.operationId
                     this.consumes = od.consumes
                     this.produces = od.produces
-                    if(this.description !== undefined && this.description[0] !== '<'){
-                        this.description = '<p>'+this.description+'</p>'
-                    }
+                    this.description = od.description
+                }
+                else{
+                    this.summary = ''
+                    this.description = ''
+                    this.operationId = ''
+                    this.consumes = ''
+                    this.produces = ''
+                    this.description = ''
                 }
                 this.$_changeObserverMixin_initObserver([
                     'summary',
@@ -399,7 +435,19 @@
             operationData : function (after,before) {
                 this.loadData()
             },
-
+            projectState : function () {
+                if(
+                    (this.projectFetchState === NOT_FOUND) ||
+                    (this.projectFetchState === COMPLETE && this.operationData === undefined && !this.isCreateNew)
+                ){
+                    this.$router.push({
+                        name :'project-editor',
+                        params : {
+                            projectId : this.$route.params.projectId
+                        }
+                    })
+                }
+            }
         },
         mounted() {
             this.loadData()

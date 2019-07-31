@@ -1,47 +1,51 @@
 <template>
-    <div>
-        <div v-if="isEditing">
-            <div class="form-inline float-right" v-for="(key,i) in enumCount" v-bind:key="i">
-                <label class="col-4">Enum :</label>
-                <input class="col-8 form-control" @keyup="onEnumTyped(i)" v-model="enums[i]" name="enum"/>
+    <div class="pr-0">
+        <slot v-if="isEditing">
+            <div class="form-row float-right mb-2 w-100" v-for="(key,i) in enumCount" v-bind:key="i">
+                <label class="col-3 text-left shrinkable-text mt-auto">Enum :</label>
+                <input class="col-9 form-control" @keyup="onEnumTyped(i)" v-model="enums[i]" name="enum"/>
             </div>
-            <div class="form-inline float-right">
-                <label class="col-4">Pattern :</label>
-                <input class="col-8 form-control" v-model="pattern" name="pattern"/>
+            <div class="form-row float-right mb-2 w-100">
+                <label class="col-3 text-left shrinkable-text mt-auto">Pattern :</label>
+                <input class="col-9 form-control" v-model="pattern" name="pattern"/>
             </div>
-            <div class="form-inline row float-right">
-                <div class="form-inline col-6 row">
-                    <label class="col-6">Min length:</label>
-                    <input type="number" class="col-6 form-control" v-model="minLength" name="min-length">
+            <div class="form-row float-right mb-2 w-100">
+                <div class="form-row col-6">
+                    <label class="col-3 text-left mt-auto">Min length:</label>
+                    <input type="number" class="col-9 form-control" v-model="minLength" name="min-length">
                 </div>
-                <div class="form-inline col-6 row">
-                    <label class="col-6">Max length:</label>
-                    <input class="col-6 form-control" v-model="maxLength" name="max-length">
+                <div class="form-row float-right col-6 ml-auto">
+                    <label class="col-3 text-left mt-auto">Max length:</label>
+                    <input type="number" class="col-9 form-control" v-model="maxLength" name="max-length">
                 </div>
             </div>
-            <div class="form-inline float-right">
-                <label class="col-4">Default :</label>
-                <input class="col-8 form-control" v-model="defaultVal" name="default-val">
+            <div class="form-row float-right w-100">
+                <label class="col-3 text-left shrinkable-text mt-auto">Default :</label>
+                <input class="col-9 form-control" v-model="defaultVal" name="default-val">
             </div>
-        </div>
-        <div v-else class="float-right">
-            <div class="row" v-if="enums.length !== 1">
-                <p class="col">Enum</p>
-                <div class="col">
+        </slot>
+        <div style="padding-left: 50%" v-else>
+            <div class="row w-100" v-if="enums.length !== 1">
+                <p>Enum :</p>
+                <div class="ml-2">
                     <p v-for="_enum in enums" v-bind:key="_enum">{{_enum}}</p>
                 </div>
             </div>
-            <div class="row" v-if="pattern !== undefined">
-                <p>Pattern : {{pattern}}</p>
+            <div class="row w-100" v-if="pattern !== undefined">
+                <p>Pattern :</p>
+                <p class="ml-2">{{pattern}}</p>
             </div>
-            <div class="row" v-if="minLength !== '' && minLength !== undefined">
-                <p>Min length : {{minLength}}, </p>
+            <div class="row w-100" v-if="minLength !== '' && minLength !== undefined">
+                <p>Min length :</p>
+                <p class="ml-2">{{minLength}}</p>
             </div>
-            <div v-if="maxLength !== '' && maxLength !== undefined" class="row">
-                <p>Max length : {{maxLength}}</p>
+            <div v-if="maxLength !== '' && maxLength !== undefined" class="row w-100">
+                <p>Max length :</p>
+                <p class="ml-2">{{maxLength}}</p>
             </div>
-            <div class="row" v-if="defaultVal !== '' && defaultVal !== undefined">
-                <p>Default : {{defaultVal}}</p>
+            <div class="row w-100" v-if="defaultVal !== '' && defaultVal !== undefined">
+                <p>Default :</p>
+                <p class="ml-2">{{defaultVal}}</p>
             </div>
         </div>
     </div>

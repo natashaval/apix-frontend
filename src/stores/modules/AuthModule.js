@@ -27,6 +27,7 @@ export default {
             state.status = 'error'
         },
         [AUTH_LOGOUT]: (state) => {
+            state.status = 'logout'
             state.token = ''
         }
     },
@@ -34,12 +35,12 @@ export default {
         [AUTH_REQUEST]: ({commit, dispatch}, user) => {
             return new Promise(((resolve, reject) => {
                 commit(AUTH_REQUEST)
-                axios({url: BASE_URL + 'auth/login', data: user, method: 'POST'})
+                axios({url: BASE_URL + '/auth/login', data: user, method: 'POST'})
                     .then(response => {
                         const token = response.data.token
                         localStorage.setItem('apix-token', token)
                         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-                        commit(AUTH_SUCCESS, response)
+                        commit(AUTH_SUCCESS, token)
 
                         dispatch('user/' + USER_REQUEST, null, {root: true}) // to log in user
                         resolve(response)
@@ -49,12 +50,11 @@ export default {
                         localStorage.removeItem('apix-token')
                         reject(error)
                     })
-
             }))
         },
 
-        [AUTH_LOGOUT]: ({commit, dispatch}) => {
-            return new Promise(((resolve, reject) => {
+        [AUTH_LOGOUT]: ({commit}) => {
+            return new Promise(((resolve) => {
                 commit(AUTH_LOGOUT)
                 localStorage.removeItem('apix-token')
                 delete  axios.defaults.headers.common['Authorization']

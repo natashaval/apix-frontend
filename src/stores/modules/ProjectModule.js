@@ -1,11 +1,14 @@
 import axios from 'axios'
-import {BASE_URL} from "../actions/const";
+import {IN_PROCESS,COMPLETE,NOT_FOUND} from "@/stores/consts/FetchStatus";
+import {NOT_START} from "@/stores/consts/FetchStatus";
+import {BASE_PROJECT_URL} from "../actions/const";
 
 export default{
     namespaced : true,
     state : {
         projects : [],//list project lain, cuma data sederhana (id,nama,...dll)
-        project : {}//menyimpan data detail dari suatu project
+        project : {},//menyimpan data detail dari suatu project
+        fetchStatus : NOT_START
     },
     getters : {
         getProjectList(state){
@@ -47,6 +50,15 @@ export default{
         },
         getGithubData(state) {
             return state.project.githubProject
+        },
+        getState(state){
+            return state.fetchStatus
+        },
+        getProjectOwner(state) {
+            return state.project.projectOwner
+        },
+        getTeams(state) {
+            return state.project.teams
         }
     },
     mutations: {
@@ -65,20 +77,34 @@ export default{
 
         ADD_DATA(state, newData) {
             state.projects.push(newData)
+        },
+        CHANGE_STATE(state, processState){
+            state.fetchStatus = processState
+        },
+        PUSH_TEAM(state, newTeam) {
+            state.project.teams.push(newTeam)
+        },
+        REMOVE_TEAM(state, deleteTeam) {
+
         }
     },
     actions : {
         fetchProjectData({ commit }, idProject) {
-            let fetchData = () => axios.get(BASE_URL + 'projects/'+idProject).then(
+            commit('CHANGE_STATE', IN_PROCESS)
+            axios.get(BASE_PROJECT_URL +'/'+ idProject).then(
                 (response) => {
-                    commit('ASSIGN_DATA', response.data)
+                    if(response.status === 200){
+                        commit('ASSIGN_DATA', response.data)
+                        commit('CHANGE_STATE', COMPLETE)
+                    }
                 }
-            )
-            fetchData()
+            ).catch(() => {
+                commit('CHANGE_STATE', NOT_FOUND)
+            })
         },
-        
+
         fetchAllProjectsData({ commit }) {
-            let fetchProjects = () => axios.get(BASE_URL + 'projects/all/info')
+            let fetchProjects = () => axios.get(BASE_PROJECT_URL + '/all/info')
                 .then((response) => {
                     commit('LIST_DATA', response.data)
                 })
@@ -86,7 +112,7 @@ export default{
         },
 
         deleteProjectData({ commit }, idProject) {
-            let deleteProject = () => axios.delete(BASE_URL + 'projects/' + idProject).then(
+            let deleteProject = () => axios.delete(BASE_PROJECT_URL +'/'+ idProject).then(
                 (response) => {
                     commit('DELETE_DATA', idProject)
                 }
@@ -98,7 +124,7 @@ export default{
 
         createProjectData({commit}, newProjectForm) {
             return new Promise((resolve, reject) => {
-                axios.post(BASE_URL + 'projects', newProjectForm)
+                axios.post(BASE_PROJECT_URL, newProjectForm)
                     .then((response) => {
                         console.log('hasil axios dari module', response.data)
                         commit('ADD_DATA', response.data.newProject)
@@ -109,6 +135,17 @@ export default{
                         reject(error)
                     })
             })
+        },
+
+        assignTeamToProject({state, commit}, payload){
+            console.log('assign team')
+            if (!state.project.teams.includes(payload)) commit('PUSH_TEAM', payload)
+            else console.log('tidak perlu push')
+        },
+        unassignTeamFromProject({state, commit}, payload) {
+            console.log('unassign team')
+            if(state.project.teams.includes(payload)) commit('REMOVE_TEAM', payload)
+            else console.log('tidak ada yang diunassign')
         }
     }
 }

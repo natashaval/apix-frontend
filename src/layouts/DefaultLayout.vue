@@ -1,7 +1,7 @@
 <template>
     <div class="all-layout">
         <h2>All Layout</h2>
-        <MenuBar></MenuBar>
+        <MenuBar class="m-4"></MenuBar>
         <router-view></router-view>
     </div>
 </template>
@@ -9,14 +9,14 @@
 <script>
     import MenuBar from "./MenuBar";
     export default {
-        name: "AllLayout",
+        name: "DefaultLayout",
         components: {MenuBar},
     }
 </script>
 
 <style scoped>
     .all-layout {
-        width: 80%;
+        width: 95%;
         margin: auto;
         /*background-color: beige;*/
     }

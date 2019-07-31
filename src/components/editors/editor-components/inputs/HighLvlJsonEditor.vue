@@ -1,49 +1,57 @@
 <template>
-    <div :class="(borderable)?'dot-border':''">
-        <div ref="alwaysShown">
-
-        </div>
+    <div :class="isSubArray?'':'dot-border'">
         <div class="row justify-content-end" style="margin-left: -10%">
-            <div class="col-1 ">
-                <button class="round-button btn"
-                        style="margin: 10px"
-                        v-if="type === 'object'"
-                        @click="showChild = (showChild === 'down')?'':'down'"
-                        v-b-toggle="_uid+'-child-collapse'">
-                    <i class="fa fa-angle-right rotate"
-                       v-bind:class="showChild"></i>
-                </button>
-                <div class="w-100"></div>
-            </div>
-            <div class="col-10 justify-content-end">
+            <div class="col-10 mt-3">
+                <div v-if="editable" class="container row">
+                    <p v-if="type === 'object'" class="btn-text"  @click="$bvModal.show(_uid+'-extract-modal')">
+                        <i class="fas fa-cube"></i> Extract datatype
+                    </p>
+                </div>
                 <div class="container row">
                     <!--kolom kiri-->
                     <div class="col-6">
-                        <div v-if="showEdit" class="form-inline">
-                            <slot v-if="nameable">
-                                <label class="col-4">Name :</label>
-                                <slot v-if="disableName">
-                                    <input class="col-8 form-control" disabled v-model="name" :name="_uid+'-name'"/>
-                                </slot>
-                                <slot v-else>
-                                    <input class="col-8 form-control" v-model="name" :name="_uid+'-name'"/>
-                                </slot>
-                            </slot>
-                            <p v-for="(error,i) in $_changeObserverMixin_getErrors('name')"
-                               v-bind:key="i"
-                               class="error-message">{{error}}</p>
-                            <label class="col-4">{{(isSubArray)?'Of :':'Type :'}}</label>
-                            <select class="col-8 form-control" :name="_uid+'-select-type'" v-model="selectedType">
-                                <option v-for="dataType in dataTypes"
-                                        v-bind:key="dataType.val"
-                                        :value="dataType.val">{{dataType.text}}</option>
-                                <hr/>
-                                <option v-for="dataType in customDataTypes"
-                                        v-bind:key="dataType.value"
-                                        :value="dataType.value">{{dataType.name}}</option>
-                            </select>
-                            <label>Required : </label>
-                            <input type="checkbox" class="form-check" v-model="required" :name="_uid+'-is-required'"/>
+                        <div v-if="showEdit" class="form-row">
+                            <div class="form-row">
+                                <b-form-group v-if="nameable" class="form-row mb-2 w-100 pr-0"
+                                              :state="nameState" :invalid-feedback="nameInvalidFeedback"
+                                              label="name * :"
+                                              label-class="shrinkable-text"
+                                              label-cols="2">
+                                    <slot v-if="disableName">
+                                        <b-form-input trim class="form-control" disabled v-model="name"
+                                                      :name="_uid+'-name'"></b-form-input>
+                                    </slot>
+                                    <slot v-else>
+                                        <b-form-input v-model="name" class="w-100"
+                                                      :state="nameState" trim
+                                                      :name="_uid+'-name'"></b-form-input>
+                                    </slot>
+                                </b-form-group>
+                            </div>
+                            <div class="form-row w-100 mb-2">
+                                <p v-if="type === 'object' && isSubArray" class="btn-text w-100" @click="$bvModal.show(_uid+'-extract-modal')">
+                                    <i class="fas fa-cube"></i> Extract datatype
+                                </p>
+                                <label class="shrinkable-text col-2 mt-auto">{{(isSubArray)?'Of :':'Type :'}}</label>
+                                <b-select class="form-control col-10" :name="_uid+'-select-type'" v-model="selectedType">
+                                    <optgroup label="Data Type"></optgroup>
+                                    <hr/>
+                                    <option v-for="dataType in dataTypes"
+                                            v-bind:key="dataType.val"
+                                            :value="dataType.val">{{dataType.text}}</option>
+                                    <hr/>
+                                    <optgroup label="Model / Custom DataType"></optgroup>
+                                    <hr/>
+                                    <option v-for="dataType in customDataTypes"
+                                            v-bind:key="dataType.value"
+                                            :value="dataType.value">{{dataType.name}}</option>
+                                </b-select>
+                            </div>
+                            <div class="form-row w-100">
+                                <label class="shrinkable-text mt-1 col-3">Required :</label>
+                                <input type="checkbox" class="mt-2" v-model="required" :name="_uid+'-is-required'"/>
+
+                            </div>
                         </div>
                         <div v-else class="row">
                             <p v-if="isSubArray">Of: </p>
@@ -61,32 +69,31 @@
                     <!--kolom kanan-->
                     <div class="col-6">
                         <div v-if="showEdit">
-                            <div class="row">
-                                <label class="col-4">Description :</label>
-                                <input class="col-8" v-model="description" :name="_uid+'-description'"/>
+                            <div class="form-row mb-2">
+                                <label class="shrinkable-text col-3 mt-auto">Description :</label>
+                                <input class="col-9 form-control" v-model="description" :name="_uid+'-description'"/>
                             </div>
-                            <div class="row">
-                                <label class="col-4">Example :</label>
-                                <input class="col-8" v-model="example"/>
+                            <div class="form-row">
+                                <label class="shrinkable-text col-3 mt-auto">Example :</label>
+                                <input class="col-9 form-control" v-model="example"/>
                             </div>
-                            <div class="form-inline float-right w-100">
-                                <a style="float: right;color: #4493e2;cursor: pointer;" v-bind:id="_uid+'-more-attribute'"
-                                   class="more-attribute btn-link" @click="clickMoreDisplay">more attributes</a>
+                            <div class="form-row mt-2 mb-2">
+                                <a v-bind:id="_uid+'-more-attribute'"
+                                   class="btn-text more-attribute text-right w-100" @click="clickMoreDisplay"
+                                v-html="(isMoreDisplay)?'less':'more attributes'"
+                                >more attributes</a>
                             </div>
-                            <br/>
                         </div>
-                        <div v-else class="container">
-                            <div class="row" style="text-align: right;display: block;">
+                        <div v-else style="padding-left: 50%">
+                            <div class="row" style="display: block;">
                                 <p v-if="description !== undefined">Description : {{description}}</p>
                             </div>
-                            <div class="row" style="text-align: right;display: block;">
+                            <div class="row" style="display: block;">
                                 <p v-if="example !== undefined">Example : {{example}}</p>
                             </div>
                         </div>
                         <div v-bind:style="{display: (showEdit)?moreDisplay:'block'}"
                             v-bind:id="_uid+'-more-attr-form'">
-                            <!--more attributes of selected datatype-->
-                            <div class="w-100"></div>
                             <StringData ref="curDataType" v-if="type === 'string'"
                                         :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                         :is-editing="showEdit" :schema-data="schemaData"/>
@@ -111,20 +118,12 @@
                                          :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                          :is-editing="showEdit"
                                          :schema-data="schemaData"/>
-                            <FileData ref="curDataType" v-else-if="type === 'file'"
-                                         :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                                         :is-editing="showEdit"
-                                         :schema-data="schemaData"/>
                             <CustomData ref="curDataType" v-else-if="ref !== undefined"
                                         :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                         :schema-data="schemaData" :current-ref="ref"/>
                         </div>
                     </div>
                 </div>
-
-
-                <button @click="dump">Dump!</button>
-
             </div>
             <div class="col-1 " style="padding: 10px 25px;">
                 <button v-if="editable" @click="isEditing = !isEditing"
@@ -140,16 +139,26 @@
         <!--tambahan view jika tipe datanya array-->
         <div class="w-100" v-if="type === 'array'">
             <HighLvlJsonEditor ref="arrayItem" :schema-data="(schemaData !== undefined)?schemaData.items:undefined"
-                           :borderable="false"
                            :nameable="false" :deleteable="false" :editable="false"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                            :is-sub-array="true" :parent-is-editing="showEdit"/>
         </div>
+        <div>
+            <button class="round-button btn"
+                    style="margin: 10px"
+                    v-if="type === 'object'"
+                    @click="showChild = (showChild === 'down')?'':'down'"
+                    v-b-toggle="_uid+'-child-collapse'">
+                <i class="fa fa-angle-right rotate"
+                   v-bind:class="showChild"></i>
+            </button>
+            <div class="w-100"></div>
+        </div>
 
         <b-collapse v-bind:id="_uid+'-child-collapse'" visible>
-            <div v-if="type === 'object'">
+            <div v-if="type === 'object'" style="padding-right: 0">
                 <!--child object-->
-                <div v-for="(val,i) in propertiesData" v-bind:key="val.id" class="row justify-content-end">
+                <div v-for="(val,i) in propertiesData" v-bind:key="val.id" class="form-row justify-content-end" style="">
                     <div style="margin-top: -16px;margin-bottom: 16px">
                         <hr class="vline"/>
                     </div>
@@ -159,11 +168,18 @@
                                    :editable="editable"
                                    :deleteable="editable"
                                    :$_changeObserverMixin_parent="$_changeObserverMixin_this"
-                                   v-on:delete="deleteChild" class="col-11"/>
+                                   v-on:delete="deleteChild" class="col-11 border-right-0"/>
                 </div>
-                <button :ref="_uid+'-add-child-btn'" @click="addNewProperty">Add more property</button>
+                <a :ref="_uid+'-add-child-btn'" @click="addNewProperty" class="btn-text">
+                    <i class="fas fa-plus"></i> Add more property
+                </a>
             </div>
         </b-collapse>
+        <b-modal :id="_uid+'-extract-modal'" ref="extractModal" title="Extract to New Type" hide-footer>
+            <ExtractDataTypeModal
+                    @extractComplete="onExtractComplete"
+                    :init-name="name" :high-lvl-json-editor="this"></ExtractDataTypeModal>
+        </b-modal>
     </div>
 
 </template>
@@ -179,11 +195,11 @@
     import CustomData from "./typedatas/CustomData";
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
-    import FileData from "./typedatas/FileData";
+    import ExtractDataTypeModal from "./ExtractDataTypeModal";
 
     export default {
         name: "HighLvlJsonEditor",
-        components: {FileData, CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
+        components: {ExtractDataTypeModal, CustomData, BooleanData, NumericData, ObjectData, StringData, ArrayData},
         mixins : [ChangeObserverMixin],
         props : {
             parentFunctions : {//wrapper function dari parent yang bisa diakses child
@@ -212,10 +228,6 @@
             fixedName : {//jika @nameable == false, maka nama yang dipakai adalah @fixedName
                 type : String
             },
-            borderable : {//punya border (default : true)
-                type : Boolean,
-                default : true
-            },
             deleteable : {//punya tombol delete (default : true)
                 type : Boolean,
                 default : true
@@ -237,6 +249,7 @@
             isMoreDisplay : false,
             childCollapseId : Math.random().toString(),
             showChild : 'down',
+            showExtractModal : false,
 
             //data general
             name : '',
@@ -271,11 +284,16 @@
                 {text : 'String', val : 'string'},
                 {text : 'Number', val : 'number'},
                 {text : 'Integer', val : 'integer'},
-                {text : 'Boolean', val : 'boolean'},
-                {text : 'File', val : 'file'}
+                {text : 'Boolean', val : 'boolean'}
             ]
         }),
         computed : {
+            nameState: function(){
+                return this.$_changeObserverMixin_isValid('name')
+            },
+            nameInvalidFeedback() {
+                return this.$_changeObserverMixin_getErrors('name')[0]
+            },
             refName : function () {
                 if(this.ref === undefined){
                     return undefined
@@ -305,7 +323,7 @@
                     deleteChild : this.deleteChild,
                     isValidName : this.isValidName
                 }
-            },
+            }
         },
         methods : {
             isValidName : function (name) {
@@ -326,22 +344,20 @@
             clickMoreDisplay : function(){
                 this.isMoreDisplay = ! this.isMoreDisplay
             },
-            selectItemType : function (value,i) {
-                if(value === 'array' && i === this.items.length -1 ){
-                    this.items.push({
-                        type : 'string'
-                    })
-                }
-                else{
-                    this.items = this.items.slice(0,i+1)
-                }
-
+            onExtractComplete : function(newModelRef){
+                this.$_changeObserverMixin_onDataChanged(0,1)
+                this.$bvModal.hide(this._uid+'-extract-modal')
+                this.ref = newModelRef
+                this.type = ''
+                this.selectedType = this.ref
+                this.propertiesData = []
+                console.log(this.ref)
             },
             getActions : function () {
                 let tmp = this.schemaData
                 return ActionBuilder.createActions(tmp, this._data, this.attributesKey)
             },
-            //mengcopy hasil edit ke state vuex project
+            //mengcopy hasil edit ke nameState vuex project
             commitChange : function () {
                 ActionExecutorUtil.executeActions(this.schemaData, this.actionsQuery)
                 if(this.type === 'object' ){
@@ -359,6 +375,9 @@
             * */
             buildQuery : function (parentQuery) {
                 this.commitChangeCallback = []
+                let callbacks = []
+                let schemaActions = []
+                let propertiesActions = []
                 let query = {_hasActions : true, _actions : []}
                 let childIsEdited = false
                 if(parentQuery._hasActions === undefined){
@@ -417,7 +436,7 @@
 
                 if(this.type === 'object'){
                     query.properties = {
-                        _actions : this.propertiesActionQuery = [],
+                        _actions : propertiesActions = [],
                         _hasActions : true
                     }
 
@@ -428,7 +447,8 @@
                         let callback = this.$refs['property-'+id][0].buildQuery(query.properties)
                         if(callback !== undefined){
                             childIsEdited = true
-                            this.commitChangeCallback.push(callback)
+                            // this.commitChangeCallback.push(callback)
+                            callbacks.push(callback)
                         }
                     }
 
@@ -448,7 +468,8 @@
                     let callback = this.$refs['arrayItem'].buildQuery(query)
                     if(callback !== undefined){
                         childIsEdited = true
-                        this.commitChangeCallback.push(callback)
+                        // this.commitChangeCallback.push(callback)
+                        callbacks.push(callback)
                     }
                     else{
                         delete query.items
@@ -465,12 +486,24 @@
                         delete query._actions
                     }
                     else{
-                        this.actionsQuery = query._actions
+                        schemaActions = query._actions
                         isEdited = true
                     }
                 }
+                let schemaData = this.schemaData
+                let type = this.type
+                return (isEdited)?()=>{
+                    ActionExecutorUtil.executeActions(schemaData, schemaActions)
+                    if(type === 'object' ){
+                        //execute actions yang ada di properties
+                        ActionExecutorUtil.executeActions(
+                            schemaData.properties,
+                            propertiesActions
+                        )
+                    }
+                    callbacks.forEach(fn => fn())
 
-                return (isEdited)?this.commitChange : undefined
+                } : undefined
             },
             getData : function () {
                 let res = this.$refs.curDataType.getAttributes()
@@ -511,47 +544,27 @@
                 }
                 this.propertiesData.splice(childIndex,1)
             },
-            onExampleTyped : function(i) {
-                if(i === this.exampleCount - 1 ){
-                    if(this.examples[i] !== ''){
-                        this.exampleCount++
-                        this.examples.push('')
-                    }
-                }
-                else if(i === this.exampleCount - 2){
-                    if(this.examples[i] === ''){
-                        this.exampleCount--
-                        this.examples.pop()
-                    }
-                }
-            },
             dump : function () {
                 let tmp = {}
                 this.buildQuery(tmp)
-                console.log(tmp)
-                console.log(this.getData())
             },
             reloadData : function(){
                 this.loadData()
             },
-            /*
-            * input : #/definitions/mydatatype
-            * output : mydatatype
-            * */
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
                 this.projectId = this.$route.params.projectId
 
                 this.deletedProperty = []
                 this.propertiesData = []
-
+                this.ref = undefined
                 if(this.parentIsEditing !== undefined){
                     this.isEditing = this.parentIsEditing
                 }
                 if(this.schemaData !== undefined){
                     let sd = this.schemaData
                     this.name = sd.name
-                    this.type = sd.type
+                    this.type = (sd.type)?sd.type:undefined
                     this.selectedType = sd.type
                     this.description = sd.description
                     this.required = sd.required
@@ -559,6 +572,7 @@
                     if(sd['$ref'] !== undefined){
                         this.ref = sd['$ref']
                         this.selectedType = this.ref
+                        this.type = undefined
                     }
 
                     //punya properties/child
@@ -622,6 +636,13 @@
                 else{
                     this.ref = value
                     this.type = undefined
+
+                    //check is the ref exist
+                    let exist = this.customDataTypes.some(type => type.value === this.ref)
+                    if(!exist){
+                        this.type = 'string'
+                        this.ref = ''
+                    }
                 }
             }
         },

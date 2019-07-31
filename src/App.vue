@@ -1,17 +1,15 @@
 <template>
-    <div id="app" class="container-fluid">
-        <b-row>
+    <div id="app">
             <component v-bind:is="layout"></component>
-        </b-row>
-
     </div>
 
 </template>
 
 <script>
-    import SingleLayout from "./layouts/SingleLayout";
-    import AllLayout from "./layouts/AllLayout";
+    import EditorLayout from "./layouts/EditorLayout";
+    import DefaultLayout from "./layouts/DefaultLayout";
     import axios from 'axios'
+    import {DEFAULT_LAYOUT, EDITOR_LAYOUT} from "./consts/LayoutMode"
 
     export default {
         name: 'app',
@@ -21,8 +19,8 @@
             }
         },
         components: {
-            'single-layout': SingleLayout,
-            'all-layout': AllLayout
+            [DEFAULT_LAYOUT]: DefaultLayout,
+            [EDITOR_LAYOUT]: EditorLayout
         },
         computed : {
             layout: function () {
@@ -33,49 +31,43 @@
 
         },
         created: function () {
-            axios.interceptors.response.use(undefined, function (err) {
-                return new Promise (function (resolve, reject) {
-                    if(err.status === 401 && err.config && !err.config.__isRetryRequest) {
-                        // if get 401 unauthorized, logout user
+            axios.interceptors.response.use(response => response
+            , error => {
+                console.log('dari axios interceptor', error.response.data)
+                if(error.response.status === 401){
+                    return new Promise(((resolve, reject) => {
                         this.$store.dispatch('auth/AUTH_LOGOUT')
-                    }
-                    throw err;
-                })
+                        this.$router.push({name: 'auth-login'})
+                    }))
+                }
+
+
+                return Promise.reject(error)
+
             })
+
         }
     }
 </script>
 
 <style>
     @import "https://use.fontawesome.com/releases/v5.7.1/css/all.css";
+    @import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
 
+    body {
+        padding: 0;
+        margin: 0;
+        width: 100%;
+    }
     #app {
-        font-family: 'Avenir', Helvetica, Arial, sans-serif;
+        /*font-family: 'Avenir', Helvetica, Arial, sans-serif;*/
+        font-family: 'Roboto', sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        text-align: center;
-        color: #2c3e50;
+        left: 0;
+        /*text-align: justify;*/
+        /*color: #2c3e50;*/
     }
-
-    #app{
-        border: aqua 1px solid;
-        height: 100%;
-        overflow: hidden;
-    }
-
-    .sidebar{
-        border: red 1px solid;
-        position: fixed;
-        overflow: auto;
-        height: 100vh;
-    }
-
-    .main-view{
-        border: greenyellow 1px solid;
-        height: 100vh;
-        overflow: auto;
-    }
-
     .blue-frame{
         border: 1px solid blue;
     }
@@ -97,7 +89,6 @@
         box-shadow: 0px 0px 2px #888;
         padding: 0.5em 0.6em;
     }
-
 
 </style>
 

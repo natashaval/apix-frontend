@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div v-if="isEditing" class="form-inline float-right">
-            <label class="col-4">default :</label>
-            <input type="checkbox" name="default-val" class="col-8 form-check" v-model="defaultVal"/>{{defaultVal}}
+        <div v-if="isEditing" class="form-inline w-100">
+            <label class="col-3 text-left shrinkable-text">default :</label>
+            <input type="checkbox" name="default-val" class="form-check" v-model="defaultVal"/>
         </div>
-        <div v-else>
+        <div class="row" style="padding-left: 50%" v-else>
             <p>default : {{defaultVal}}</p>
         </div>
     </div>

@@ -1,50 +1,68 @@
 <template>
     <div>
-        <ul v-if="isEdited">
-            <li><button @click="submit">Save</button></li>
-            <li><button @click="cancel">Cancel</button></li>
-        </ul>
-        <div class="row" v-if="isEditing">
-            <div class="col-11">
-                <div class="form-group">
-                    <label>Title:</label>
-                    <input name="title" v-model="title">
+        <EditorHeaderComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
+                               :submit="submit" :cancel="cancel" :name="editorTitle"></EditorHeaderComponent>
+        <div class="form-row">
+            <div class="col-11 pl-3" v-if="isEditing">
+                <div class="form-row">
+                    <div class="col-8 mb-2 form-group">
+                        <label class="font-weight-bold">Title:</label>
+                        <input name="title" v-model="title" class="form-control" type="text" placeholder="Project Title">
+                    </div>
+                    <div class="col-4 mb-2 form-group">
+                        <label class="font-weight-bold">Version:</label>
+                        <input name="version" v-model="version" class="form-control">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Version:</label>
-                    <input name="version" v-model="version">
+                <div class="form-row pl-2">
+                    <div class="form-group">
+                        <label class="font-weight-bold">Description:</label>
+                        <vue-editor name="description" v-model="description"></vue-editor>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Host:</label>
-                    <input name="host" v-model="host">
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label class="font-weight-bold">Host:</label>
+                        <input name="host" v-model="host" class="form-control">
+                    </div>
+                    <div class="form-group col-6">
+                        <label class="font-weight-bold">Base Url:</label>
+                        <input name="baseUrl" v-model="basePath" class="form-control">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Base Url:</label>
-                    <input name="baseUrl" v-model="basePath">
+                <div class="form-row mb-4">
+                    <div class="col-4 form-group">
+                        <label class="font-weight-bold">Contact Name:</label>
+                        <input name="contactName" v-model="contactName" class="form-control">
+                    </div>
+                    <div class="col-4 form-group">
+                        <label class="font-weight-bold">Contact Email:</label>
+                        <input name="contactEmail" v-model="contactEmail" class="form-control">
+                    </div>
+                    <div class="col-4 form-group">
+                        <label class="font-weight-bold">Contact Url:</label>
+                        <input name="contactUrl" v-model="contactUrl" class="form-control">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Description:</label>
-                    <vue-editor name="description" v-model="description"></vue-editor>
-                </div>
-            </div>
-            <div class="col-1">
-                <button v-if="editable" @click="isEditing = !isEditing"
-                        class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
-                    <i class="fa fa-pencil-alt"></i>
-                </button>
-            </div>
 
-        </div>
-        <div class="row" v-else>
-            <div class="col-11">
-                <h1>{{title}}</h1>
-                <h3>v {{version}}</h3>
-                <h3>Host: {{host}}</h3>
-                <h3>Base Url: {{basePath}}</h3>
-                <div v-html="description"></div>
             </div>
-            <div class="col-1">
-                <button v-if="editable" @click="isEditing = !isEditing"
+            <div class="col-11 pl-3" v-else>
+                <div class="dot-border">
+                    <h1 class="text-center font-weight-bold">{{title}}</h1>
+                    <h3 class="text-center">v {{version}}</h3>
+                    <h3 class="text-center">Host: {{host}}</h3>
+                    <h3 class="text-center">Base Url: {{basePath}}</h3>
+                    <h3 class="text-center" v-if="contactName">Contact Name: {{contactName}}</h3>
+                    <h3 class="text-center" v-if="contactEmail">Contact Email: {{contactEmail}}</h3>
+                    <h3 class="text-center" v-if="contactUrl">Contact Url: {{contactUrl}}</h3>
+                    <div class="dot-border">
+                        <h3 class="text-center">Description :</h3>
+                        <div v-html="description" class="text-center"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-1 pr-4 pt-1">
+                <button v-if="$_projectPrivilege_canEdit" @click="isEditing = !isEditing"
                         class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
                     <i class="fa fa-pencil-alt"></i>
                 </button>
@@ -59,11 +77,15 @@
     import ActionBuilder from "@/utils/ActionBuilderUtil"
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
+    import {NOT_FOUND} from "@/stores/consts/FetchStatus"
+    import EditorHeaderComponent from "./editor-components/EditorHeaderComponent"
+    import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin"
+    import {BASE_PROJECT_URL} from "@/stores/actions/const"
 
     export default {
         name: "ProjectEditor",
-        components: {VueEditor},
-        mixins : [ChangeObserverMixin],
+        components: {EditorHeaderComponent, VueEditor},
+        mixins : [ChangeObserverMixin, ProjectPrivilegeMixin],
         props : ['projectId'],
         data : ()=>({
             title : '',
@@ -71,23 +93,24 @@
             host: '',
             basePath: '',
             version: '',
+            contactName: '',
+            contactEmail: '',
+            contactUrl: '',
             isEdited : false,
             isEditing : false
         }),
         computed : {
+            projectFetchState : function (){
+                return this.$store.getters['project/getState']
+            },
             apiData : function () {
                 return this.$store.getters['project/getProjectData']
             },
-            editable : function () {
-                let hasEditingPrivilege = this.$store.getters['user/hasEditingPrivilege']
-                if(hasEditingPrivilege === undefined)return false
-                return hasEditingPrivilege
-            },
+            editorTitle : function () {
+                return '<h4><i class="fas fa-atom"></i> '+ this.title+'</h4>'
+            }
         },
         methods: {
-            setLayout (layout) {
-                this.$store.commit('layout/SET_LAYOUT', layout);
-            },
             loadData: function () {
                 if(this.apiData && this.apiData.info){
                     this.isEdited = false
@@ -127,7 +150,7 @@
                     ActionExecutorUtil.executeActions(this.apiData, apiQuery)
                 }
 
-                axios.put('http://localhost:8080/projects/'+this.projectId,tree).then(
+                axios.put(BASE_PROJECT_URL+'/'+this.projectId,tree).then(
                     (response) => {
                         if(response.status === 200){
                             this.apiData._signature = response.data.new_signature
@@ -135,8 +158,11 @@
                             this.loadData()
                         }
                     }
-                ).catch(function (error) {
-                    console.log(error)
+                ).catch(error => {
+                    this.$bvToast.toast(error.response.data.message + ' , Please refresh the page.', {
+                        title: 'Failed',
+                        variant: 'danger'
+                    })
                 })
 
             },
@@ -151,12 +177,16 @@
         watch : {
             apiData : function () {
                 this.loadData()
+            },
+            projectState : function () {
+                if(this.projectFetchState === NOT_FOUND){
+                    this.$router.push({
+                        name :'project-repo'
+                    })
+                }
             }
         },
         mounted: function () {
-            this.$nextTick(function () {
-                this.setLayout('single-layout');
-            });
             this.loadData()
         }
     }

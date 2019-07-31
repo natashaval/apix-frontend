@@ -1,18 +1,20 @@
 <template>
     <div>
-        <button v-if="editable" @click="addProperty">Add</button>
+        <p v-if="editable" @click="addProperty" class="text-primary btn-text" style="font-size: 15px"
+            :id="_uid+'-add-property'">
+            <i class="fas fa-plus"></i> Add
+        </p>
         <div v-for="(property,idx) in propertiesData" v-bind:key="property.id">
-            <HighLvlJsonEditor :parent-is-editing="property.isEditing"
+            <HighLvlJsonEditor :ref="'property-'+property.id"
+                           :parent-is-editing="property.isEditing"
                            :project-id="projectId"
                            :editable="editable"
                            :deleteable="editable"
                            :parent-functions="publicFunctions"
                            :schema-data="property.schemaData"
-                           :ref="'property-'+property.id"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                            :component-id="idx"/>
         </div>
-        <button @click="buildQuery">Dump!</button>
     </div>
 </template>
 
@@ -38,9 +40,6 @@
             propertyId : 0,
             //menyimpan property yang didelete, tidak menyimpan property yang baru dibuat lalu dihapus
             deletedProperty : [],
-            commitChangeCallback : [],
-            actionsQuery : []
-
         }),
         computed : {
             projectId : function () {
@@ -51,11 +50,9 @@
                     deleteChild : this.deleteChild,
                     isValidName : this.isValidName
                 }
-            }
-        },
-        watch : {
-            schemasData : function () {
-                this.loadData()
+            },
+            myRef : function () {
+                return this.$refs
             }
         },
         methods : {
@@ -83,13 +80,14 @@
             addProperty : function () {
                 this.propertiesData.push({id : this.propertyId++,isEditing : true})
             },
-            reloadData : function(){
+            reloadData : function () {
                 this.loadData()
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
-                this.propertiesData = []
-                if (this.schemasData !== undefined) {
+                this.propertiesData.length = 0
+                this.deletedProperty = []
+                if (this.schemasData) {
                     let sd = this.schemasData
                     for (let key in sd) {
                         let tmp = sd[key]
@@ -103,10 +101,6 @@
                 }
                 this.$_changeObserverMixin_initObserver(['propertiesData.length'])
             },
-            commitChange : function () {
-                ActionExecutorUtil.executeActions(this.schemasData, this.actionsQuery)
-                this.commitChangeCallback.forEach(fn => fn())
-            },
             deleteChild : function (childIndex) {
                 //jika bukan property baru, maka bikin query delete
                 if(this.propertiesData[childIndex].schemaData !== undefined){
@@ -116,18 +110,17 @@
                 }
                 this.propertiesData.splice(childIndex,1)
             },
-            buildQuery : function (query) {
-                this.commitChangeCallback = []
+            buildQuery :function (query) {
+                let callbacks = []
                 let isEdited = false
                 for(let i = 0; i < this.propertiesData.length; i++){
                     let id = this.propertiesData[i].id
                     let callback = this.$refs['property-'+id][0].buildQuery(query)
                     if( callback !== undefined ){
                         isEdited = true
-                        this.commitChangeCallback.push(callback)
+                        callbacks.push(callback)
                     }
                 }
-
                 if(this.deletedProperty.length > 0){
                     isEdited = true
                     if(query._actions === undefined){
@@ -143,13 +136,22 @@
                     }
                     else{
                         isEdited = true
-                        this.actionsQuery = query._actions
+                        let propertiesActions = query._actions
+                        let schemasData = this.schemasData
+                        callbacks.push(()=>{
+                            ActionExecutorUtil.executeActions(schemasData, propertiesActions)
+                        })
                     }
                 }
-
-                return (isEdited)?this.commitChange : undefined
+                return (isEdited)?()=>{callbacks.forEach(fn => fn())}: undefined
             }
         },
+        watch : {
+            schemasData : function () {
+                this.loadData()
+            }
+        },
+
         mounted() {
             this.loadData()
         }

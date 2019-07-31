@@ -1,22 +1,22 @@
 <template>
-    <div>
-        <div v-if="isEditing">
-            <div class="form-inline row float-right">
-                <div class="form-inline col-6 row">
-                    <label class="col-6">Min items:</label>
-                    <input type="number" name="min-items" class="col-6 form-control" v-model="minItems">
+    <div class="pr-0">
+        <slot v-if="isEditing">
+            <div class="form-row float-right w-100">
+                <div class="form-row col-6">
+                    <label class="col-3 text-left mt-auto">Min items:</label>
+                    <input type="number" name="min-items" class="col-9 form-control" v-model="minItems"/>
                 </div>
-                <div class="form-inline col-6 row">
-                    <label class="col-6">Max items:</label>
-                    <input type="number" name="max-items" class="col-6 form-control" v-model="maxItems">
+                <div class="form-row col-6 ml-2">
+                    <label class="col-3 text-left mt-auto">Max items:</label>
+                    <input type="number" name="max-items" class="col-9 form-control" v-model="maxItems"/>
                 </div>
             </div>
-            <div class="form-inline row float-right">
-                <label>Unique items</label>
+            <div class="form-inline w-100">
+                <label class="col-4 shrinkable-text text-left mt-auto ml-0">Unique items:</label>
                 <input type="checkbox" name="unique-items" v-model="uniqueItems" class="form-check">
             </div>
-        </div>
-        <div v-else class="float-right">
+        </slot>
+        <div v-else class="w-100" style="padding-left: 50%">
             <div class="row">
                 <p v-if="minItems !== undefined">Min items : {{minItems}}</p>
             </div>
@@ -60,10 +60,12 @@
                 return this.attributesKey
             },
             getAttributes : function () {
+                let minItems = parseInt(this.minItems)
+                let maxItems = parseInt(this.maxItems)
                 return {
                     type : 'array',
-                    minItems : parseInt(this.minItems),
-                    maxItems : parseInt(this.maxItems),
+                    minItems : minItems?minItems:null,
+                    maxItems : maxItems?maxItems:null,
                     uniqueItems : this.uniqueItems
                 }
             },

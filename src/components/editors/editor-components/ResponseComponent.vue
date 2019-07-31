@@ -1,20 +1,26 @@
 <template>
-    <div>
-        <h2>Responses :</h2>
-        <div class="row">
-            <div class="col-2">
-                <ul>
-                    <li v-for="(response,i) in responseList" v-bind:key="i" class="row">
-                        <button @click="setActiveView(i)">{{response.code}}</button>
-                        <b-button v-if="editable" @click="deleteChild(i)">
-                            <i class="fa fa-trash"></i>
-                        </b-button>
-                    </li>
-                    <button v-if="editable" @click="addResponse">Add</button>
-                </ul>
-            </div>
-            <div class="col-10 red-frame">
-                <div class="row" v-for="(response,i) in responseList" v-bind:key="response.id">
+    <div class="dot-border">
+        <label class="font-weight-bold">Response :</label>
+            <b-tabs vertical card pills nav-wrapper-class="w-15">
+                <b-tab v-for="(response, i) in responseList" :key="i.id" @click="setActiveView(i)" class="pr-0">
+                    <div slot="title">
+                        <span ref="codeTabs">
+                            <slot v-if="isDuplicateCode(i)">
+                                <span class="text-danger">{{response.code}}</span>
+                            </slot>
+                            <slot v-else>
+                                <span>{{response.code}}</span>
+                            </slot>
+                        </span>
+                        <button class="btn-circle ml-2" v-if="editable" @click="deleteChild(i)" size="sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <slot v-if="isDuplicateCode(i)">
+                            <br>
+                            <div class="text-danger w-100" style="font-size: 13px;">must be unique!</div>
+                        </slot>
+                    </div>
+
                     <ResponseForm v-bind:style="{display: (i === activeIndex)?'block':'none'}"
                                   ref="responseForm"
                                   :editable="editable"
@@ -23,9 +29,18 @@
                                   :notify-change-status-code="notifyChangeStatusCode"
                                   :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                   :response-data="response.data" :response-code="response.code" class="w-100"/>
+
+                </b-tab>
+
+                <template slot="tabs">
+                    <b-nav-item v-if="editable" @click.prevent="addResponse">
+                        <small><i class="fas fa-plus"></i> Add</small>
+                    </b-nav-item>
+                </template>
+                <div slot="empty" class="text-center text-muted">
+                    There are no response http code available <br />
                 </div>
-            </div>
-        </div>
+            </b-tabs>
     </div>
 </template>
 
@@ -33,7 +48,7 @@
     import HttpStatusCode from "@/consts/HttpStatusCode";
     import ResponseForm from "./forms/ResponseForm";
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
-    import ActionExecutorUtil from "../../../utils/ActionExecutorUtil";
+    import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
 
     export default {
         name: "ResponseComponent",
@@ -53,13 +68,13 @@
             componentId : 0,
             responseList : [],
             optionList : HttpStatusCode,
-            actionsQuery : [],
-            commitChangeCallback : [],
+            codeTabsRef: null,
+            deletedChilds : []
         }),
         computed : {
             operationApi : function () {
                 return this.$route.params.operationApi
-            },
+            }
         },
         methods : {
             getData : function () {
@@ -76,28 +91,38 @@
             addResponse : function () {
                 this.responseList.push({code : "200"})
                 this.activeIndex = this.responseList.length-1
-
+                setTimeout(()=>{
+                    this.$refs.codeTabs[this.activeIndex].click()
+                },10)
             },
             notifyChangeStatusCode : function (childIndex, newStatusCode) {
                 this.responseList[childIndex].code = newStatusCode
             },
             deleteChild : function (childIndex) {
+                if(childIndex === this.activeIndex){
+                    this.setActiveView(this.responseList.length-2)
+                    if(this.activeIndex >= 0){
+                        setTimeout(()=>{
+                            this.$refs.codeTabs[this.activeIndex].click()
+                        },10)
+                    }
+                }
                 if(this.responseList[childIndex].data !== undefined){
-                    this.actionsQuery.push({
-                        action : 'delete',
-                        key : this.responseList[childIndex].code
-                    })
+                    this.deletedChilds.push(this.responseList[childIndex].code)
                 }
                 this.responseList.splice(childIndex,1)
             },
             reloadData : function(){
                 this.loadData()
+                if(this.$refs.responseForm){
+                    this.$refs.responseForm.forEach(form => form.reloadData())
+                }
             },
             loadData : function () {
                 this.$_changeObserverMixin_unObserve()
                 this.activeIndex = 0
                 this.responseList = []
-                this.actionsQuery = []
+                this.deletedChilds = []
                 for(let respCode in this.responsesData){
                     this.responseList.push({
                         code: respCode,
@@ -109,31 +134,33 @@
                 this.$_changeObserverMixin_initObserver(['responseList.length'])
             },
             buildQuery : function (responsesPointer) {
-                this.commitChangeCallback = []
-
+                let callbacks = []
                 let isEdited = false
 
                 let rl = this.responseList
-                responsesPointer._actions = this.actionsQuery
+                responsesPointer._actions = []
+                this.deletedChilds.forEach(code => responsesPointer._actions.push({
+                    action : 'delete',
+                    key : code
+                }))
                 responsesPointer._hasActions = true
                 for(let i in rl){
                     let callback = this.$refs.responseForm[i].buildQuery(responsesPointer)
                     if(callback !== undefined){
                         isEdited = true
-                        this.commitChangeCallback.push(callback)
+                        callbacks.push(callback)
                     }
                 }
 
                 if(responsesPointer._actions.length > 0){
                     isEdited = true
-                    this.actionsQuery = responsesPointer._actions
+                    let responsesData = this.responsesData
+                    callbacks.push(()=>{
+                        ActionExecutorUtil.executeActions(responsesData, responsesPointer._actions)
+                    })
                 }
 
-                return (isEdited)?this.commitChange : undefined
-            },
-            commitChange : function () {
-                ActionExecutorUtil.executeActions(this.responsesData, this.actionsQuery)
-                this.commitChangeCallback.forEach(fn => fn())
+                return (isEdited)?()=>{callbacks.forEach(fn => fn())} : undefined
             },
             isDuplicateCode : function (i) {
                 let count = 0
@@ -156,5 +183,5 @@
 </script>
 
 <style scoped>
-
+    @import "../../../assets/css/app.css";
 </style>

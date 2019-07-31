@@ -1,0 +1,227 @@
+<template>
+    <div>
+        <div class="row mb-3">
+            <div class="">
+                <b-button v-if="isInvite" :to="{name: 'team-viewer', params: {name: teamInvite.name }}" size="sm" variant="outline-secondary">
+                    <i class="fas fa-angle-left"></i> Back</b-button>
+                <b-button v-else :to="{name: 'team-list'}" size="sm" variant="outline-secondary">
+                    <i class="fas fa-angle-left"></i> Back
+                </b-button>
+            </div>
+
+            <div class="col-md-11 mt-2">
+                <form id="create-team" @submit.prevent="submit" @reset="reset" v-if="show">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div v-if="isInvite">
+                                <h3>Invite Members of <span class="font-italic">{{ teamInvite.name }}</span></h3>
+                            </div>
+                            <div v-else>
+                                <h3>Create Team</h3>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-1 mb-2">
+                            <!--                    <label for="create-submit" class="invisible">Submit</label>-->
+                            <button type="submit" id="create-submit"
+                                    class="btn btn-info btn-block">Submit</button>
+                        </div>
+                        <div class="form-group col-md-1 mb-2">
+                            <!--                    <label for="create-submit" class="invisible">Reset</label>-->
+                            <button type="reset" id="create-reset"
+                                    class="btn btn-outline-secondary btn-block">Reset</button>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6 mb-2">
+                            <label for="create-name">Name: </label>
+                            <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.name" readonly />
+                            <input v-else type="text" class="form-control" v-model="name" id="create-name" required />
+                        </div>
+                        <div class="form-group col-md-2 mb-2">
+                            <label for="create-access">Access: </label>
+                            <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.access.toLowerCase()" readonly/>
+                            <select v-else v-model="access" id="create-access" class="form-control">
+                                <option value="PUBLIC">Public</option>
+                                <option value="PRIVATE">Private</option>
+                            </select>
+                        </div>
+                        <!--                <div class="form-group col-md-1 mb-2">-->
+                        <!--                    <label for="create-submit" class="invisible">Submit</label>-->
+                        <!--                    <button type="submit" id="create-submit"-->
+                        <!--                            class="btn btn-info btn-block">Submit</button>-->
+                        <!--                </div>-->
+                        <!--                <div class="form-group col-md-1 mb-2">-->
+                        <!--                    <label for="create-submit" class="invisible">Reset</label>-->
+                        <!--                    <button type="reset" id="create-reset"-->
+                        <!--                            class="btn btn-outline-danger btn-block">Reset</button>-->
+                        <!--                </div>-->
+
+                    </div>
+
+                    <div class="form-row">
+                        <label>Member List: </label>
+                        <div class="input-group mb-2 form-row">
+                            <input class="form-control col-md-8 ml-2" type="text"
+                                   v-model="searchUser" placeholder="Search member name ..."/>
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fa fa-search"></i> </span>
+                            </div>
+                        </div>
+                        <div class="col-md-12 custom-control custom-checkbox">
+                            <ul class="ul-user">
+                                <li v-for="(user, i) in filterUser" :key="i">
+                                    <input type="checkbox" class="custom-control-input"
+                                           :id="user.username" :value="user.username"
+                                           v-model="selectedMember" />
+                                    <label class="custom-control-label"
+                                           :for="user.username">{{user.username}}</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!--<span>Selected Members: {{selectedMember}}</span>-->
+                </form>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    import axios from 'axios'
+    import {BASE_URL} from "../../stores/actions/const";
+    import {makeToast} from "../../assets/toast.js"
+
+    export default {
+        name: "TeamCreate",
+        data: function(){
+            return {
+                name: '',
+                access: 'PUBLIC',
+                users: [],
+                searchUser: '',
+                selectedMember: [],
+                response: {
+                    show: false,
+                    success: false,
+                    message: '',
+                    errors: []
+                },
+                show: true
+            }
+        },
+        props: {
+            isInvite: Boolean,
+            teamInvite: Object
+        },
+        methods: {
+            makeToast,
+            loadUsers: function(){
+                axios.get(BASE_URL + '/admin/users').then((response) => {
+                    this.users = response.data
+                }).catch((e) => {
+                    console.error(e);
+                })
+            },
+            dump: function () {
+                let res = {}
+                if (!this.isInvite) {
+                    res.teamName = this.name
+                    res.access = this.access
+                    res.creator = this.profile.username
+
+                    let members = []
+                    members.push(this.profile.username)
+
+                    if (this.access == 'PUBLIC') {
+                        for (let i = 0; i < this.selectedMember.length; i++) {
+                            if (this.selectedMember[i] == this.profile.username) continue;
+                            members.push(this.selectedMember[i])
+                        }
+                    } else {
+                        for (let i = 0; i < this.selectedMember.length; i++) {
+                            if (this.selectedMember[i] == this.profile.username) continue;
+                            members.push(this.selectedMember[i])
+                        }
+                    }
+                    res.members = members
+                    return res
+                }
+                else {
+                    res.name = this.teamInvite.name
+                    res.access = this.teamInvite.access
+                    res.creator = this.teamInvite.creator
+
+                    let members = []
+                    for (let i=0; i < this.selectedMember.length; i++) {
+                        if (this.selectedMember[i] == this.profile.username) continue;
+                        members.push(this.selectedMember[i])
+                    }
+                    res.members = members
+                    return res
+                }
+            },
+            submit: function () {
+                let payload = this.dump()
+                if (!this.isInvite) {
+                    axios.post(BASE_URL + '/teams', payload).then((res) => {
+                        // this.response.show = true
+                        // this.response.success = res.data.success
+                        // this.response.message = res.data.message
+                        // if (res.data.errors && res.data.errors.length > 0) this.response.errors = res.data.errors
+                        this.makeToast('success', res.data.success, res.data.message)
+                        // this.reset();
+                    }).catch((e) => {
+                        console.error(e)
+                        this.makeToast('danger', e.response.data.success, e.response.data.message)
+                    })
+                }
+                else {
+                    console.log(payload);
+                    axios.put(BASE_URL + '/teams/' + payload.name , payload).then((res) => {
+                        this.makeToast('success', res.data.success, res.data.message)
+                    }).catch((e) => {
+                        console.error(e)
+                        this.makeToast('danger', e.response.data.success, e.response.data.message)
+                    })
+                }
+            },
+            reset: function(evt){
+                evt.preventDefault();
+                this.name = ''
+                this.access = 'PUBLIC'
+                this.searchUser = ''
+                this.selectedMember = []
+
+                this.show = false
+                // reset validation state
+                this.$nextTick(() => {
+                    this.show = true
+                })
+            }
+        },
+        computed: {
+            filterUser() {
+                if (!this.users) return null;
+                return this.users.filter(rep =>
+                    rep.username.toLowerCase().includes(this.searchUser.toLowerCase())
+                    && rep.username !== this.profile.username
+                );
+            },
+            profile() {
+                return this.$store.getters['user/getProfile']
+            },
+        },
+        created(){
+            this.loadUsers();
+        }
+    }
+</script>
+
+<style scoped>
+    ul.ul-user {
+        column-count: 3;
+        column-gap: 2rem;
+        list-style: none;
+        text-align: left;
+    }
+</style>

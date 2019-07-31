@@ -38,13 +38,21 @@
                     {ref : this.currentRef},
                     this.attributesKey
                 )
+            },
+            loadData : function () {
+                if(this.schemaData !== undefined){
+                    this.refBefore = this.schemaData['$ref']
+                }
+                this.$_changeObserverMixin_initObserver()
+            }
+        },
+        watch : {
+            schemaData : function () {
+                this.loadData()
             }
         },
         mounted() {
-            if(this.schemaData !== undefined){
-                this.refBefore = this.schemaData.ref
-            }
-            this.$_changeObserverMixin_initObserver()
+            this.loadData()
         }
     }
 </script>
