@@ -46,6 +46,7 @@
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
     import BodyForm from "./editor-components/forms/BodyForm";
     import {BASE_PROJECT_URL} from "@/stores/actions/const";
+    import KeyCheckerUtil from "@/utils/KeyCheckerUtil";
 
     export default {
         name: "DefinitionEditor",
@@ -129,6 +130,11 @@
                                 }
                             }
                         }
+                        let validatorResult = KeyCheckerUtil.validateKey(this.name)
+                        if(!validatorResult.isValid){
+                            return [validatorResult.message]
+                        }
+
                         return []
                     }
                 },'description'])

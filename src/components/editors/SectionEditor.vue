@@ -45,6 +45,7 @@
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
     import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
+    import KeyCheckerUtil from "@/utils/KeyCheckerUtil";
 
     export default {
         name: "SectionEditor",
@@ -120,6 +121,11 @@
                                     }
                                 }
                             }
+                            let validatorResult = KeyCheckerUtil.validateKey(this.name)
+                            if(!validatorResult.isValid){
+                                return [validatorResult.message]
+                            }
+
                             return []
                         }
                         return ['name can\'t be empty']

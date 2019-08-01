@@ -196,6 +196,7 @@
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil";
     import ChangeObserverMixin from "@/mixins/ChangeObserverMixin";
     import ExtractDataTypeModal from "./ExtractDataTypeModal";
+    import KeyCheckerUtil from "@/utils/KeyCheckerUtil";
 
     export default {
         name: "HighLvlJsonEditor",
@@ -589,8 +590,15 @@
                                 if(this.name.length === 0){
                                     return ['name can\'t be empty']
                                 }
-                                else if(!this.parentFunctions.isValidName(this.name))
+                                else if(!this.parentFunctions.isValidName(this.name)){
                                     return ['name must be unique']
+                                }
+                                else{
+                                    let validatorResult = KeyCheckerUtil.validateKey(this.name)
+                                    if(!validatorResult.isValid){
+                                        return [validatorResult.message]
+                                    }
+                                }
                             }
                             return []
                         }

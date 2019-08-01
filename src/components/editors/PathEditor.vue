@@ -62,6 +62,7 @@
     import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
     import {BASE_PROJECT_URL} from "@/stores/actions/const";
+    import KeyCheckerUtil from "@/utils/KeyCheckerUtil";
 
     export default {
         name: "PathEditor",
@@ -261,6 +262,11 @@
                                     }
                                 }
                             }
+                            let validatorResult = KeyCheckerUtil.validateKey(this.path)
+                            if(!validatorResult.isValid){
+                                return [validatorResult.message]
+                            }
+
                             return []
                         }
                         return ['Name can\'t be empty']
