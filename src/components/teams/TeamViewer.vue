@@ -5,11 +5,19 @@
                 <TeamDetail :team="team" :is-creator="isCreator"></TeamDetail>
                 <div class="form-row">
                     <label class="col-md-2">Member: </label>
+                    <div class="col-md-4" v-if="isCreator">
+                        <button class="btn btn-info" @click="routeInvite(team)">
+                            Invite Member</button>
+                    </div>
+                    <div class="col-md-4" v-if="isCreator">
+                        <button class="btn btn-warning" @click="routeRemove(team)">
+                            Remove Member</button>
+                    </div>
                 </div>
 
                 <div v-if="isCreator">
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-12">
                             <div class="input-group my-2">
                                 <input class="form-control" type="text"
                                        v-model="searchMember" placeholder="Search member name ..."/>
@@ -17,10 +25,6 @@
                                     <span class="input-group-text"><i class="fa fa-search"></i> </span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <b-button class="btn btn-info" :to="{name: 'team-create', params: {isInvite: true, teamInvite: team}}">
-                                Invite Member</b-button>
                         </div>
                     </div>
                     <div class="row">
@@ -36,24 +40,33 @@
 
                 <div v-else>
                     <!--You are not anything-->
-                    <li v-for="(member,i) in team.members" :key="i" class="ml-4 li-member">{{member.username}}</li>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="input-group my-2">
+                                <input class="form-control" type="text"
+                                       v-model="searchMember" placeholder="Search member name ..."/>
+                                <div class="input-group-append">
+                                    <span class="input-group-text"><i class="fa fa-search"></i> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 column-3">
+                            <ul v-for="(member,i) in filterMember" :key="i">
+                                <li v-if="member.grant">{{member.username}}</li>
+                            </ul>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
             <div class="col-md-8">
-                <!--                <div class="row">-->
-                <!--                    <div class="col-md-12 mb-2">-->
                 <p class="font-weight-bold" style="font-size: 1.5em;">
                     <i class="fas fa-book"></i>
                     Projects</p>
                 <ProjectsTablePagination v-if="team.name" :team="team.name"></ProjectsTablePagination>
-                <!--                    </div>-->
-                <!--                </div>-->
-                <!--                <div class="row">-->
-                <!--                    <div class="col-md-12">-->
-                <!--                        <ProjectsTable :team="team.name"></ProjectsTable>-->
-                <!--                    </div>-->
-                <!--                </div>-->
             </div>
 
         </div>
@@ -64,14 +77,13 @@
 <script>
     import {BASE_URL} from "../../stores/actions/const";
     import axios from 'axios'
-    import ProjectsTable from "../projects/projects-components/ProjectsTable";
     import TeamDetail from "./team-components/TeamDetail";
     import {makeToast} from "../../assets/toast";
     import ProjectsTablePagination from "../projects/projects-components/ProjectsTablePagination";
 
     export default {
         name: "TeamViewer",
-        components: {ProjectsTablePagination, TeamDetail, ProjectsTable},
+        components: {ProjectsTablePagination, TeamDetail},
         data: function () {
             return {
                 name: '',
@@ -108,24 +120,14 @@
                     // (this.team.creator === this.profile.username) ? this.isCreator = true : this.isCreator = false
                 })
             },
-            grant: function () {
-                let members = []
-                for (let i=0; i < this.selectedMember.length; i++) {
-                    let member = {
-                        grant: false,
-                        username: this.selectedMember[i]
-                    }
-                    members.push(member)
-                }
-                console.log(members)
-
-                axios.put(BASE_URL + '/teams/' + this.team.name, members).then((res) => {
-                    this.makeToast('success', res.data.success, res.data.message)
-                    this.selectedMember = []
-                    this.loadTeam();
-                }).catch((e) => {
-                    console.error(e);
-                    this.makeToast('danger', e.response.data.success, e.response.data.message)
+            routeInvite: function (team) {
+                this.$router.push({
+                    name: 'team-create', params: {isInvite: true, teamInvite: team}
+                })
+            },
+            routeRemove: function (team) {
+                this.$router.push({
+                    name: 'team-create', params: {isRemove: true, teamInvite: team}
                 })
             }
         },
@@ -136,14 +138,6 @@
 </script>
 
 <style scoped>
-    /*li{*/
-    /*    list-style-type: none;*/
-    /*}*/
-    /*li:before {*/
-    /*    content: '✓';*/
-    /*    padding-right: 2px;*/
-    /*}*/
-
     .column-3 {
         -webkit-column-count: 3;
         -moz-column-count: 3;

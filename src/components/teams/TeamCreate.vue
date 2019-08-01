@@ -2,7 +2,7 @@
     <div>
         <div class="row mb-3">
             <div class="">
-                <b-button v-if="isInvite" :to="{name: 'team-viewer', params: {name: teamInvite.name }}" size="sm" variant="outline-secondary">
+                <b-button v-if="isInvite || isRemove" :to="{name: 'team-viewer', params: {name: teamInvite.name }}" size="sm" variant="outline-secondary">
                     <i class="fas fa-angle-left"></i> Back</b-button>
                 <b-button v-else :to="{name: 'team-list'}" size="sm" variant="outline-secondary">
                     <i class="fas fa-angle-left"></i> Back
@@ -16,12 +16,14 @@
                             <div v-if="isInvite">
                                 <h3>Invite Members of <span class="font-italic">{{ teamInvite.name }}</span></h3>
                             </div>
+                            <div v-else-if="isRemove">
+                                <h3>Remove Members from <span class="font-italic">{{ teamInvite.name }}</span></h3>
+                            </div>
                             <div v-else>
                                 <h3>Create Team</h3>
                             </div>
                         </div>
                         <div class="form-group col-md-1 mb-2">
-                            <!--                    <label for="create-submit" class="invisible">Submit</label>-->
                             <button type="submit" id="create-submit"
                                     class="btn btn-info btn-block">Submit</button>
                         </div>
@@ -34,28 +36,17 @@
                     <div class="form-row">
                         <div class="form-group col-md-6 mb-2">
                             <label for="create-name">Name: </label>
-                            <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.name" readonly />
+                            <input v-if="isInvite || isRemove" type="text" class="form-control" :placeholder="teamInvite.name" readonly />
                             <input v-else type="text" class="form-control" v-model="name" id="create-name" required />
                         </div>
                         <div class="form-group col-md-2 mb-2">
                             <label for="create-access">Access: </label>
-                            <input v-if="isInvite" type="text" class="form-control" :placeholder="teamInvite.access.toLowerCase()" readonly/>
+                            <input v-if="isInvite || isRemove" type="text" class="form-control" :placeholder="teamInvite.access.toLowerCase()" readonly/>
                             <select v-else v-model="access" id="create-access" class="form-control">
                                 <option value="PUBLIC">Public</option>
                                 <option value="PRIVATE">Private</option>
                             </select>
                         </div>
-                        <!--                <div class="form-group col-md-1 mb-2">-->
-                        <!--                    <label for="create-submit" class="invisible">Submit</label>-->
-                        <!--                    <button type="submit" id="create-submit"-->
-                        <!--                            class="btn btn-info btn-block">Submit</button>-->
-                        <!--                </div>-->
-                        <!--                <div class="form-group col-md-1 mb-2">-->
-                        <!--                    <label for="create-submit" class="invisible">Reset</label>-->
-                        <!--                    <button type="reset" id="create-reset"-->
-                        <!--                            class="btn btn-outline-danger btn-block">Reset</button>-->
-                        <!--                </div>-->
-
                     </div>
 
                     <div class="form-row">
@@ -69,17 +60,17 @@
                         </div>
                         <div class="col-md-12 custom-control custom-checkbox">
                             <ul class="ul-user">
-                                <li v-for="(user, i) in filterUser" :key="i">
+                                <li v-for="(username, i) in filterUser" :key="i">
                                     <input type="checkbox" class="custom-control-input"
-                                           :id="user.username" :value="user.username"
+                                           :id="username" :value="username"
                                            v-model="selectedMember" />
                                     <label class="custom-control-label"
-                                           :for="user.username">{{user.username}}</label>
+                                           :for="username">{{username}}</label>
                                 </li>
                             </ul>
                         </div>
                     </div>
-                    <!--<span>Selected Members: {{selectedMember}}</span>-->
+<!--                    <span>Selected Members: {{selectedMember}}</span>-->
                 </form>
             </div>
         </div>
@@ -110,8 +101,19 @@
             }
         },
         props: {
+            teamInvite: Object,
             isInvite: Boolean,
-            teamInvite: Object
+            isRemove: Boolean
+        },
+        computed: {
+            filterUser() {
+                if (!this.users) return null;
+                let filterUser = this.dump()
+                return filterUser.filter(rep => rep.toLowerCase().includes(this.searchUser.toLowerCase()))
+            },
+            profile() {
+                return this.$store.getters['user/getProfile']
+            },
         },
         methods: {
             makeToast,
@@ -122,52 +124,44 @@
                     console.error(e);
                 })
             },
-            dump: function () {
+            createPayload: function () {
                 let res = {}
-                if (!this.isInvite) {
-                    res.teamName = this.name
-                    res.access = this.access
-                    res.creator = this.profile.username
-
-                    let members = []
-                    members.push(this.profile.username)
-
-                    if (this.access == 'PUBLIC') {
-                        for (let i = 0; i < this.selectedMember.length; i++) {
-                            if (this.selectedMember[i] == this.profile.username) continue;
-                            members.push(this.selectedMember[i])
-                        }
-                    } else {
-                        for (let i = 0; i < this.selectedMember.length; i++) {
-                            if (this.selectedMember[i] == this.profile.username) continue;
-                            members.push(this.selectedMember[i])
-                        }
-                    }
-                    res.members = members
+                if (this.isInvite || this.isRemove ) {
+                    res.teamName = this.teamInvite.name
+                    res.members = this.selectedMember
+                    res.invite = false
                     return res
                 }
                 else {
-                    res.name = this.teamInvite.name
-                    res.access = this.teamInvite.access
-                    res.creator = this.teamInvite.creator
-
-                    let members = []
-                    for (let i=0; i < this.selectedMember.length; i++) {
-                        if (this.selectedMember[i] == this.profile.username) continue;
-                        members.push(this.selectedMember[i])
-                    }
-                    res.members = members
+                    res.teamName = this.name
+                    res.access = this.access
+                    res.creator = this.profile.username
+                    res.members = this.selectedMember
                     return res
                 }
             },
             submit: function () {
-                let payload = this.dump()
-                if (!this.isInvite) {
+                let payload = this.createPayload()
+                if (this.isInvite) { // invite members to team
+                    console.log('invite', payload);
+                    axios.put(BASE_URL + '/teams/' + payload.teamName + '/invite', payload).then((res) => {
+                        this.makeToast('success', res.data.success, res.data.message)
+                    }).catch((e) => {
+                        console.error(e)
+                        this.makeToast('danger', e.response.data.success, e.response.data.message)
+                    })
+                }
+                else if (this.isRemove) { // remove members from team
+                    console.log('remove', payload);
+                    axios.put(BASE_URL + '/teams/' + payload.teamName + '/remove', payload).then((res) => {
+                        this.makeToast('success', res.data.success, res.data.message)
+                    }).catch((e) => {
+                        console.error(e)
+                        this.makeToast('danger', e.response.data.success, e.response.data.message)
+                    })
+                }
+                else { //create new team
                     axios.post(BASE_URL + '/teams', payload).then((res) => {
-                        // this.response.show = true
-                        // this.response.success = res.data.success
-                        // this.response.message = res.data.message
-                        // if (res.data.errors && res.data.errors.length > 0) this.response.errors = res.data.errors
                         this.makeToast('success', res.data.success, res.data.message)
                         // this.reset();
                     }).catch((e) => {
@@ -175,15 +169,7 @@
                         this.makeToast('danger', e.response.data.success, e.response.data.message)
                     })
                 }
-                else {
-                    console.log(payload);
-                    axios.put(BASE_URL + '/teams/' + payload.name , payload).then((res) => {
-                        this.makeToast('success', res.data.success, res.data.message)
-                    }).catch((e) => {
-                        console.error(e)
-                        this.makeToast('danger', e.response.data.success, e.response.data.message)
-                    })
-                }
+                return payload
             },
             reset: function(evt){
                 evt.preventDefault();
@@ -197,19 +183,24 @@
                 this.$nextTick(() => {
                     this.show = true
                 })
+            },
+            dump: function () {
+                // evt.preventDefault()
+                let userList = this.users.map(user => user.username)
+                var idxCreator = userList.indexOf(this.profile.username)
+                if (idxCreator !== -1) userList.splice(idxCreator, 1);
+                if (this.isInvite && this.teamInvite) {
+                    let memberList = this.teamInvite.members.map(member => member.username)
+                    let res = userList.filter(x => !memberList.includes(x))
+                    return res
+                }
+                if (this.isRemove && this.teamInvite){
+                    let memberList = this.teamInvite.members.map(member => member.username)
+                    memberList.splice(memberList.indexOf(this.profile.username), 1)
+                    return memberList
+                }
+                return userList
             }
-        },
-        computed: {
-            filterUser() {
-                if (!this.users) return null;
-                return this.users.filter(rep =>
-                    rep.username.toLowerCase().includes(this.searchUser.toLowerCase())
-                    && rep.username !== this.profile.username
-                );
-            },
-            profile() {
-                return this.$store.getters['user/getProfile']
-            },
         },
         created(){
             this.loadUsers();
