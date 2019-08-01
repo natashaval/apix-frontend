@@ -1,5 +1,5 @@
 import {shallowMount, createLocalVue} from "@vue/test-utils";
-import UserViewer from "@/components/auth/admin-components/UserViewer.Vue"
+import UserViewer from "@/components/auth/admin-components/UserViewer"
 import BootstrapVue from "bootstrap-vue";
 import Vuex from "vuex";
 import AdminModule from "@/stores/modules/AdminModule";

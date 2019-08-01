@@ -156,7 +156,6 @@
                             paths:{}
                         }
                     }]
-                    tree.leaf._hasActions = true
 
                     callbacks.push(() => {
                         ActionExecutorUtil.executeActions(this.projectData.sections, tree.leaf._actions)
@@ -174,7 +173,6 @@
                         callbacks.push(() => {
                             ActionExecutorUtil.executeActions(this.projectData.sections, tmp)
                         })
-                        tree.leaf._hasActions = true
                         tree.root._signature = this.projectData._signature // jika rename section, maka refer to project data signature
 
                         sectionQuery.push({
@@ -194,8 +192,7 @@
 
                     tree.leaf[this.name] = {}
                     tree.leaf = tree.leaf[this.name].info = {
-                        _actions: sectionQuery,
-                        _hasActions: true
+                        _actions: sectionQuery
                     }
 
                     //copy reference of current section data

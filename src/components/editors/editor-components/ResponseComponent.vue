@@ -143,7 +143,6 @@
                     action : 'delete',
                     key : code
                 }))
-                responsesPointer._hasActions = true
                 for(let i in rl){
                     let callback = this.$refs.responseForm[i].buildQuery(responsesPointer)
                     if(callback !== undefined){

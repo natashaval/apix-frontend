@@ -357,31 +357,17 @@
                 let tmp = this.schemaData
                 return ActionBuilder.createActions(tmp, this._data, this.attributesKey)
             },
-            //mengcopy hasil edit ke nameState vuex project
-            commitChange : function () {
-                ActionExecutorUtil.executeActions(this.schemaData, this.actionsQuery)
-                if(this.type === 'object' ){
-                    //execute actions yang ada di properties
-                    ActionExecutorUtil.executeActions(
-                        this.schemaData.properties,
-                        this.propertiesActionQuery
-                    )
-                }
-                this.commitChangeCallback.forEach(fn => fn())
-            },
             /* parameter : @parentQuery(pointer object dari parent, semua query akan langsung di assign ke pointer,
             * tidak melalui return value)
             * return : fungsi callback(digunakan untuk commit change) jika data dirinya atau childnya teredit
             * */
             buildQuery : function (parentQuery) {
-                this.commitChangeCallback = []
                 let callbacks = []
                 let schemaActions = []
                 let propertiesActions = []
-                let query = {_hasActions : true, _actions : []}
+                let query = {_actions : []}
                 let childIsEdited = false
-                if(parentQuery._hasActions === undefined){
-                    parentQuery._hasActions = true
+                if(!parentQuery._actions){
                     parentQuery._actions = []
                 }
 
@@ -436,8 +422,7 @@
 
                 if(this.type === 'object'){
                     query.properties = {
-                        _actions : propertiesActions = [],
-                        _hasActions : true
+                        _actions : propertiesActions = []
                     }
 
                     this.deletedProperty.forEach(x => query.properties._actions.push({action : 'delete',key : x}))
@@ -447,14 +432,12 @@
                         let callback = this.$refs['property-'+id][0].buildQuery(query.properties)
                         if(callback !== undefined){
                             childIsEdited = true
-                            // this.commitChangeCallback.push(callback)
                             callbacks.push(callback)
                         }
                     }
 
                     if(query.properties._actions.length === 0){
                         delete query.properties._actions
-                        delete query.properties._hasActions
                     }
                     else{
                         childIsEdited = true
@@ -468,7 +451,6 @@
                     let callback = this.$refs['arrayItem'].buildQuery(query)
                     if(callback !== undefined){
                         childIsEdited = true
-                        // this.commitChangeCallback.push(callback)
                         callbacks.push(callback)
                     }
                     else{
@@ -476,20 +458,18 @@
                     }
                 }
 
-                let isEdited = query._actions.length > 0 || childIsEdited
+                if(query._actions.length === 0){
+                    delete query._actions
+                }
+                else{
+                    schemaActions = query._actions
+                }
+
+                let isEdited = query._actions || childIsEdited
                 if(!isEdited){
                     delete parentQuery[this.name]
                 }
-                else{
-                    if(query._actions.length === 0){
-                        delete query._hasActions
-                        delete query._actions
-                    }
-                    else{
-                        schemaActions = query._actions
-                        isEdited = true
-                    }
-                }
+
                 let schemaData = this.schemaData
                 let type = this.type
                 return (isEdited)?()=>{

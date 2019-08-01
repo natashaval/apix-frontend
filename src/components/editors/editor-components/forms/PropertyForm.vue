@@ -129,9 +129,8 @@
                     this.deletedProperty.forEach(fieldName => query._actions.push({action : 'delete', key : fieldName}))
                 }
 
-                if(query._actions !== undefined){
+                if(query._actions){
                     if(query._actions.length === 0){
-                        delete query._hasActions
                         delete query._actions
                     }
                     else{

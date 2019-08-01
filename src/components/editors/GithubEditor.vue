@@ -263,7 +263,6 @@
                 let payload = {
                     githubProject: {
                         _actions: [],
-                        _hasActions: false,
                         _signature: ''
                     },
                     // _signature: ''
@@ -276,7 +275,6 @@
 
                 // console.log('============ has Actions ============', this.gitActions)
                 payload.githubProject._actions = this.gitActions
-                payload.githubProject._hasActions = true
                 if (this.githubData) payload.githubProject._signature = this.githubData._signature
                 else payload.githubProject._signature = uuidv4();
 

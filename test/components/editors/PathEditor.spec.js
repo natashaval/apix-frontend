@@ -81,8 +81,7 @@ describe('create new tests', () => {
                                     "_signature": "<random UUID>"
                                 }
                             }
-                        ],
-                        "_hasActions": true
+                        ]
                     }
                 }
             }
@@ -195,7 +194,6 @@ describe('edit tests', () => {
                                 "newKey": "/hello/{id}/world/{var2}/{var3}"
                             }
                         ],
-                        "_hasActions": true,
                         "/hello/{id}/world/{var2}/{var3}": {
                             "_actions": [
                                 {
@@ -224,8 +222,7 @@ describe('edit tests', () => {
                                     "key": "description",
                                     "value": "<p></p>"
                                 }
-                            ],
-                            "_hasActions": true
+                            ]
                         }
                     }
                 }

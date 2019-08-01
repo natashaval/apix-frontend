@@ -175,7 +175,6 @@
                     let isEdited = false
                     let callback = undefined
                     let codePointer = responsesPointer[this.selectedCode] = {}
-                    codePointer._hasActions = true
                     codePointer._actions = []
                     if(this.initCode !== this.selectedCode){
                         responsesPointer._actions.push({
@@ -231,9 +230,8 @@
                         }
                     }
 
-                    if(codePointer._hasActions && codePointer._actions.length === 0){
+                    if(codePointer._actions && codePointer._actions.length === 0){
                         delete codePointer._actions
-                        delete codePointer._hasActions
                     }
 
                     if(!isEdited){

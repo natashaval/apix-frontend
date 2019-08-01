@@ -259,7 +259,6 @@
                     tree.leaf._signature = this.pathData._signature
 
                     let leaf = tree.leaf.methods = {}
-                    leaf._hasActions = true
                     leaf._actions = [{
                         action : 'put',
                         key : this.method,
@@ -280,7 +279,6 @@
                         signaturePointer = this.pathData
 
                         let tmp = tree.root.sections[this.sectionApi].paths[this.pathApi].methods
-                        tmp._hasActions = true
                         let data = this.getData()
                         data._signature = uuidv4()
                         tmp._actions = [
@@ -311,7 +309,6 @@
 
                         operationActions = this.getActions()
 
-                        pointer._hasActions = true
                         pointer._actions = operationActions
 
 
@@ -332,7 +329,6 @@
 
                         if(pointer._actions.length === 0){
                             delete pointer._actions
-                            delete pointer._hasActions
                         }
                     }
 

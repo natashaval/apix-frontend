@@ -175,8 +175,7 @@
                 let callbacks = []
                 let bodyData = this.bodyData
 
-                if(requestPointer._hasActions === undefined){
-                    requestPointer._hasActions = true
+                if(!requestPointer._actions){
                     requestPointer._actions = []
                 }
                 if(this.isImportJson || this.$refs.lowLvlEditor._data.isEdited){
@@ -220,11 +219,9 @@
                     callbacks.push(()=>{
                         ActionExecutorUtil.executeActions(bodyData, requestPointer._actions)
                     })
-                    requestPointer._hasActions = true
                 }
                 else{
                     delete requestPointer._actions
-                    delete requestPointer._hasActions
                 }
 
                 let ref = this.$refs.highLvlEditor

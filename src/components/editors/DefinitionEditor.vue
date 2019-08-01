@@ -173,7 +173,6 @@
                         key : uuidv4(),
                         value : data
                     }]
-                    tree.leaf._hasActions = true
                     callbacks.push(()=>{
                         ActionExecutorUtil.executeActions(this.$store.getters['project/getDefinitions'], tmp)
                         this.$router.push({
@@ -189,14 +188,12 @@
                     signaturePointer = this.definitionData
                     tree.leaf._signature = signaturePointer._signature
                     tree.leaf._actions = this.getActions()
-                    tree.leaf._hasActions = true
 
                     let callback = this.$refs.root.buildQuery(tree.leaf)
                     if(callback !== undefined){
                         callbacks.push(callback)
                     }
                     if(tree.leaf._actions && tree.leaf._actions.length === 0){
-                        delete tree.leaf._hasActions
                         delete tree.leaf._actions
                     }
                     if(this.name !== this.definitionData.name){

@@ -71,7 +71,6 @@
                     key : modelUid,
                     value : futureDefData
                 }]
-                tree.leaf._hasActions = true
                 let projectId = this.$route.params.projectId
                 console.log(tree.root)
                 axios.put(BASE_PROJECT_URL+'/'+projectId,tree.root).then(

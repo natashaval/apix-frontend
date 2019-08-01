@@ -146,7 +146,6 @@
                             methods : {}
                         }
                     }]
-                    tree.leaf._hasActions = true
                     commitFunctions.push(()=>{
                         ActionExecutorUtil.executeActions(sectionData.paths, tree.leaf._actions)
                     })
@@ -162,11 +161,9 @@
                             ActionExecutorUtil.executeActions(sectionData.paths, tree.leaf._actions)
                             this.pathApi = getPath()
                         })
-                        tree.leaf._hasActions = true
                     }
                     tree.leaf[this.path] = {
-                        _actions : pathQuery,
-                        _hasActions : true
+                        _actions : pathQuery
                     }
 
 

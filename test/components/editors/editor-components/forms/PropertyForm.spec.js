@@ -91,7 +91,6 @@ describe('test data load',()=>{
         let query = {}
         wrapper.vm.buildQuery(query)
         expect(ApixUtil.isEqualObject(query,{
-            "_hasActions": true,
             "_actions": [
                 {
                     "action": "delete",

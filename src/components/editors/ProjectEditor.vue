@@ -134,8 +134,7 @@
 
                 if(infoQuery.length > 0){
                     tree.info = {
-                        _actions: infoQuery,
-                        _hasActions: true
+                        _actions: infoQuery
                     }
                     callbacks.push(()=>{
                         ActionExecutorUtil.executeActions(this.apiData.info, infoQuery)
@@ -146,7 +145,6 @@
 
                 if(apiQuery.length > 0){
                     tree._actions = apiQuery
-                    tree._hasActions = true
                     ActionExecutorUtil.executeActions(this.apiData, apiQuery)
                 }
 

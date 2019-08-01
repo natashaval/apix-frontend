@@ -71,7 +71,6 @@
                                     action: 'delete',
                                     key: this.definitionKey
                                 }]
-                                tree.definitions._hasActions = true
 
                                 axios.put('http://localhost:8080/projects/'+this.projectApi, tree).then(
                                     (response) => {

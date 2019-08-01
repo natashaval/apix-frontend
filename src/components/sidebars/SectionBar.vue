@@ -129,7 +129,6 @@
                                     action: 'delete',
                                     key: this.sectionApi
                                 }]
-                                tree.sections._hasActions = true
                                 axios.put(BASE_PROJECT_URL+'/'+this.projectApi, tree).then(
                                     (response) => {
                                         if(response.status === 200){

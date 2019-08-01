@@ -1,15 +1,15 @@
-import {createLocalVue, shallowMount} from "@vue/test-utils";
-import AuthLogin from "@/components/auth/AuthLogin.Vue"
+import {createLocalVue, shallowMount} from "@vue/test-utils"
+import AuthLogin from "@/components/auth/AuthLogin"
 import Vuex from "vuex"
-import AuthModule from "@/stores/modules/AuthModule.js"
-import BootstrapVue from "bootstrap-vue";
-import VueRouter from 'vue-router';
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-import {AUTH_REQUEST, AUTH_LOGOUT} from "@/stores/actions/auth";
-import ProjectsList from "../../../src/components/projects/ProjectsList";
-import {BASE_URL} from "../../../src/stores/actions/const";
-import LayoutModule from "../../../src/stores/modules/LayoutModule";
+import AuthModule from "@/stores/modules/AuthModule"
+import BootstrapVue from "bootstrap-vue"
+import VueRouter from 'vue-router'
+import axios from 'axios'
+import MockAdapter from 'axios-mock-adapter'
+import {AUTH_REQUEST} from "@/stores/actions/auth"
+import ProjectsList from "@/components/projects/ProjectsList"
+import {BASE_URL} from "@/stores/actions/const"
+import LayoutModule from "@/stores/modules/LayoutModule"
 
 // https://vue-test-utils.vuejs.org/guides/using-with-vue-router.html
 

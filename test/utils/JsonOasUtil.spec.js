@@ -37,7 +37,8 @@ describe('all function tests', ()=>{
             "properties": {
                 "string1": {
                     "type": "string",
-                    "name": "string1"
+                    "name": "string1",
+                    "default" : ""
                 },
                 "string2": {
                     "type": "string",
@@ -46,12 +47,12 @@ describe('all function tests', ()=>{
                 },
                 "number1": {
                     "type": "number",
-                    "default": "1",
+                    "default": 1,
                     "name": "number1"
                 },
                 "number2": {
                     "type": "number",
-                    "default": "1.2",
+                    "default": 1.2,
                     "name": "number2"
                 },
                 "obj1": {
@@ -60,46 +61,40 @@ describe('all function tests', ()=>{
                     "properties": {
                         "obj-str": {
                             "type": "string",
-                            "name": "obj-str"
+                            "name": "obj-str",
+                            "default" : ""
                         },
                         "obj-num": {
                             "type": "number",
-                            "enum": [],
-                            "default": "2",
+                            "default": 2,
                             "name": "obj-num"
                         }
                     }
                 },
                 "array1": {
                     "type": "array",
-                    "uniqueItems": false,
                     "name": "array1",
                     "items": {
                         "type": "number",
-                        "enum": [],
-                        "default": "1"
+                        "default": 1
                     }
                 },
                 "array2": {
                     "type": "array",
-                    "uniqueItems": false,
                     "name": "array2",
                     "items": {
                         "type": "string",
-                        "enum": [],
-                        "default": ""
+                        "default" : ""
                     }
                 },
                 "array3": {
                     "type": "array",
-                    "uniqueItems": false,
                     "name": "array3",
                     "items": {
                         "type": "object",
                         "properties": {
                             "arr-obj-str": {
                                 "type": "string",
-                                "enum": [],
                                 "default": "",
                                 "name": "arr-obj-str"
                             }
@@ -108,19 +103,16 @@ describe('all function tests', ()=>{
                 },
                 "array4": {
                     "type": "array",
-                    "uniqueItems": false,
                     "name": "array4",
                     "items": {
                         "type": "array",
-                        "uniqueItems": false,
                         "items": {
                             "type": "object",
                             "properties": {
                                 "arr-arr-obj-str": {
                                     "type": "string",
-                                    "enum": [],
-                                    "default": "",
-                                    "name": "arr-arr-obj-str"
+                                    "name": "arr-arr-obj-str",
+                                    "default" : ""
                                 }
                             }
                         }

@@ -4,11 +4,23 @@ import ApixUtil from "@/utils/ApixUtil";
 
 import BootstrapVue from "bootstrap-vue";
 import Vuex from "vuex";
+import UserModule from "@/stores/modules/UserModule";
 const localVue = createLocalVue()
 
 localVue.use(BootstrapVue)
 localVue.use(Vuex)
-
+const store = new Vuex.Store({
+    modules: {
+        project: {
+            namespaced : true,
+            state : {
+                project : {
+                }
+            },
+            getters: UserModule.getters
+        }
+    }
+})
 describe('create new tests', () => {
     let $route = {
         params : {
@@ -28,6 +40,7 @@ describe('create new tests', () => {
                 $_projectPrivilege_canEdit : ()=>true
             },
             localVue,
+            store,
             stubs: ['router-link','vue-editor'],
             mocks : {$route : $route}
         })
@@ -50,8 +63,7 @@ describe('create new tests', () => {
                         },
                         paths : {}
                     }
-                }],
-                _hasActions : true
+                }]
             }
         }
         let res = wrapper.vm.submit()
@@ -72,6 +84,7 @@ describe('edit tests', () => {
 
         wrapper = mount(SectionEditor,{
             localVue,
+            store,
             computed : {
                 projectData(){
                     return {
@@ -120,7 +133,6 @@ describe('edit tests', () => {
                     "sectionX": {
                         "info": {
                             "_actions": [],
-                            "_hasActions": true,
                             "_signature": "infoSignature"
                         }
                     }
@@ -138,15 +150,13 @@ describe('edit tests', () => {
                     key : 'sectionX',
                     newKey : 'sectionXY'
                 }],
-                _hasActions : true,
                 sectionXY: {
                     info : {
                         _actions : [{
                             action : 'put',
                             key : 'name',
                             value : 'sectionXY'
-                        }],
-                        _hasActions : true,
+                        }]
                     }
                 }
             }

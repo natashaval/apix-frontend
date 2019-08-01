@@ -92,7 +92,6 @@ describe('create new test', () => {
                     "paths": {
                         "pathX": {
                             "methods": {
-                                "_hasActions": true,
                                 "_actions": [
                                     {
                                         "action": "put",
@@ -219,7 +218,6 @@ describe('editing tests',()=>{
                         "pathX": {
                             "methods": {
                                 "post": {},
-                                "_hasActions": true,
                                 "_actions": [
                                     {
                                         "action": "delete",

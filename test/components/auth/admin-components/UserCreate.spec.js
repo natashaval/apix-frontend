@@ -1,5 +1,5 @@
-import {shallowMount, createLocalVue, mount} from "@vue/test-utils";
-import UserCreate from "@/components/auth/admin-components/UserCreate.Vue"
+import {createLocalVue, mount} from "@vue/test-utils";
+import UserCreate from "@/components/auth/admin-components/UserCreate"
 import BootstrapVue from "bootstrap-vue";
 import Vuex from "vuex";
 import axios from 'axios';

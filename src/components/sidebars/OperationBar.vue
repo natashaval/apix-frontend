@@ -95,7 +95,6 @@
                                     action: 'delete',
                                     key: this.operationApi
                                 }]
-                                tree.leaf._hasActions = true
                                 axios.put('http://localhost:8080/projects/'+this.projectApi, tree.root).then(
                                     (response) => {
                                         if(response.status === 200){
