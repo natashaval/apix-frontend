@@ -6,7 +6,7 @@
 
         <b-modal id="project-upload"
                  hide-footer
-                 title="Files Upload"
+                 title="Import from Projects"
                  size="lg"
         >
             <ProjectsUpload></ProjectsUpload>
@@ -60,8 +60,6 @@
 </template>
 
 <script>
-    import {BASE_URL} from "../../../stores/actions/const";
-    import axios from 'axios';
     import {makeToast} from "../../../assets/toast";
     import AssignComponent from "../../editors/editor-components/AssignComponent";
     import {USER_REQUEST} from "../../../stores/actions/user";
