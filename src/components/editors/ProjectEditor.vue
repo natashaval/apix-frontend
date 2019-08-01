@@ -176,7 +176,7 @@
             apiData : function () {
                 this.loadData()
             },
-            projectState : function () {
+            projectFetchState : function () {
                 if(this.projectFetchState === NOT_FOUND){
                     this.$router.push({
                         name :'project-repo'
