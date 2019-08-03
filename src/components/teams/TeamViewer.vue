@@ -5,14 +5,14 @@
                 <TeamDetail :team="team" :is-creator="isCreator"></TeamDetail>
                 <div class="form-row">
                     <label class="col-md-2">Member: </label>
-                    <div class="col-md-4" v-if="isCreator">
-                        <button class="btn btn-info" @click="routeInvite(team)">
-                            Invite Member</button>
-                    </div>
-                    <div class="col-md-4" v-if="isCreator">
-                        <button class="btn btn-warning" @click="routeRemove(team)">
-                            Remove Member</button>
-                    </div>
+<!--                    <div class="col-md-4" v-if="isCreator">-->
+<!--                        <button class="btn btn-info" @click="routeInvite(team)">-->
+<!--                            Invite Member</button>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-4" v-if="isCreator">-->
+<!--                        <button class="btn btn-warning" @click="routeRemove(team)">-->
+<!--                            Remove Member</button>-->
+<!--                    </div>-->
                 </div>
 
                 <div v-if="isCreator">

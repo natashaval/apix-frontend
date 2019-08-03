@@ -12,7 +12,7 @@
             <div class="col-md-11 mt-2">
                 <form id="create-team" @submit.prevent="submit" @reset="reset" v-if="show">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6 col-sm-3">
                             <div v-if="isInvite">
                                 <h3>Invite Members of <span class="font-italic">{{ teamInvite.name }}</span></h3>
                             </div>
@@ -23,14 +23,14 @@
                                 <h3>Create Team</h3>
                             </div>
                         </div>
-                        <div class="form-group col-md-1 mb-2">
+                        <div class="col-md-1 mb-2">
                             <button type="submit" id="create-submit"
-                                    class="btn btn-info btn-block">Submit</button>
+                                    class="btn btn-info">Submit</button>
                         </div>
-                        <div class="form-group col-md-1 mb-2">
+                        <div class="col-md-1 mb-2">
                             <!--                    <label for="create-submit" class="invisible">Reset</label>-->
                             <button type="reset" id="create-reset"
-                                    class="btn btn-outline-secondary btn-block">Reset</button>
+                                    class="btn btn-outline-secondary">Reset</button>
                         </div>
                     </div>
                     <div class="form-row">
