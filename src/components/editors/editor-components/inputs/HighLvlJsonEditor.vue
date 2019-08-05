@@ -174,7 +174,7 @@
         </b-collapse>
         <b-modal :id="_uid+'-extract-modal'" ref="extractModal" title="Extract to New Type" hide-footer>
             <ExtractDataTypeModal
-                    @extractComplete="onExtractComplete"
+                    @onExtractComplete="onExtractComplete"
                     :init-name="name" :high-lvl-json-editor="this"></ExtractDataTypeModal>
         </b-modal>
     </div>

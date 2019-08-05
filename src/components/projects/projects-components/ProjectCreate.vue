@@ -1,73 +1,52 @@
 <template>
     <div>
-        <b-button v-b-modal="'project-modal'" variant="primary" class="mr-2">New Project</b-button>
-        <b-button v-b-modal="'project-upload'" variant="secondary">Import Projects</b-button>
+        <form ref="form" @submit.stop.prevent="handleSubmit">
+            <b-row>
+                <b-col cols="8">
+                    <b-form-group :state="title.state" label="Title" label-for="title-input" :invalid-feedback="requiredField('Title')">
+                        <b-form-input id="title-input" v-model="title.field" :state="title.state" required />
+                    </b-form-group>
+                </b-col>
+                <b-col cols="4">
+                    <b-form-group :state="version.state" label="Version" label-for="version-input" invalid-feedback="Version is required">
+                        <b-form-input id="version-input" v-model="version.field" :state="version.state" required></b-form-input>
+                    </b-form-group>
+                </b-col>
+            </b-row>
 
+            <b-row>
+                <b-col cols="6">
+                    <b-form-group label="Host" label-for="host-input">
+                        <b-form-input id="host-input" v-model="host.field"></b-form-input>
+                    </b-form-group>
+                </b-col>
 
-        <b-modal id="project-upload"
-                 hide-footer
-                 title="Import from Projects"
-                 size="lg"
-        >
-            <ProjectsUpload></ProjectsUpload>
-        </b-modal>
+                <b-col cols="6">
+                    <b-form-group :state="basepath.state" label="basePath" label-for="basepath-input" :invalid-feedback="validBasePath()">
+                        <b-form-input id="basepath-input" pattern="(\/)\w+" v-model="basepath.field" :state="basepath.state" title="Leading slash (/) is required"></b-form-input>
+                    </b-form-group>
+                </b-col>
+            </b-row>
 
-        <b-modal id="project-modal" ref="modal" size="lg"
-                 title="Create New Project"
-                 @show="resetModal"
-                 @hidden="resetModal"
-                 @ok="handleOk" ok-title="Save"
-                 header-bg-variant="info"
-        >
-            <form ref="form" @submit.stop.prevent="handleSubmit">
-                <b-row>
-                    <b-col cols="8">
-                <b-form-group :state="title.state" label="Title" label-for="title-input" :invalid-feedback="requiredField('Title')">
-                    <b-form-input id="title-input" v-model="title.field" :state="title.state" required />
-                </b-form-group>
-                    </b-col>
-                    <b-col cols="4">
-                <b-form-group :state="version.state" label="Version" label-for="version-input" invalid-feedback="Version is required">
-                    <b-form-input id="version-input" v-model="version.field" :state="version.state" required></b-form-input>
-                </b-form-group>
-                    </b-col>
-                </b-row>
+            <b-row>
+                <b-col>
+                    <AssignComponent ref="assign" :assign-new="assignNew"></AssignComponent>
+                </b-col>
+            </b-row>
+            <button class="mt-3 btn btn-success float-right" @click="handleOk">submit</button>
+        </form>
 
-                <b-row>
-                    <b-col cols="6">
-                <b-form-group label="Host" label-for="host-input">
-                    <b-form-input id="host-input" v-model="host.field"></b-form-input>
-                </b-form-group>
-                    </b-col>
-
-                    <b-col cols="6">
-                <b-form-group :state="basepath.state" label="basePath" label-for="basepath-input" :invalid-feedback="validBasePath()">
-                    <b-form-input id="basepath-input" pattern="(\/)\w+" v-model="basepath.field" :state="basepath.state" title="Leading slash (/) is required"></b-form-input>
-                </b-form-group>
-                    </b-col>
-                </b-row>
-
-                <b-row>
-                    <b-col>
-                        <AssignComponent ref="assign" :assign-new="assignNew"></AssignComponent>
-                    </b-col>
-                </b-row>
-
-            </form>
-
-        </b-modal>
     </div>
 </template>
 
 <script>
-    import {makeToast} from "../../../assets/toast";
-    import AssignComponent from "../../editors/editor-components/AssignComponent";
-    import {USER_REQUEST} from "../../../stores/actions/user";
-    import ProjectsUpload from "../ProjectsUpload";
+    import {makeToast} from "@/assets/toast";
+    import AssignComponent from "@/components/editors/editor-components/AssignComponent";
+    import {USER_REQUEST} from "@/stores/actions/user";
 
     export default {
         name: "ProjectModal",
-        components: {ProjectsUpload, AssignComponent},
+        components: {AssignComponent},
         data: function () {
             return {
                 title: {
