@@ -9,7 +9,7 @@
                         Owner: {{team.creator}}
                     </b-card-text>
                 </b-card-body>
-                <button slot="footer" class="btn btn-primary confirm-team" v-if="!isGrant" @click="confirm(team.name)">Confirm</button>
+<!--                <button slot="footer" class="btn btn-primary confirm-team" v-if="!isGrant" @click="confirm(team.name)">Confirm</button>-->
             </b-card>
 
             <b-card class="mb-2 team-header" no-body header-bg-variant="light" v-else>
@@ -45,23 +45,21 @@
             makeToast,
             confirm: function (teamName) {
                 console.log('confirm')
-                let grantList = []
-                let confirmation = {
-                    username: this.profile.username,
-                    grant: false
-                }
-                grantList.push(confirmation)
-                console.log(grantList, teamName)
+                let res = {}
+                res.teamName = teamName
+                res.members = [this.profile.username]
+                res.invite = true
+                console.log(res)
 
-
-                axios.put(BASE_URL + "/teams/" + teamName, grantList).then((resp) => {
+                axios.put(BASE_URL + '/teams/' + teamName + '/grant', res).then((resp) => {
                     this.makeToast('success', resp.data.success, resp.data.message);
                     this.$emit('update');
                 }).catch((e) => {
                     console.error(e);
                     this.makeToast('danger', e.response.data.success, e.response.data.message);
                 })
-                return grantList
+
+                return res
             },
             viewTeam: function(teamName) {
                 this.$router.push({
