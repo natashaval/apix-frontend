@@ -29,9 +29,6 @@
                                 </b-form-group>
                             </div>
                             <div class="form-row w-100 mb-2">
-                                <p v-if="type === 'object' && isSubArray" class="btn-text w-100" @click="$bvModal.show(_uid+'-extract-modal')">
-                                    <i class="fas fa-cube"></i> Extract datatype
-                                </p>
                                 <label class="shrinkable-text col-2 mt-auto">{{(isSubArray)?'Of :':'Type :'}}</label>
                                 <b-select class="form-control col-10" :name="_uid+'-select-type'" v-model="selectedType">
                                     <optgroup label="Data Type"></optgroup>
@@ -126,7 +123,7 @@
                 </div>
             </div>
             <div class="col-1 " style="padding: 10px 25px;">
-                <button v-if="editable" @click="isEditing = !isEditing"
+                <button v-if="editable && !isSubArray" @click="isEditing = !isEditing"
                         class="float-right round-button btn" v-bind:id="_uid+'-edit-btn'">
                     <i class="fa fa-pencil-alt"></i>
                 </button>
@@ -139,7 +136,7 @@
         <!--tambahan view jika tipe datanya array-->
         <div class="w-100" v-if="type === 'array'">
             <HighLvlJsonEditor ref="arrayItem" :schema-data="(schemaData !== undefined)?schemaData.items:undefined"
-                           :nameable="false" :deleteable="false" :editable="false"
+                           :nameable="false" :deleteable="false" :editable="editable"
                            :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                            :is-sub-array="true" :parent-is-editing="showEdit"/>
         </div>
@@ -177,7 +174,7 @@
         </b-collapse>
         <b-modal :id="_uid+'-extract-modal'" ref="extractModal" title="Extract to New Type" hide-footer>
             <ExtractDataTypeModal
-                    @extractComplete="onExtractComplete"
+                    @onExtractComplete="onExtractComplete"
                     :init-name="name" :high-lvl-json-editor="this"></ExtractDataTypeModal>
         </b-modal>
     </div>

@@ -1,6 +1,5 @@
 <template>
     <div>
-
         <div class="row my-2">
             <div class="col-md-4">
                 <form class="form-inline">
@@ -26,11 +25,11 @@
         <table class="table table-hover table-sm">
             <thead class="thead-dark">
             <tr>
-                <th>Api Title</th>
-                <th>Project Owner</th>
-                <th>Host</th>
-                <th>Repository</th>
-                <th>Updated At</th>
+                <th @click="setOrderBy('title')">Api Title <span v-html="getSortIcon('title')"></span></th>
+                <th @click="setOrderBy('owner')">Project Owner <span v-html="getSortIcon('owner')"></span></th>
+                <th @click="setOrderBy('host')">Host <span v-html="getSortIcon('host')"></span></th>
+                <th @click="setOrderBy('repository')">Repository <span v-html="getSortIcon('repository')"></span></th>
+                <th @click="setOrderBy('updated_at')">Updated At <span v-html="getSortIcon('updated_at')"></span></th>
             </tr>
             </thead>
             <tbody v-if="!isLoading">
@@ -139,16 +138,34 @@
             }
         },
         methods: {
+            getSortIcon : function(field) {
+                if(this.pageable.sort === field){
+                   return (this.pageable.direction === 'desc')? '<i class="fas fa-sort-down"></i>':'<i class="fas fa-sort-up"></i>'
+                }
+                return ''
+            },
+            setOrderBy : function(orderBy) {
+                let isDesc = this.pageable.direction === 'desc'
+                if(this.pageable.sort === orderBy){
+                    isDesc = !isDesc
+                }
+                if(isDesc){
+                    this.pageable.direction = 'desc'
+                }
+                else{
+                    this.pageable.direction = 'asc'
+                }
+                this.pageable.sort = orderBy
+                this.fetchData()
+            },
             fetchData: function() {
                 let url
                 if (this.team != null) {
-                    console.log('team name', this.team)
                     url = BASE_PROJECT_URL + '/team/' + this.team
                 }
                 else url = BASE_PROJECT_URL
                 if(this.pageable) {
                     this.isLoading = true
-                    console.log('url', url.toString())
                     axios.get(url, {
                         params: this.pageable
                     }).then((response) => {

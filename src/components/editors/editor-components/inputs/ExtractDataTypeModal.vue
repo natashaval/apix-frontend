@@ -78,7 +78,7 @@
                         if(response.status === 200){
                             projectData._signature = response.data.new_signature
                             callbacks.forEach(fn => fn())
-                            this.$emit('extractComplete',modelRef)
+                            this.$emit('onExtractComplete',modelRef)
                         }
                     }
                 ).catch(error => {

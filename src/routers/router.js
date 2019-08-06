@@ -19,9 +19,7 @@ import ClientEditor from "../components/editors/ClientEditor";
 import SwaggerClient from "../components/editors/SwaggerClient";
 import TeamList from "../components/teams/TeamList";
 import TeamEditor from "../components/editors/TeamEditor";
-import ProjectsImport from "../components/projects/ProjectsImport";
 import {DEFAULT_LAYOUT, EDITOR_LAYOUT} from "../consts/LayoutMode"
-import ProjectsTablePagination from "../components/projects/projects-components/ProjectsTablePagination";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -33,28 +31,6 @@ const initProject = (to, from, next) => {
     }
     next()
 }
-
-/*
-const listProjects = () => {
-    store.dispatch('fetchAllProjectsData')
-}
-*/
-
-/*
-router.beforeEach((to, from, next) => {
-    //redirect to login if not logged in and trying to access restricted page
-    // http://jasonwatmore.com/post/2018/07/14/vue-vuex-user-registration-and-login-tutorial-example#loginpage-vue
-    const publicPages = ['/login', '/'];
-    const  authRequired = !publicPages.includes(to.path);
-    const loggedIn = localStorage.getItem('apix-token');
-
-    if (authRequired && !loggedIn) {
-        return next('/login');
-    }
-
-    next();
-})
-*/
 
 let routeLayoutConfigs = [
     {
@@ -138,18 +114,10 @@ let routeLayoutConfigs = [
                 name: 'project-repo', path: '/projects',
                 component: ProjectsList
             },
-            // { // (TRIAL) for pagination table testing
-            //   name: 'project-server', path: '/server',
-            //   component: ProjectsTablePagination
-            // },
             {
                 name: 'auth-login', path: '/login',
                 component: AuthLogin
             },
-            // {
-            //     name: 'user-profile', path: '/user/profile',
-            //     component: UserProfile
-            // },
             {
                 name: 'team-create', path: '/team/new-team',
                 component: TeamCreate, props: true

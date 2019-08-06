@@ -3,13 +3,11 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-<!--                <h3>Files Upload</h3>-->
                 <input type="file" id="file" ref="file" multiple @change="handleFileUpload()"/>
 
                 <div class="btn-group mb-2" role="group" aria-label="files upload">
                     <button class="btn btn-primary" @click="addFile()">Add Files</button>
                     <button class="btn btn-success" @click="submitFile()">Submit</button>
-                    <!--                    <button class="btn btn-dark" @click="dumpFile()">Dump!</button>-->
                     <button class="btn btn-danger" @click="resetFile()">Reset</button>
                 </div>
 
@@ -24,16 +22,15 @@
                             <span class="remove-file" @click="removeFile(i)"><i class="fas fa-times"></i> Remove</span>
                         </div>
                     </div>
-                    <!--                                <progress max="100" :value.prop="existFile.uploadPercentage"></progress>-->
                     <div class="row">
                         <div class="col-md-2">
                             <p>Validation: </p>
                         </div>
                         <div class="col-md-6">
                             <span
-                                    :class="{'text-danger': !existFile.status, 'text-success': existFile.status}"
-                            >
-                                {{existFile.message}}</span>
+                                :class="{'text-danger': !existFile.status, 'text-success': existFile.status}">
+                                {{existFile.message}}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -44,11 +41,11 @@
 
 <script>
     import axios from 'axios'
-    import {BASE_PROJECT_URL} from "../../stores/actions/const";
-    import AssignComponent from "../editors/editor-components/AssignComponent";
+    import {BASE_PROJECT_URL} from "@/stores/actions/const";
+    import AssignComponent from "@/components/editors/editor-components/AssignComponent";
 
     export default {
-        name: "ProjectsUpload",
+        name: "ProjectImport",
         components: {AssignComponent},
         data: function() {
             return {
@@ -61,25 +58,20 @@
             handleFileUpload() {
                 let uploadedFile = this.$refs.file.files; //upload multiple files
                 for (var i = 0; i< uploadedFile.length; i++) {
-                    // https://github.com/vuejs/vue/issues/4443
-                    // -- error if file is declared in array should be an object
                     this.$set(this.files, i,
                         {
                             file: uploadedFile[i],
                             status: true,
-                            message: '',
-                            // uploadPercentage: 0
+                            message: ''
                         })
                 }
 
             },
             submitFile(){
                 const self = this;
-                // console.log(self.files);
 
                 for (var key in self.files) {
 
-                    // self.files.forEach(function(value, i) {
                     let formData = new FormData();
                     const postFile = self.files[key];
                     formData.append('type', 'oas-swagger2');
@@ -107,45 +99,28 @@
                             headers: {
                                 'Content-Type': 'multipart/form-data'
                             },
-                            // https://serversideup.net/file-upload-progress-indicator-with-axios-and-vuejs/
-                            // SUDAH BISA JALAN
-                            // onUploadProgress: function (progressEvent) {
-                            //     console.log('progressEvent', progressEvent.loaded, progressEvent.total)
-                            //     postFile.uploadPercentage = parseInt( Math.round( ( progressEvent.loaded * 100 ) / progressEvent.total ) );
-                            // }
                         }).then((response) => {
                             console.log('SUCCESS!');
                             postFile.status = true;
                             postFile.message = 'OAS has been imported';
+                            this.$emit('onImportComplete')
                         })
-                            .catch(function (e) {
-                                console.log('ERROR!', e);
-                                postFile.status = false;
-                                postFile.message = e.response.data.message;
-                                // postFile.uploadPercentage = 0;
-                            })
+                        .catch(function (e) {
+                            console.log('ERROR!', e);
+                            postFile.status = false;
+                            postFile.message = e.response.data.message;
+                        })
 
                     }
                 }
-
-                // });
-
-
             },
             addFile(){
                 this.$refs.file.click();
             },
             removeFile(idx){
-                console.log('remove clicked', idx)
-                // delete this.files[idx];
                 this.$delete(this.files, idx);
-                console.log(this.files)
-            },
-            dumpFile(){
-                console.log(this.files);
             },
             resetFile(){
-                // this.$refs.file.files = [];
                 this.files = {};
                 this.$refs.assign.isNewTeam = false;
                 this.$refs.assign.inputTeamName = '';
