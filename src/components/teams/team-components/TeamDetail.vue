@@ -6,7 +6,7 @@
                     <i class="fas fa-users"></i>
                     Team {{team.name}}</p>
             </div>
-            <div class="col-md-2 float-right">
+            <div class="col-md-2 float-right" v-show="isEdit">
                 <b-dropdown size="sm" right text="Right align" variant="light" toggle-class="text-decoration-none" no-caret>
                     <template slot="button-content"><i class="fas fa-ellipsis-h"></i></template>
                     <b-dropdown-item @click="routeInvite(team)"><i class="fas fa-user-plus"></i> Invite Member</b-dropdown-item>
@@ -42,7 +42,8 @@
         name: "TeamDetail",
         props: {
             team: Object,
-            isCreator: Boolean
+            isCreator: Boolean,
+            isEdit: Boolean
         },
         methods: {
             makeToast,

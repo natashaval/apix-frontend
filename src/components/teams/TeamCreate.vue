@@ -12,7 +12,7 @@
             <div class="col-md-11 mt-2">
                 <form id="create-team" @submit.prevent="submit" @reset="reset" v-if="show">
                     <div class="row">
-                        <div class="col-md-6 col-sm-3">
+                        <div class="col-md-6 col-sm-4">
                             <div v-if="isInvite">
                                 <h3>Invite Members of <span class="font-italic">{{ teamInvite.name }}</span></h3>
                             </div>
@@ -146,6 +146,16 @@
                     console.log('invite', payload);
                     axios.put(BASE_URL + '/teams/' + payload.teamName + '/invite', payload).then((res) => {
                         this.makeToast('success', res.data.success, res.data.message)
+                        for (let i = 0; i < payload.members.length; i++) {
+                            this.teamInvite.members.push({
+                                username: payload.members[i],
+                                grant: false
+                            })
+                        }
+                        setTimeout(() => {
+                            console.log('habis invite', this.teamInvite);
+                            this.selectedMember = []
+                        }, 1000);
                     }).catch((e) => {
                         console.error(e)
                         this.makeToast('danger', e.response.data.success, e.response.data.message)
@@ -155,7 +165,14 @@
                     console.log('remove', payload);
                     axios.put(BASE_URL + '/teams/' + payload.teamName + '/remove', payload).then((res) => {
                         this.makeToast('success', res.data.success, res.data.message)
-
+                        let membersArray = this.teamInvite.members
+                        for (let i = 0; i < payload.members.length; i++) {
+                            membersArray.splice(membersArray.findIndex(u => u.username === payload.members[i]), 1)
+                        }
+                        setTimeout(() => {
+                            console.log('habis remove apakah berhasil', this.teamInvite);
+                            this.selectedMember = []
+                        }, 1000);
                     }).catch((e) => {
                         console.error(e)
                         this.makeToast('danger', e.response.data.success, e.response.data.message)

@@ -5,7 +5,7 @@
                 <b-col md="1">
                     <label>Create User: </label>
                 </b-col>
-                <b-col md="9">
+                <b-col md="11">
                     <b-form inline @submit="onSubmit" @reset="onReset">
                         <b-form-input id="input-username"
                                       name="username"
