@@ -155,6 +155,7 @@
                     console.log('remove', payload);
                     axios.put(BASE_URL + '/teams/' + payload.teamName + '/remove', payload).then((res) => {
                         this.makeToast('success', res.data.success, res.data.message)
+
                     }).catch((e) => {
                         console.error(e)
                         this.makeToast('danger', e.response.data.success, e.response.data.message)
