@@ -44,8 +44,8 @@
         methods : {
             makeToast,
             onImportComplete : function () {
-                this.$bvModal.hide('project-import')
-                this.makeToast('success', true, 'import success')
+                // this.$bvModal.hide('project-import')
+                // this.makeToast('success', true, 'import success')
                 this.$refs.projectTable.fetchData()
             }
         }

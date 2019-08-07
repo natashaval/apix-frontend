@@ -73,7 +73,7 @@
             exportOas: function () {
                 let self = this
                 self.exportStatus = true
-                axios.post(BASE_PROJECT_URL +'/'+ self.projectId + '/export?type=oas-swagger2&format=JSON')
+                axios.get(BASE_PROJECT_URL +'/'+ self.projectId + '/export?format=JSON')
                     .then((response) => {
                         self.makeToast('success', response.data.success, response.data.message)
                         self.fileExportLocation = response.data.file_url

@@ -58,13 +58,13 @@
                         <button class="btn btn-dark mt-2" @click="push" :disabled="isEdited">Push to Github</button>
                     </div>
                 </div>
-                <div clas="row">
-                    <div class="col-8" v-if="commitResponse.commitDate">
-                        <div class="alert alert-primary" role="alert">
-                            Project is successfully push to Github -> {{commitResponse.message}}
-                        </div>
-                    </div>
-                </div>
+                <!--<div clas="row">-->
+                    <!--<div class="col-8" v-if="commitResponse.commitDate">-->
+                        <!--<div class="alert alert-primary" role="alert">-->
+                            <!--Project is successfully push to Github -> {{commitResponse.message}}-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
                 <div class="row mt-2" style="background-color: ghostwhite;">
                     <div class="col-7 ml-3">
                         <h5 class="font-weight-bold">Pull to Project &nbsp;&nbsp;
@@ -76,38 +76,8 @@
                         <button class="btn btn-dark mt-2" @click="pull" :disabled="isEdited">Pull to Project</button>
                     </div>
                 </div>
-                <!--<div clas="row">-->
-                <!--<div class="col-8" v-if="pullResponse">-->
-                <!--<div class="alert alert-primary" role="alert">-->
-                <!--OAS from Github has been pulled to this project -> {{pullResponse.message}}-->
-                <!--</div>-->
-                <!--</div>-->
-                <!--</div>-->
+
             </div>
-
-            <!--<div v-else class="col-11">-->
-            <!--<div class="row">-->
-            <!--<div class="col-md-12 ml-3" v-if="ownerData">-->
-            <!--<p class="font-weight-bold">Owner :  <span class="badge badge-secondary">{{owner}}</span></p> <br />-->
-            <!--</div>-->
-            <!--</div>-->
-            <!--<div class="row">-->
-            <!--<div class="col-md-5 ml-3">-->
-            <!--<p class="font-weight-bold">Repo: {{repo}}</p>-->
-            <!--</div>-->
-            <!--<div class="col-md-5">-->
-            <!--<p class="font-italic">Branch: {{branch}}</p><br />-->
-            <!--</div>-->
-            <!--</div>-->
-            <!--<div class="row">-->
-            <!--<div class="col-md-12 ml-3">-->
-            <!--<p class="font-weight-bold">Path: {{ path }} &nbsp;-->
-            <!--<span><i v-show="oasLoading" class="fa fa-spinner fa-spin"></i></span>-->
-            <!--</p>-->
-            <!--</div>-->
-            <!--</div>-->
-            <!--</div>-->
-
         </div>
         <div class="row" v-if="content">
             <div class="col-md-11 m-auto">
