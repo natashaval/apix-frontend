@@ -7,7 +7,8 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "test": "jest",
-    "test:unit": "jest",
+    "test:unit": "vue-cli-service test:unit",
+    "test:coverage": "vue-cli-service test:unit --coverage",
     "clear_jest": "jest --clearCache"
   },
   "dependencies": {

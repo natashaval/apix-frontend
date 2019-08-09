@@ -71,7 +71,7 @@ describe('project side bar', () => {
             "message": "",
             "file_url": "/download/exported-oas/mock-export-oas.json"
         }
-        mock.onPost(BASE_PROJECT_URL + '/project-id' + '/export?type=oas-swagger2&format=JSON')
+        mock.onGet(BASE_PROJECT_URL + '/project-id' + '/export?format=JSON')
             .reply(200, data);
         let elem = wrapper.find('[name="swagger-client"]');
         elem.trigger('click')
@@ -86,7 +86,7 @@ describe('project side bar', () => {
             "message": "",
             "file_url": "/download/exported-oas/mock-export-oas.json"
         }
-        mock.onPost(BASE_PROJECT_URL + '/project-id' + '/export?type=oas-swagger2&format=JSON')
+        mock.onGet(BASE_PROJECT_URL + '/project-id' + '/export?format=JSON')
             .reply(200, data);
         let elem = wrapper.find('[name="swagger-client"]');
         elem.trigger('click')

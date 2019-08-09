@@ -13,13 +13,13 @@
                 <form id="create-team" @submit.prevent="submit" @reset="reset" v-if="show">
                     <div class="row">
                         <div class="col-md-6 col-sm-4">
-                            <div v-if="isInvite">
+                            <div v-if="isInvite" class="title">
                                 <h3>Invite Members of <span class="font-italic">{{ teamInvite.name }}</span></h3>
                             </div>
-                            <div v-else-if="isRemove">
+                            <div v-else-if="isRemove" class="title">
                                 <h3>Remove Members from <span class="font-italic">{{ teamInvite.name }}</span></h3>
                             </div>
-                            <div v-else>
+                            <div v-else class="title">
                                 <h3>Create Team</h3>
                             </div>
                         </div>

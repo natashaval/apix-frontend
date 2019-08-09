@@ -24,11 +24,10 @@ describe('github unit test', () => {
         const actions = GithubModule.actions;
 
         store = new Vuex.Store({state, getters, mutations, actions})
-        http = new MockAdapter(axios);
     })
 
     beforeAll(() => {
-
+        http = new MockAdapter(axios);
     })
     afterEach(() => {
         http.reset()

@@ -5,8 +5,8 @@ import VueRouter from "vue-router";
 import TeamViewer from "@/components/teams/TeamViewer";
 import flushPromises from "flush-promises";
 import axios from "axios";
-import {BASE_URL} from "../../../../src/stores/actions/const";
-import ApixUtil from "../../../../src/utils/ApixUtil";
+import {BASE_URL} from "@/stores/actions/const";
+import ApixUtil from "@/utils/ApixUtil";
 
 const localVue = createLocalVue()
 localVue.use(BootstrapVue)
@@ -121,7 +121,6 @@ describe('team card need confirmation team', () => {
 
     test('section need confirmation and click confirm success', async (done) => {
         expect(wrapper.findAll('.team-header').length).toEqual(1)
-        console.log(wrapper.findAll('button.confirm-team').at(0).html())
         const mockSuccessResponse = {
             success: true,
             message: 'Members have been invited!'
@@ -129,16 +128,17 @@ describe('team card need confirmation team', () => {
         axios.put = jest.fn().mockResolvedValue(Promise.resolve({
             data: mockSuccessResponse
         }))
-        let grantList = [{
-            username: 'test',
-            grant: false
-        }]
+        let grantList = {
+            invite: true,
+            members: ['test'],
+            teamName: 'TeamNot'
+        }
 
         let elem = wrapper.findAll('button.confirm-team').at(0);
         elem.trigger('click')
         expect(axios.put).toHaveBeenCalledTimes(1)
-        expect(axios.put).toHaveBeenCalledWith(BASE_URL + '/teams/TeamNot', grantList)
-        expect(ApixUtil.isEqualArray(wrapper.vm.confirm("TeamNot"), grantList)).toBeTruthy()
+        expect(axios.put).toHaveBeenCalledWith(BASE_URL + '/teams/TeamNot/grant', grantList)
+        expect(ApixUtil.isEqualObject(wrapper.vm.confirm("TeamNot"), grantList)).toBeTruthy()
         done()
     })
 
@@ -151,19 +151,15 @@ describe('team card need confirmation team', () => {
         }
         const mockFetchPromise = Promise.reject(mockFailedResponse)
         axios.put = jest.fn().mockReturnValue(mockFetchPromise)
-        let grantList = [{
-            username: 'test',
-            grant: false
-        }]
+        let grantList = {
+            invite: true,
+            members: ['test'],
+            teamName: 'TeamNot'
+        }
 
-        // let elem = wrapper.findAll('button.confirm-team').at(0);
-        // elem.trigger('click')
-        // expect(ApixUtil.isEqualArray(wrapper.vm.confirm("TeamNot"), grantList)).toBeTruthy()
-        // expect(wrapper.vm.confirm("TeamNot")).rejects.toThrowErrorMatchingSnapshot()
         await wrapper.vm.confirm("TeamNot")
         expect(axios.put).toHaveBeenCalledTimes(1)
-        // expect(axios.put).toHaveBeenCalledWith(mockFetchPromise)
-        expect(axios.put).toHaveBeenCalledWith(BASE_URL + '/teams/TeamNot', grantList)
+        expect(axios.put).toHaveBeenCalledWith(BASE_URL + '/teams/TeamNot/grant', grantList)
         done()
     })
 })

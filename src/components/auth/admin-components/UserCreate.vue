@@ -95,7 +95,7 @@
         },
         computed: {
             nameState(){
-                return this.user.username.length >= 4 ? true : false
+                return this.user.username.length >= 4
             }
         },
         methods: {

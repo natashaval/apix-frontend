@@ -49,7 +49,7 @@ const store = new Vuex.Store({
                         "teams": ["TEAMS"]
                     }
                 },
-                isProfile: () => true
+                isProfileLoaded: () => true
             },
             actions: {
                 [USER_REQUEST]: jest.fn()

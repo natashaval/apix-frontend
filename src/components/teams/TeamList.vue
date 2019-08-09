@@ -63,9 +63,6 @@
             profile() {
                 return this.$store.getters['user/getProfile']
             },
-            isAuthenticated () {
-                return this.$store.getters['auth/isAuthenticated']
-            },
             grantUser: function() {
                 // https://laracasts.com/discuss/channels/vue/computed-function-is-running-before-data-is-loaded?page=0
                 if (!this.teams) return null;
@@ -90,7 +87,6 @@
         },
         methods: {
             loadTeam(){
-                console.log('load team')
                 axios.get(BASE_URL + "/teams/my-team").then((response) => {
                     this.teams = response.data
                 }).catch((e) => {
