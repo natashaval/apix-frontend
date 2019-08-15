@@ -58,13 +58,6 @@
                         <button class="btn btn-dark mt-2" @click="push" :disabled="isEdited">Push to Github</button>
                     </div>
                 </div>
-                <!--<div clas="row">-->
-                    <!--<div class="col-8" v-if="commitResponse.commitDate">-->
-                        <!--<div class="alert alert-primary" role="alert">-->
-                            <!--Project is successfully push to Github -> {{commitResponse.message}}-->
-                        <!--</div>-->
-                    <!--</div>-->
-                <!--</div>-->
                 <div class="row mt-2" style="background-color: ghostwhite;">
                     <div class="col-7 ml-3">
                         <h5 class="font-weight-bold">Pull to Project &nbsp;&nbsp;
@@ -269,27 +262,29 @@
             push: async function () {
                 this.pushLoading = true
                 await this.fetchOas();
-                axios.put(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/contents/' + this.path,
-                    {
-                        message: this.message,
-                        projectId: this.projectId,
-                        sha: this.content.sha,
-                        branch: (this.branch == '') ? 'master' : this.branch
-                    })
-                    .then((response) => {
-                        this.commitResponse = response.data
-                        console.log(this.commitResponse)
-                        this.makeToast('success', response.data.success, "Success push to github -> " + response.data.message);
-                        this.pushLoading = false
-                        // this.$nextTick(() => {
-                        //     this.fetchOas();
-                        // })
-                    })
-                    .catch((e) => {
-                        console.error(e);
-                        this.makeToast('danger', e.response.data.success, e.response.data.message + ": " + e.response.data.errors);
-                        this.pushLoading = false
-                    })
+                if (this.content.sha) {
+                    axios.put(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/contents/' + this.path,
+                        {
+                            message: this.message,
+                            projectId: this.projectId,
+                            sha: this.content.sha,
+                            branch: (this.branch == '') ? 'master' : this.branch
+                        })
+                        .then((response) => {
+                            this.commitResponse = response.data
+                            console.log(this.commitResponse)
+                            this.makeToast('success', response.data.success, "Success push to github -> " + response.data.message);
+                            this.pushLoading = false
+                            // this.$nextTick(() => {
+                            //     this.fetchOas();
+                            // })
+                        })
+                        .catch((e) => {
+                            console.error(e);
+                            this.makeToast('danger', e.response.data.success, e.response.data.message + ": " + e.response.data.errors);
+                            this.pushLoading = false
+                        })
+                }
             },
             pull: function(){
                 let self = this
@@ -343,8 +338,14 @@
                 if (this.githubData !== undefined) {
                     axios.get(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/branches')
                         .then((response) => {
-                            let master = ['master']
-                            this.branchList = master.concat(response.data)
+                            // let master = ['master']
+                            // this.branchList = master.concat(response.data)
+                            let branches = response.data
+                            if (branches.indexOf("master") > 0){
+                                branches.splice(branches.indexOf("master"), 1)
+                                branches.unshift("master")
+                            }
+                            this.branchList = branches
                         })
                         .catch((e) => {
                             console.error(e)

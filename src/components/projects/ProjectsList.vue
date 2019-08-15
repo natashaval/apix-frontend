@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-container fluid>
-            <h3>Project Table List</h3>
+<!--            <h3>Project Table List</h3>-->
             <b-row class="my-3" no-gutters>
                 <b-col class="mx-0">
                     <b-button v-b-modal="'project-modal'" variant="primary" class="mr-2">New Project</b-button>
