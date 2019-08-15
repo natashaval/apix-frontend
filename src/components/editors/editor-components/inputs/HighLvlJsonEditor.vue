@@ -11,23 +11,24 @@
                     <!--kolom kiri-->
                     <div class="col-6">
                         <div v-if="showEdit" class="form-row">
-                            <div class="form-row">
-                                <b-form-group v-if="nameable" class="form-row mb-2 w-100 pr-0"
+<!--                            <div class="form-row">-->
+                                <b-form-group v-if="nameable" class="mb-2 w-100"
                                               :state="nameState" :invalid-feedback="nameInvalidFeedback"
-                                              label="name * :"
-                                              label-class="shrinkable-text"
-                                              label-cols="2">
-                                    <slot v-if="disableName">
-                                        <b-form-input trim class="form-control" disabled v-model="name"
+                                              label="name* :"
+                                              label-cols="2"
+                                              >
+<!--                                    <slot v-if="disableName">-->
+                                        <b-form-input v-if="disableName"
+                                                      disabled v-model="name"
                                                       :name="_uid+'-name'"></b-form-input>
-                                    </slot>
-                                    <slot v-else>
-                                        <b-form-input v-model="name" class="w-100"
-                                                      :state="nameState" trim
+<!--                                    </slot>-->
+<!--                                    <slot v-else>-->
+                                        <b-form-input v-model="name" v-else
+                                                      :state="nameState"
                                                       :name="_uid+'-name'"></b-form-input>
-                                    </slot>
+<!--                                    </slot>-->
                                 </b-form-group>
-                            </div>
+<!--                            </div>-->
                             <div class="form-row w-100 mb-2">
                                 <label class="shrinkable-text col-2 mt-auto">{{(isSubArray)?'Of :':'Type :'}}</label>
                                 <b-select class="form-control col-10" :name="_uid+'-select-type'" v-model="selectedType">
@@ -45,8 +46,8 @@
                                 </b-select>
                             </div>
                             <div class="form-row w-100">
-                                <label class="shrinkable-text mt-1 col-3">Required :</label>
-                                <input type="checkbox" class="mt-2" v-model="required" :name="_uid+'-is-required'"/>
+                                <label class="shrinkable-text mt-1 col-2">Required :</label>
+                                <input type="checkbox" class="mt-1" v-model="required" :name="_uid+'-is-required'"/>
 
                             </div>
                         </div>
