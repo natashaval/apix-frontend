@@ -1,7 +1,7 @@
 <template>
     <div>
-        <EditorHeaderComponent :isEdited="isEdited" class="w-100"
-                               :submit="submit" :cancel="cancel" :name="editorTitle" :editable="$_projectPrivilege_canEdit"></EditorHeaderComponent>
+        <EditorHeaderComponent :isEdited="isEdited" :editable="$_projectPrivilege_canEdit"
+                               :submit="submit" :cancel="cancel" :name="editorTitle"></EditorHeaderComponent>
 
         <div class="form-row ml-1 mr-1 dot-border">
             <div class="col-11">
@@ -29,6 +29,7 @@
         <div class="form-row ml-1 mr-1 dot-border">
             <label class="font-weight-bold w-100">Model :</label>
             <BodyForm :body-data="schemaData" ref="root" class="col-12"
+                      :editable="$_projectPrivilege_canEdit"
                       :$_changeObserverMixin_parent="$_changeObserverMixin_this"/>
         </div>
     </div>

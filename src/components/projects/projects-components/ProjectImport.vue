@@ -74,7 +74,6 @@
 
                     let formData = new FormData();
                     const postFile = self.files[key];
-                    formData.append('type', 'oas-swagger2');
                     formData.append('file', postFile['file']);
 
                     let isNewTeam = this.$refs.assign.isNewTeam;
@@ -84,16 +83,22 @@
                     formData.append('isNewTeam', isNewTeam);
                     formData.append('team', team);
 
+                    let filename = postFile['file'].name;
+                    let type = filename.substr(filename.lastIndexOf('.') + 1);
+                    formData.append('format', type.toUpperCase());
+                    console.log(type);
+
                     // Validation if file exists and file type is application/json
                     if (typeof postFile['file'].name === 'undefined') {
                         postFile.status = false;
                         postFile.message = 'File does not exists!';
-
-                    } else if (postFile['file'].type !== 'application/json') {
+                    }
+                    else if (type != 'json' && type !== 'yaml') {
                         postFile.status = false;
                         postFile.message = 'File type should be application/json';
-
-                    } else {
+                    }
+                    else {
+                        // console.log('success masuk ke else!');
 
                         axios.post(BASE_PROJECT_URL +'/import', formData, {
                             headers: {

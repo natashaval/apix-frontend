@@ -1,6 +1,8 @@
 <template>
     <div>
-    <button class="btn btn-outline-light float-left text-dark"><i class="fas fa-angle-left"></i> Back</button>
+    <button class="btn btn-outline-light float-left text-dark" @click="routeBack()">
+        <i class="fas fa-angle-left"></i> Back
+    </button>
     <div id="swagger-ui">
     </div>
     </div>
@@ -9,6 +11,7 @@
 <script>
     import 'swagger-ui/dist/swagger-ui.css'
     import SwaggerUI from 'swagger-ui'
+    import {BASE_URL} from "../../stores/actions/const";
 
     // import 'swagger-ui/dist/swagger-ui-standalone-preset.js'
 
@@ -32,20 +35,31 @@
                 // https://stackoverflow.com/questions/46237255/how-to-embed-swagger-ui-to-a-webpage
                 const ui  = SwaggerUI({
                     dom_id: '#swagger-ui',
-                    url: 'http://localhost:8080' + this.fileUrl,
+                    url: BASE_URL + this.fileUrl,
                 })
             },
             loadData: function () {
                 let p = this.$route.params
                 this.projectId = p.projectId
                 this.fileUrl = p.fileUrl
-            }
+            },
+            routeBack: function () {
+                console.log('click route back');
+                this.$router.push({
+                    name: 'project-editor', params: {projectId: this.projectId}
+                })
+            },
         },
         mounted: function() {
             this.loadSwagger();
         },
         created() {
             this.loadData();
+        },
+        watch : {
+            $route: function () {
+                this.loadData()
+            },
         }
     }
 </script>

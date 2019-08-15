@@ -1,12 +1,12 @@
 import {createLocalVue, shallowMount, mount} from "@vue/test-utils";
 import BootstrapVue from "bootstrap-vue";
-import TeamList from "@/components/teams/TeamList.vue"
+import TeamList from "@/components/teams/TeamList"
 import Vuex from "vuex";
 import axios from "axios";
-import MockAdapter from "axios-mock-adapter";
 import flushPromises from 'flush-promises';
-import {BASE_URL} from "../../../src/stores/actions/const";
-import TeamCard from "../../../src/components/teams/team-components/TeamCard";
+import {BASE_URL} from "@/stores/actions/const";
+import MockAdapter from "axios-mock-adapter";
+import ApixUtil from "../../../src/utils/ApixUtil";
 
 const localVue = createLocalVue()
 localVue.use(BootstrapVue)
@@ -40,7 +40,6 @@ const store = new Vuex.Store({
 
 describe('team list', () => {
     let wrapper
-    let http
 
     let methods = {
         loadTeam: jest.fn()
@@ -101,26 +100,6 @@ describe('team list', () => {
         })
     })
 
-    test.skip('load team and should show team', async () => {
-        let expected = [{
-            "id": "5d1727316c555e0d88d14d17",
-            "name": "ho",
-            "access": "PRIVATE",
-            "creator": "bebek",
-            "members": [
-                {
-                    "username": "bebek",
-                    "grant": true
-                }
-            ]
-        }]
-        http.onGet(BASE_URL + '/teams/my-team').reply(200, {data: expected})
-        wrapper.vm.loadTeam()
-        await flushPromises()
-        expect(wrapper.vm.teams.length).toEqual(1)
-        expect(wrapper.vm.teams).toEqual(expected)
-    })
-
     test('mounted call methods', () => {
         expect(methods.loadTeam).toHaveBeenCalled();
     })
@@ -168,14 +147,6 @@ describe('mock http', function () {
         wrapper = mount(TeamList, {
             localVue,
             store,
-            // computed: {
-            //     profile: function () {
-            //         return {
-            //             username: 'test'
-            //         }
-            //     },
-            //     isAuthenticated: jest.fn()
-            // },
             stubs: {
                 'route-link' : true,
                 TeamCard: {
@@ -242,11 +213,5 @@ describe('mock http', function () {
         await flushPromises();
         console.log(wrapper.vm.teams.length)
         */
-    })
-
-    test.skip('profile in computed is called', () => {
-        // console.log(wrapper.vm.profile.username)
-        expect(userGetters.getProfile()).toHaveBeenCalled()
-        expect(authGetters.isAuthenticated()).toHaveBeenCalled()
     })
 });

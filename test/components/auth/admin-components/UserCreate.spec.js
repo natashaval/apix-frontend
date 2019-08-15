@@ -51,12 +51,7 @@ const factory = (values = {}) => {
             return {
                 values
             }
-        },
-        // computed: {
-        //     nameState: () => {
-        //         return values.user.username.length >= 4 ? true : false
-        //     }
-        // }
+        }
     })
 }
 
@@ -76,21 +71,6 @@ describe('display users test', () => {
 
 describe('try axios in submit', () => {
     let http;
-    /*
-    let adminStore;
-    let adminActions = {
-        fetchAllUsersData: jest.fn(),
-        addUser: jest.fn()
-    }
-    let adminState = {
-        users: [{
-            id: 'user-id',
-            username: 'username',
-            roles: ['ROLE_USER', 'ROLE_ADMIN'],
-            teams: ['TEAMS']
-        }]
-    }
-    */
     beforeAll(() => {
         http = new MockAdapter(axios);
     })
@@ -120,5 +100,14 @@ describe('try axios in submit', () => {
         await flushPromises();
         expect(actions.addUser).toHaveBeenCalled()
         // console.log(store.getters['admin/getUsers'])
+    })
+
+    test('click on reset', () => {
+        const wrapper = factory()
+        const event = Object.assign(jest.fn(), {preventDefault: () => {}})
+        wrapper.vm.onReset(event)
+        expect(wrapper.vm.user.username).toEqual('')
+        expect(wrapper.vm.user.password).toEqual('')
+        expect(wrapper.vm.user.roles).toEqual([])
     })
 })

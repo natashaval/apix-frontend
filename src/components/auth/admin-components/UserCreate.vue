@@ -5,7 +5,7 @@
                 <b-col md="1">
                     <label>Create User: </label>
                 </b-col>
-                <b-col md="9">
+                <b-col md="11">
                     <b-form inline @submit="onSubmit" @reset="onReset">
                         <b-form-input id="input-username"
                                       name="username"
@@ -95,7 +95,7 @@
         },
         computed: {
             nameState(){
-                return this.user.username.length >= 4 ? true : false
+                return this.user.username.length >= 4
             }
         },
         methods: {

@@ -12,25 +12,25 @@
             <div class="col-md-11 mt-2">
                 <form id="create-team" @submit.prevent="submit" @reset="reset" v-if="show">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div v-if="isInvite">
+                        <div class="col-md-6 col-sm-4">
+                            <div v-if="isInvite" class="title">
                                 <h3>Invite Members of <span class="font-italic">{{ teamInvite.name }}</span></h3>
                             </div>
-                            <div v-else-if="isRemove">
+                            <div v-else-if="isRemove" class="title">
                                 <h3>Remove Members from <span class="font-italic">{{ teamInvite.name }}</span></h3>
                             </div>
-                            <div v-else>
+                            <div v-else class="title">
                                 <h3>Create Team</h3>
                             </div>
                         </div>
-                        <div class="form-group col-md-1 mb-2">
+                        <div class="col-md-1 mb-2">
                             <button type="submit" id="create-submit"
-                                    class="btn btn-info btn-block">Submit</button>
+                                    class="btn btn-info">Submit</button>
                         </div>
-                        <div class="form-group col-md-1 mb-2">
+                        <div class="col-md-1 mb-2">
                             <!--                    <label for="create-submit" class="invisible">Reset</label>-->
                             <button type="reset" id="create-reset"
-                                    class="btn btn-outline-secondary btn-block">Reset</button>
+                                    class="btn btn-outline-secondary">Reset</button>
                         </div>
                     </div>
                     <div class="form-row">
@@ -146,6 +146,16 @@
                     console.log('invite', payload);
                     axios.put(BASE_URL + '/teams/' + payload.teamName + '/invite', payload).then((res) => {
                         this.makeToast('success', res.data.success, res.data.message)
+                        for (let i = 0; i < payload.members.length; i++) {
+                            this.teamInvite.members.push({
+                                username: payload.members[i],
+                                grant: false
+                            })
+                        }
+                        setTimeout(() => {
+                            console.log('habis invite', this.teamInvite);
+                            this.selectedMember = []
+                        }, 1000);
                     }).catch((e) => {
                         console.error(e)
                         this.makeToast('danger', e.response.data.success, e.response.data.message)
@@ -155,6 +165,14 @@
                     console.log('remove', payload);
                     axios.put(BASE_URL + '/teams/' + payload.teamName + '/remove', payload).then((res) => {
                         this.makeToast('success', res.data.success, res.data.message)
+                        let membersArray = this.teamInvite.members
+                        for (let i = 0; i < payload.members.length; i++) {
+                            membersArray.splice(membersArray.findIndex(u => u.username === payload.members[i]), 1)
+                        }
+                        setTimeout(() => {
+                            console.log('habis remove apakah berhasil', this.teamInvite);
+                            this.selectedMember = []
+                        }, 1000);
                     }).catch((e) => {
                         console.error(e)
                         this.makeToast('danger', e.response.data.success, e.response.data.message)

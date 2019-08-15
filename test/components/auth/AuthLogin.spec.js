@@ -4,11 +4,7 @@ import Vuex from "vuex"
 import AuthModule from "@/stores/modules/AuthModule"
 import BootstrapVue from "bootstrap-vue"
 import VueRouter from 'vue-router'
-import axios from 'axios'
-import MockAdapter from 'axios-mock-adapter'
-import {AUTH_REQUEST} from "@/stores/actions/auth"
 import ProjectsList from "@/components/projects/ProjectsList"
-import {BASE_URL} from "@/stores/actions/const"
 import LayoutModule from "@/stores/modules/LayoutModule"
 
 // https://vue-test-utils.vuejs.org/guides/using-with-vue-router.html
@@ -89,49 +85,5 @@ describe('login user', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.$route.name).toEqual('project-repo')
         expect(wrapper.vm.$route.path).toEqual('/projects')
-    })
-})
-
-describe('actions', () => {
-    let http;
-    let store;
-    beforeAll(() => {
-        http = new MockAdapter(axios);
-        store = new Vuex.Store({
-            modules: {
-                auth: {
-                    namespaced: true,
-                    state: {
-                        status: '',
-                        token: ''
-                    },
-                    getters: AuthModule.getters,
-                    actions: {
-                        AUTH_REQUEST: () => {
-                            jest.fn(() => Promise.resolve());
-                        }
-                    }
-                }
-            }
-        })
-    })
-    afterEach(() => {
-        http.reset()
-    })
-    afterAll(() => {
-        http.restore()
-    })
-
-    test('should trigger http login post', () => {
-        const fakeUser = {
-            success: true,
-            message: 'User is authenticated!',
-            token: 'token'
-        }
-        http.onPost(BASE_URL + '/auth/login').reply(200, {data: fakeUser})
-        return store.dispatch('auth/' + AUTH_REQUEST)
-            .then(() => {
-                expect(store.state.status).toEqual('success')
-            })
     })
 })
