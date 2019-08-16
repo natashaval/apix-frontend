@@ -43,7 +43,18 @@
                 <div class="form-group ml-3">
                     <label>Path: &nbsp;&nbsp;&nbsp;</label>
                     <!--<span><i v-show="oasLoading" class="fa fa-spinner fa-spin"></i></span>-->
-                    <input v-model="path" class="form-control col-md-11"/>
+<!--                    <input v-model="path" class="form-control col-md-11"/>-->
+                    <div class="autocomplete">
+                        <input class="form-control"
+                               v-model="path"
+                               @input="searchFile"
+                               placeholder="Search path" />
+                        <ul v-show="isPathSearch" class="autocomplete-items">
+                            <li v-for="(file,f) in filteredFile" :key="f" @click="setFile(file)">
+                                {{file}}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
                 <hr />
                 <div class="row" style="background-color: ghostwhite;">
@@ -117,6 +128,7 @@
                 content: {}, // content tidak diganti, langsung dari executor export
                 message: '',
                 branchList: [],
+                fileList: [],
                 // oasLoading: false,
                 // initialOas: {},
 
@@ -126,6 +138,7 @@
                 attributesKey: [{key : 'owner'},{key : 'repo'}, {key : 'branch'},{key : 'path'}],
 
                 isRepoSearch: false,
+                isPathSearch: false,
                 filteredRepos: [],
                 projectId: undefined,
                 commitResponse: {},
@@ -162,6 +175,9 @@
             reposData() {
                 return this.$store.getters['github/getRepos']
             },
+            filteredFile() {
+             return this.fileList.filter(f => f.toLowerCase().includes(this.path.toLowerCase()))
+            }
         },
         created() {
             this.$store.dispatch('github/fetchRepos');
@@ -355,6 +371,23 @@
                     console.log('GithubAPI still empty!')
                 }
             },
+            fetchFileList: function () {
+                if (this.githubData !== undefined) {
+                    let tree = ''
+                    if (this.branch === '') tree = 'master'
+                    else tree = this.branch
+                    axios.get(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/git/trees/' + tree)
+                        .then((response) => {
+                            this.fileList = response.data
+                        })
+                        .catch((e) => {
+                            console.error(e)
+                        })
+                }
+                else {
+                    console.log('GithubAPI still empty!')
+                }
+            },
             fetchOas: function() {
                 // if (this.githubData !== undefined) {
                 if (this.githubData.repo !== ''){
@@ -391,6 +424,9 @@
                 this.isRepoSearch = true
                 this.filterResults();
             },
+            searchFile: function(){
+              this.isPathSearch = true;
+            },
             filterResults: function() {
                 if (this.reposData) {
                     this.filteredRepos = this.reposData.filter(rep => rep.name.toLowerCase().includes(this.repo.toLowerCase()));
@@ -405,8 +441,12 @@
                 this.owner = result.ownerName;
                 this.isRepoSearch = false;
 
-                // this.fetchInitial();
                 this.fetchBranchList();
+                this.fetchFileList();
+            },
+            setFile: function(result) {
+                this.isPathSearch = false;
+                this.path = result;
             }
         },
         watch: {

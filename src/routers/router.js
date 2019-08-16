@@ -211,9 +211,6 @@ router.beforeEach((to, from, next) => {
     const publicPages = ['/login'];
     const  authRequired = !publicPages.includes(to.path);
     const loggedIn = localStorage.getItem('apix-token');
-    // const hasAdminRole = store.getters['user/getProfile'];
-    // const hasAdminRole = store.getters.user.getProfile;
-    console.log(store.state.user.profile)
 
     if (authRequired && !loggedIn) {
         router.push('/login');
