@@ -143,6 +143,14 @@
               return res
             },
             submit: function(){
+                if(!this.$_changeObserverMixin_allIsValid()){
+                    this.$bvToast.toast('Can\'t submit due to invalid input', {
+                        title: 'Failed',
+                        variant: 'danger'
+                    })
+                    return
+                }
+
                 this.isEdited = false
 
                 let tree = undefined
