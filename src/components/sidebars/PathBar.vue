@@ -44,7 +44,6 @@
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
     import EditorSwitchMixin from "@/mixins/EditorSwitchMixin";
-    import {EditorHeader} from "../../utils/GlobalVars"
     export default {
         name: "PathBar",
         components: {OperationBar},

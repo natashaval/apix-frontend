@@ -106,6 +106,7 @@
         methods : {
             loadData : function () {
                 this.isEdited = false
+                this.isEditing = false
                 this.$_changeObserverMixin_unObserve()
                 if(this.definitionData !== undefined){
                     this.description = this.definitionData.description
