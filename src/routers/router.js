@@ -20,6 +20,7 @@ import SwaggerClient from "../components/editors/SwaggerClient";
 import TeamList from "../components/teams/TeamList";
 import TeamEditor from "../components/editors/TeamEditor";
 import {DEFAULT_LAYOUT, EDITOR_LAYOUT} from "../consts/LayoutMode"
+import ErrorForbidden from "../ErrorForbidden";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
@@ -30,6 +31,32 @@ const initProject = (to, from, next) => {
         console.log('end outer call')
     }
     next()
+}
+
+const checkAdmin = (to, from, next) => {
+    // https://forum.vuejs.org/t/solved-delay-vue-action-until-a-state-variable-is-set/9063/5
+    function proceed() {
+        if (store.getters['user/isProfileLoaded']) {
+            next()
+        }
+    }
+
+    if (to.meta.adminAuth) {
+        if (!store.getters['user/isProfileLoaded']) {
+            store.watch(
+                (state) => state.user.profile,
+                (value) => {
+                    if (value.roles.includes('ROLE_ADMIN') || value.roles.includes('ADMIN')) {
+                        proceed()
+                    } else {
+                        router.push('/forbidden')
+                    }
+                }
+            )
+        } else {
+            proceed()
+        }
+    }
 }
 
 let routeLayoutConfigs = [
@@ -132,7 +159,13 @@ let routeLayoutConfigs = [
             },
             {
                 name: 'user-viewer', path: '/admin/users',
-                component: UserViewer
+                component: UserViewer,
+                meta: {adminAuth: true },
+                beforeEnter: checkAdmin
+            },
+            {
+                name: 'error-forbidden', path: '/forbidden',
+                component: ErrorForbidden
             },
             {
                 name: 'error-not-found', path: '*',

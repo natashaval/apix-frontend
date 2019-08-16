@@ -17,9 +17,11 @@
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
     import axios from "axios"
     import {makeToast} from "@/assets/toast"
+    import EditorSwitchMixin from "@/mixins/EditorSwitchMixin"
 
     export default {
         name: "ModelBar",
+        mixins : [EditorSwitchMixin],
         props: {
             definitionApi: String,
             definitionKey: String,
@@ -42,15 +44,17 @@
         methods: {
             makeToast,
             definitionClick: function(){
-                // this.isClick = !this.isClick
-                // this.hover = true
-                this.$router.push({
-                    name: 'definition-editor',
-                    params: {
-                        projectId: this.projectApi,
-                        definitionApi: this.definitionApi
-                    }
-                })
+                let callback = () => {
+                    this.$router.push({
+                        name: 'definition-editor',
+                        params: {
+                            projectId: this.projectApi,
+                            definitionApi: this.definitionApi
+                        }
+                    })
+                }
+                this.$_EditorSwitch_changeRouteHandler(callback)
+
             },
             deleteDefinition: function (){
             let tree

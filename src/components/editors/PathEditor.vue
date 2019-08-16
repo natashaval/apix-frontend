@@ -298,6 +298,10 @@
                 }
             },
             path : function (after, before) {
+                if(after[0] !== '/'){
+                    this.path = '/'+this.path
+                    return
+                }
                 let newVars = this.getVars()
                 let newLen = newVars.length
                 //jika menghapus
