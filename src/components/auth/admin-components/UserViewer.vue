@@ -60,15 +60,12 @@
                         key: 'username',
                         sortable: true
                     },
-                    {
-                        key: 'roles'
-                    },
+                    { key: 'roles' },
                     {
                         key: 'actions',
                         label: 'Actions'
                     }
                 ]
-
             }
         },
         computed: {
