@@ -3,15 +3,12 @@ import MenuBar from "@/layouts/MenuBar.vue"
 import Vuex from "vuex";
 import BootstrapVue from "bootstrap-vue";
 import VueRouter from 'vue-router';
-import {NOT_START} from "../../src/stores/consts/FetchStatus";
-import {AUTH_REQUEST, AUTH_LOGOUT} from "@/stores/actions/auth";
-import AuthModule from "../../src/stores/modules/AuthModule";
-import UserModule from "../../src/stores/modules/UserModule";
-import ProjectsList from "../../src/components/projects/ProjectsList";
-import TeamList from "../../src/components/teams/TeamList";
-import UserViewer from "../../src/components/auth/admin-components/UserViewer";
-import AuthLogin from "../../src/components/auth/AuthLogin";
-import {USER_REQUEST} from "../../src/stores/actions/user";
+import ProjectsList from "@/components/projects/ProjectsList";
+import TeamList from "@/components/teams/TeamList";
+import UserViewer from "@/components/auth/admin-components/UserViewer";
+import AuthLogin from "@/components/auth/AuthLogin";
+import {USER_REQUEST} from "@/stores/actions/user";
+import flushPromises from "flush-promises";
 
 // https://lmiller1990.github.io/vue-testing-handbook/vuex-in-components.html#using-createlocalvue-to-test-store-state
 const localVue = createLocalVue()
@@ -65,23 +62,9 @@ describe('menu bar tests', () => {
             localVue,
             router,
             store,
-            // computed: {
-            //     isAdmin: () => true,
-            //     isAuthenticated: () => true,
-            //     isProfile: () => true,
-            //     profile: () => {
-            //         return {
-            //             'success': true,
-            //             'message': 'User is authenticated!',
-            //             'username': 'test',
-            //             'roles': ['ROLE_USER', 'ROLE_ADMIN'],
-            //             'teams': ['team-test']
-            //         }
-            //     }
-            // },
             stubs: {
-                'route-link': true
-            },
+                'router-link': true
+            }
             // mocks: {
             //     $route: routes
             // }
@@ -94,29 +77,5 @@ describe('menu bar tests', () => {
 
     test('menu bar navbar item', () => {
         expect(wrapper.text().trim()).toEqual('APIX  Projects Teams Users  test Logout')
-    })
-
-    test.skip('team menu clicked', async () => {
-        wrapper.find('#menu-teams').trigger('click')
-        await wrapper.vm.$nextTick();
-        console.log(wrapper.vm.$route.name)
-        // expect(wrapper.vm.$route.name).toEqual('project-repo')
-        // expect(wrapper.vm.$route.path).toHaveBeenCalledWith('/projects')
-        // https://medium.com/@sarngru/vue-router-unit-testing-navigation-6cc0b0f86811
-    })
-
-    test.skip('logout user and should return to login page', async () => {
-        wrapper.find('#profile-logout').trigger('click')
-        wrapper.vm.logout();
-        await wrapper.vm.$nextTick();
-        console.log(wrapper.vm.$el);
-        // expect(wrapper.vm.$route.name).toEqual('auth-login')
-        // expect(wrapper.vm.$route.path).toHaveBeenCalledWith('/login')
-        // let elem = wrapper.find('#profile-logout');
-        // console.log(elem)
-        // elem.trigger('click');
-        // wrapper.vm.logout();
-        // await wrapper.vm.$nextTick();
-        // console.log(wrapper.vm.$el);
     })
 })

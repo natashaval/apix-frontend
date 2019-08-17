@@ -45,22 +45,3 @@ describe('admin view users management page and users is already exists', () => {
         expect(wrapper.vm.users.length).toEqual(1);
     })
 })
-
-describe('admin created where user has not exist', () => {
-    test.skip('dispatch admin user', () => {
-        let wrapper = shallowMount(UserViewer, {
-            localVue,
-            store,
-            computed: {
-                users: () => [],
-            }
-        })
-
-        console.log('jan', wrapper.vm.users)
-        // expect(actions.fetchAllUsersData.length).toBe(1);
-        expect(actions.fetchAllUsersData()).toHaveBeenCalledWith("admin/fetchAllUsersData");
-        // console.log(actions.fetchAllUsersData);
-        // expect(actions.fetchAllUsersData.mock.calls.length).toBe(1);
-        // console.log('after', wrapper.vm.users)
-    })
-})
