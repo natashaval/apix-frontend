@@ -110,7 +110,7 @@
     import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";
     import BadgeGeneratorUtil from "@/utils/BadgeGeneratorUtil";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
-    import {BASE_PROJECT_URL} from "../../stores/actions/const";
+    import {BASE_PROJECT_URL} from "../../stores/consts/url";
 
     export default {
         name: "OperationEditor",

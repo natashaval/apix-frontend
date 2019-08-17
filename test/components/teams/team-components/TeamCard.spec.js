@@ -5,7 +5,7 @@ import VueRouter from "vue-router";
 import TeamViewer from "@/components/teams/TeamViewer";
 import flushPromises from "flush-promises";
 import axios from "axios";
-import {BASE_URL} from "@/stores/actions/const";
+import {BASE_URL} from "@/stores/consts/url";
 import ApixUtil from "@/utils/ApixUtil";
 
 const localVue = createLocalVue()

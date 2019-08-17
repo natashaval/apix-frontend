@@ -5,7 +5,7 @@ import Vuex from "vuex";
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import flushPromises from 'flush-promises';
-import {BASE_URL} from "@/stores/actions/const";
+import {BASE_URL} from "@/stores/consts/url";
 import AdminModule from "@/stores/modules/AdminModule";
 
 // https://vuejs.org/v2/cookbook/unit-testing-vue-components.html

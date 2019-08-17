@@ -40,8 +40,6 @@
                         this.$router.push({name: 'auth-login'})
                     }))
                 }
-
-
                 return Promise.reject(error)
 
             })
@@ -65,8 +63,6 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         left: 0;
-        /*text-align: justify;*/
-        /*color: #2c3e50;*/
     }
     .blue-frame{
         border: 1px solid blue;

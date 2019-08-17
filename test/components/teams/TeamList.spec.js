@@ -4,7 +4,7 @@ import TeamList from "@/components/teams/TeamList"
 import Vuex from "vuex";
 import axios from "axios";
 import flushPromises from 'flush-promises';
-import {BASE_URL} from "@/stores/actions/const";
+import {BASE_URL} from "@/stores/consts/url";
 import MockAdapter from "axios-mock-adapter";
 import ApixUtil from "../../../src/utils/ApixUtil";
 
@@ -107,41 +107,7 @@ describe('team list', () => {
 })
 
 describe('mock http', function () {
-    /*
-    let http
-    let wrapper
-    beforeAll(() => {
-        http = new MockAdapter(axios)
-    })
-    afterEach(() => {
-        http.reset()
-        jest.clearAllMocks()
-    })
-    afterAll(() => {
-        http.restore()
-    })
-    beforeEach(() => {
-        wrapper = shallowMount(TeamList, {
-            localVue,
-            data: function() {
-                return {
-                    teams: [],
-                    searchTeam: ''
-                }
-            },
-            stubs: {
-                'route-link' : true,
-                TeamCard: {
-                    render: () => {},
-                    methods : {
-                        confirm : jest.fn(),
-                        viewTeam : jest.fn()
-                    }
-                }
-            }
-        })
-    })
-    */
+
     let wrapper
     beforeEach(() => {
         wrapper = mount(TeamList, {
@@ -193,25 +159,6 @@ describe('mock http', function () {
         await wrapper.vm.loadTeam()
         expect(axios.get).toHaveBeenCalledTimes(1)
         expect(axios.get).toHaveBeenCalledWith(BASE_URL + '/teams/my-team')
-        // expect(wrapper.vm.teams).toEqual(mockSuccessResponse)
         done()
-        /*
-        let expected = [{
-            "id": "5d1727316c555e0d88d14d17",
-            "name": "ho",
-            "access": "PRIVATE",
-            "creator": "bebek",
-            "members": [
-                {
-                    "username": "bebek",
-                    "grant": true
-                }
-            ]
-        }]
-        http.onGet(BASE_URL + '/teams/my-team').reply(200, {data: expected})
-        // wrapper.vm.loadTeam()
-        await flushPromises();
-        console.log(wrapper.vm.teams.length)
-        */
     })
 });

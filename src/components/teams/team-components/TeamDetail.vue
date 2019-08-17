@@ -9,9 +9,9 @@
             <div class="col-md-2 float-right" v-show="isEdit">
                 <b-dropdown size="sm" right text="Right align" variant="light" toggle-class="text-decoration-none" no-caret>
                     <template slot="button-content"><i class="fas fa-ellipsis-h"></i></template>
-                    <b-dropdown-item @click="routeInvite(team)"><i class="fas fa-user-plus"></i> Invite Member</b-dropdown-item>
-                    <b-dropdown-item @click="routeRemove(team)"><i class="fas fa-user-alt-slash"></i> Remove Member</b-dropdown-item>
-                    <b-dropdown-item @click="deleteTeam(team)"><i class="fas fa-user-times"></i> Delete Team</b-dropdown-item>
+                    <b-dropdown-item @click="routeInvite(team)" name="route-invite"><i class="fas fa-user-plus"></i> Invite Member</b-dropdown-item>
+                    <b-dropdown-item @click="routeRemove(team)" name="route-remove"><i class="fas fa-user-alt-slash"></i> Remove Member</b-dropdown-item>
+                    <b-dropdown-item @click="deleteTeam(team)" name="delete-team"><i class="fas fa-user-times"></i> Delete Team</b-dropdown-item>
                 </b-dropdown>
             </div>
         </div>
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-    import {BASE_URL} from "../../../stores/actions/const";
+    import {BASE_URL} from "../../../stores/consts/url";
     import axios from "axios";
     import {makeToast} from "../../../assets/toast";
 
@@ -49,12 +49,12 @@
             makeToast,
             routeInvite: function (team) {
                 this.$router.push({
-                    name: 'team-create', params: {isInvite: true, teamInvite: team}
+                    name: 'team-create', params: {isInvite: true, isRemove: false, teamInvite: team}
                 })
             },
             routeRemove: function (team) {
                 this.$router.push({
-                    name: 'team-create', params: {isRemove: true, teamInvite: team}
+                    name: 'team-create', params: {isRemove: true, isInvite: false, teamInvite: team}
                 })
             },
             deleteTeam: function(team) {
@@ -75,7 +75,7 @@
                         }, true],
                     ],
                     buttons: [
-                        ['<button class="btn btn-sm btn-outline-danger ml-1">Delete</button>', function (instance, toast, button, e, inputs) {
+                        ['<button class="btn btn-sm btn-outline-danger ml-1" name="delete-team-yes">Delete</button>', function (instance, toast, button, e, inputs) {
                             if (inputs[0].value === team.name){
                                 axios.delete(BASE_URL + '/teams/' + team.name).then((response) => {
                                     self.makeToast('success', response.data.success, response.data.message)

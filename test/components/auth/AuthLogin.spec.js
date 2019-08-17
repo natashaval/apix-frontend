@@ -16,10 +16,7 @@ localVue.use(Vuex)
 localVue.use(VueRouter)
 
 const routes = [{
-    name: 'project-repo',
-    path: '/projects',
-    component: ProjectsList
-}]
+    name: 'project-repo', path: '/projects', component: ProjectsList }]
 const router = new VueRouter({routes})
 
 const store = new Vuex.Store({

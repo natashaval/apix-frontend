@@ -105,7 +105,7 @@
     import axios from 'axios'
     import uuidv4 from 'uuid/v4';
     // import { VueEditor } from 'vue2-editor'
-    import {BASE_URL} from "../../stores/actions/const";
+    import {BASE_URL} from "../../stores/consts/url";
     import ChangeObserverMixin from "../../mixins/ChangeObserverMixin";
     import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
     import ActionExecutorUtil from "../../utils/ActionExecutorUtil";

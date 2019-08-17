@@ -16,7 +16,7 @@
     import uuidv4 from 'uuid/v4';
     import Vue from 'vue'
     import * as axios from "axios"
-    import {BASE_PROJECT_URL} from "@/stores/actions/const";
+    import {BASE_PROJECT_URL} from "@/stores/consts/url";
     import HighLvlJsonEditor from "./HighLvlJsonEditor"
 
     export default {

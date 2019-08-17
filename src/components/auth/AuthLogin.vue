@@ -1,18 +1,18 @@
 <template>
     <div class="col-md-6 offset-md-3 login bg-light shadow-lg">
         <form class="login" @submit.prevent="login">
-            <h4 style="text-align: center">
+            <h4 class="text-center">
                 <i class="fas fa-sign-in-alt"></i> Sign In
             </h4>
             <br />
             <div v-if="authStatus == 'loading'" class="text-center">
-                <b-spinner v-if="authStatus == 'loading' " small label="Small Spinner"></b-spinner>
+                <b-spinner small label="Small Spinner"></b-spinner>
             </div>
             <div v-if="authStatus == 'error' ">
-                <div class="alert alert-danger">Invalid Username or Password</div>
+                <div class="alert alert-danger">{{error}}</div>
             </div>
             <label>Username</label>
-            <input type="text" v-model="username" name="username" class="form-control border-top-0 border-left-0 border-right-0" required/>
+            <input type="text" v-model="username" name="username" class="form-control" required/>
             <br />
             <label>Password</label>
             <input type="password" v-model="password" name="password" class="form-control" required/>
@@ -29,8 +29,9 @@
         name: "AuthLogin",
         data: function () {
             return {
-                username : "",
-                password : ""
+                username : '',
+                password : '',
+                error: ''
             }
         },
         methods: {
@@ -39,8 +40,11 @@
                 this.$store.dispatch ('auth/' + AUTH_REQUEST, {username, password})
                     .then(() => {
                         this.$router.push({path: '/projects'})
-                    }, (err) => {
-                        console.log('login', err)
+                    }, (e) => {
+                        this.error = e.response.data.message
+                    })
+                    .catch((e) => {
+                        console.log('failed login', e.response.data.message)
                     })
             }
         },

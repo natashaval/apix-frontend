@@ -11,7 +11,7 @@
 <script>
     import 'swagger-ui/dist/swagger-ui.css'
     import SwaggerUI from 'swagger-ui'
-    import {BASE_URL} from "../../stores/actions/const";
+    import {BASE_URL} from "../../stores/consts/url";
 
     // import 'swagger-ui/dist/swagger-ui-standalone-preset.js'
 

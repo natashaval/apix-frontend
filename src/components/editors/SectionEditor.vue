@@ -40,7 +40,7 @@
     import DeepTreeBuilderUtil from "@/utils/DeepTreeBuilderUtil";
     import { VueEditor } from 'vue2-editor'
     import * as axios from "axios"
-    import {BASE_PROJECT_URL} from "@/stores/actions/const";
+    import {BASE_PROJECT_URL} from "@/stores/consts/url";
     import uuidv4 from 'uuid/v4';
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
     import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";

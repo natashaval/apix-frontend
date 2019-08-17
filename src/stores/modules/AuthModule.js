@@ -1,7 +1,7 @@
 import { AUTH_REQUEST, AUTH_SUCCESS, AUTH_ERROR, AUTH_LOGOUT } from "../actions/auth"
 import {USER_REQUEST} from "../actions/user"
 import axios from 'axios'
-import {BASE_URL} from "../actions/const";
+import {BASE_URL} from "../consts/url";
 // https://blog.sqreen.com/authentication-best-practices-vue/
 // https://scotch.io/tutorials/handling-authentication-in-vue-using-vuex
 

@@ -41,7 +41,7 @@
     import PathBar from './PathBar'
     import * as axios from "axios"
     import ActionExecutorUtil from "@/utils/ActionExecutorUtil"
-    import {BASE_PROJECT_URL} from "../../stores/actions/const";
+    import {BASE_PROJECT_URL} from "../../stores/consts/url";
     import EditorSwitchMixin from "../../mixins/EditorSwitchMixin";
 
     export default {

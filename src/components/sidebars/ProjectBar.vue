@@ -10,7 +10,7 @@
 </template>
 
 <script>
-    import {BASE_PROJECT_URL} from "../../stores/actions/const";
+    import {BASE_PROJECT_URL} from "../../stores/consts/url";
     import axios from 'axios';
     import {makeToast} from "../../assets/toast";
 

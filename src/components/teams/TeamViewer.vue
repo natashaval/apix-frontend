@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-4 border-right" style="background-color: ghostwhite;">
-                <TeamDetail :team="team" :is-creator="isCreator" :is-edit="true"></TeamDetail>
+                <TeamDetail :team="team" :is-creator="isCreator" :is-edit="isCreator"></TeamDetail>
                 <div class="form-row">
                     <label class="col-md-2">Member: </label>
                 </div>
@@ -66,7 +66,7 @@
 </template>
 
 <script>
-    import {BASE_URL} from "../../stores/actions/const";
+    import {BASE_URL} from "../../stores/consts/url";
     import axios from 'axios'
     import TeamDetail from "./team-components/TeamDetail";
     import {makeToast} from "../../assets/toast";
