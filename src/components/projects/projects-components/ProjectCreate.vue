@@ -8,7 +8,7 @@
                     </b-form-group>
                 </b-col>
                 <b-col cols="4">
-                    <b-form-group :state="version.state" label="Version" label-for="version-input" invalid-feedback="Version is required">
+                    <b-form-group :state="version.state" label="Version" label-for="version-input" :invalid-feedback="requiredField('Version')">
                         <b-form-input id="version-input" v-model="version.field" :state="version.state" required></b-form-input>
                     </b-form-group>
                 </b-col>
@@ -136,34 +136,37 @@
                 }
 
                 console.log(newProject)
+                let self = this
 
-                this.$store.dispatch('project/createProjectData', newProject)
+                self.$store.dispatch('project/createProjectData', newProject)
                     .then((response) => {
-                        if (response.data.success && response.status == 201){
-
-                            this.newProject.id = response.data.new_project
+                        console.log('response csreate', response.data)
+                        if (response.data.success){
+                            self.newProject.id = response.data.new_project
                             console.log('newProject Id', this.newProject.id)
-                            this.makeToast('success', response.data.success, response.data.message, 1000)
-                            this.$store.dispatch('user/' + USER_REQUEST)
+                            self.makeToast('success', response.data.success, response.data.message, 1000)
+                            // this.$store.dispatch('user/' + USER_REQUEST)
 
                             setTimeout(() => {
-                                this.$router.push({
+                                self.$router.push({
                                     name :'project-editor',
                                     params: {projectId : this.newProject.id}
                                 })
                             }, 1500);
 
                         } else {
-                            this.makeToast('danger', response.data.success, response.data.message)
+                            console.log('failed to create project')
                         }
-
+                    })
+                    .catch((e) => {
+                        console.log('reject',e.response.data.message)
+                        self.makeToast('danger', e.response.data.success, e.response.data.message, 1000)
                     })
 
-
-                this.$nextTick(() => {
-                    this.$refs.modal.hide()
-
-                })
+                // self.$nextTick(() => {
+                //     self.$refs.modal.hide()
+                //
+                // })
             },
         }
     }

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import {IN_PROCESS,COMPLETE,NOT_FOUND} from "@/stores/consts/FetchStatus";
 import {NOT_START} from "@/stores/consts/FetchStatus";
-import {BASE_PROJECT_URL} from "../actions/const";
+import {BASE_PROJECT_URL} from "../consts/url";
 
 export default{
     namespaced : true,
@@ -126,12 +126,10 @@ export default{
             return new Promise((resolve, reject) => {
                 axios.post(BASE_PROJECT_URL, newProjectForm)
                     .then((response) => {
-                        console.log('hasil axios dari module', response.data)
                         commit('ADD_DATA', response.data.newProject)
                         resolve(response)
                     })
                     .catch((error) => {
-                        console.log(error)
                         reject(error)
                     })
             })
@@ -140,12 +138,10 @@ export default{
         assignTeamToProject({state, commit}, payload){
             console.log('assign team')
             if (!state.project.teams.includes(payload)) commit('PUSH_TEAM', payload)
-            else console.log('tidak perlu push')
         },
         unassignTeamFromProject({state, commit}, payload) {
             console.log('unassign team')
             if(state.project.teams.includes(payload)) commit('REMOVE_TEAM', payload)
-            else console.log('tidak ada yang diunassign')
         }
     }
 }

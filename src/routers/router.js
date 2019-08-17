@@ -33,6 +33,7 @@ const initProject = (to, from, next) => {
     next()
 }
 
+// try to access restricted page (not on role)
 const checkAdmin = (to, from, next) => {
     // https://forum.vuejs.org/t/solved-delay-vue-action-until-a-state-variable-is-set/9063/5
     function proceed() {
@@ -204,13 +205,12 @@ export const router = new VueRouter({
     routes
 })
 
-// redirect to login if not logged in
 router.beforeEach((to, from, next) => {
-    //redirect to login if not logged in and trying to access restricted page
+    //redirect to login if not logged in
     // http://jasonwatmore.com/post/2018/07/14/vue-vuex-user-registration-and-login-tutorial-example#loginpage-vue
     const publicPages = ['/login'];
-    const  authRequired = !publicPages.includes(to.path);
-    const loggedIn = localStorage.getItem('apix-token');
+    const authRequired = !publicPages.includes(to.path);
+    const loggedIn = store.getters['auth/isAuthenticated'];
 
     if (authRequired && !loggedIn) {
         router.push('/login');

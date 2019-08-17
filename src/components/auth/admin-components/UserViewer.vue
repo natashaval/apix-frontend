@@ -46,7 +46,7 @@
 
 <script>
     import UserCreate from "./UserCreate";
-    import {BASE_URL} from "../../../stores/actions/const";
+    import {BASE_URL} from "../../../stores/consts/url";
     import axios from 'axios';
     import {makeToast} from "../../../assets/toast";
 

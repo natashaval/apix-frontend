@@ -66,7 +66,7 @@
 </template>
 
 <script>
-    import {BASE_URL} from "../../stores/actions/const";
+    import {BASE_URL} from "../../stores/consts/url";
     import axios from 'axios'
     import TeamDetail from "./team-components/TeamDetail";
     import {makeToast} from "../../assets/toast";

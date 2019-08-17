@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {BASE_URL} from "../actions/const";
+import {BASE_URL} from "../consts/url";
 
 export default{
     namespaced : true,

@@ -40,7 +40,7 @@
 
 <script>
     import axios from 'axios';
-    import {BASE_PROJECT_URL, BASE_URL} from "../../../stores/actions/const";
+    import {BASE_PROJECT_URL, BASE_URL} from "../../../stores/consts/url";
     import {USER_REQUEST} from "../../../stores/actions/user";
     import {makeToast} from "../../../assets/toast";
 
@@ -94,7 +94,7 @@
                     })
             },
             assignTeam(){
-                console.log(this.selectedTeamName)
+                // console.log(this.selectedTeamName)
                 axios.post(BASE_PROJECT_URL +'/'+ this.projectId + '/assign', {
                     assignType: 'grant',
                     teamName: this.selectedTeamName

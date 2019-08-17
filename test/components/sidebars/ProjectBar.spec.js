@@ -6,7 +6,7 @@ import ProjectEditor from "../../../src/components/editors/ProjectEditor";
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import flushPromises from 'flush-promises';
-import {BASE_PROJECT_URL} from "../../../src/stores/actions/const";
+import {BASE_PROJECT_URL} from "../../../src/stores/consts/url";
 // import SwaggerClient from "../../../src/components/editors/SwaggerClient";
 
 const localVue = createLocalVue()

@@ -61,7 +61,7 @@
     import {COMPLETE, NOT_FOUND} from "@/stores/consts/FetchStatus";
     import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
-    import {BASE_PROJECT_URL} from "@/stores/actions/const";
+    import {BASE_PROJECT_URL} from "@/stores/consts/url";
     import KeyCheckerUtil from "@/utils/KeyCheckerUtil";
 
     export default {

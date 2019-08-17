@@ -1,7 +1,5 @@
 <template>
     <div class="d-block">
-<!--        Is Profile Loaded: {{isProfile}}-->
-<!--        is Authenticated: {{isAuthenticated}}-->
         <b-navbar toggleable="lg" type="dark" variant="dark" fixed="top">
             <b-navbar-brand href="#"><i class="fas fa-fire-alt"></i> APIX</b-navbar-brand>
 
@@ -10,7 +8,6 @@
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav v-if="isAuthenticated">
                     <b-nav-item :to="{name: 'project-repo'}" name="menu-projects">Projects</b-nav-item>
-                    <!--<b-nav-item :to="{name: 'project-server'}" id="menu-server">Server</b-nav-item>-->
                     <b-nav-item :to="{name: 'team-list'}" name="menu-teams">Teams</b-nav-item>
                     <b-nav-item :to="{name:'user-viewer'}" v-if="isAdmin" id="menu-users">Users</b-nav-item>
                 </b-navbar-nav>

@@ -5,7 +5,7 @@ import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import flushPromises from 'flush-promises';
 import Vuex from "vuex";
-import {BASE_URL} from "../../../src/stores/actions/const";
+import {BASE_URL} from "../../../src/stores/consts/url";
 import ApixUtil from "../../../src/utils/ApixUtil";
 
 const localVue = createLocalVue()

@@ -46,7 +46,7 @@
 
 <script>
     import axios from "axios";
-    import {BASE_URL} from "../../stores/actions/const";
+    import {BASE_URL} from "../../stores/consts/url";
     import TeamCard from "./team-components/TeamCard";
 
     export default {

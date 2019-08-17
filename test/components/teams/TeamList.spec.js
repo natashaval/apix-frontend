@@ -4,7 +4,7 @@ import TeamList from "@/components/teams/TeamList"
 import Vuex from "vuex";
 import axios from "axios";
 import flushPromises from 'flush-promises';
-import {BASE_URL} from "@/stores/actions/const";
+import {BASE_URL} from "@/stores/consts/url";
 import MockAdapter from "axios-mock-adapter";
 import ApixUtil from "../../../src/utils/ApixUtil";
 

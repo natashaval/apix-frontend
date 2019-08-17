@@ -41,7 +41,7 @@
 
 <script>
     import axios from 'axios'
-    import {BASE_PROJECT_URL} from "@/stores/actions/const";
+    import {BASE_PROJECT_URL} from "@/stores/consts/url";
     import AssignComponent from "@/components/editors/editor-components/AssignComponent";
 
     export default {
