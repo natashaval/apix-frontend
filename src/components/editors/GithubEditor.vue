@@ -9,7 +9,6 @@
         </div>
         <div class="row">
             <div v-if="showEdit" class="col-11" style="border-color: crimson">
-                <!--{{ownerData}}-->
                 <div class="form-group ml-3" v-if="ownerData">
                     <label class="font-weight-bold">Owner : &nbsp;</label>
                     <span class="badge badge-secondary">
@@ -42,8 +41,6 @@
                 </div>
                 <div class="form-group ml-3">
                     <label>Path: &nbsp;&nbsp;&nbsp;</label>
-                    <!--<span><i v-show="oasLoading" class="fa fa-spinner fa-spin"></i></span>-->
-<!--                    <input v-model="path" class="form-control col-md-11"/>-->
                     <div class="autocomplete">
                         <input class="form-control"
                                v-model="path"
@@ -104,7 +101,6 @@
 <script>
     import axios from 'axios'
     import uuidv4 from 'uuid/v4';
-    // import { VueEditor } from 'vue2-editor'
     import {BASE_URL} from "../../stores/consts/url";
     import ChangeObserverMixin from "../../mixins/ChangeObserverMixin";
     import ActionBuilderUtil from "../../utils/ActionBuilderUtil";
@@ -124,12 +120,12 @@
                 repo: '',
                 branch: '',
                 path: 'README.md',
+                sha: '',
                 githubJson: {},
                 content: {}, // content tidak diganti, langsung dari executor export
                 message: '',
                 branchList: [],
                 fileList: [],
-                // oasLoading: false,
                 // initialOas: {},
 
                 isEditing: true,
@@ -144,7 +140,7 @@
                 commitResponse: {},
                 pullResponse: {},
                 pullLoading: false,
-                pushLoading: false
+                pushLoading: false,
             }
         },
         computed : {
@@ -176,7 +172,7 @@
                 return this.$store.getters['github/getRepos']
             },
             filteredFile() {
-             return this.fileList.filter(f => f.toLowerCase().includes(this.path.toLowerCase()))
+                return this.fileList.filter(f => f.toLowerCase().includes(this.path.toLowerCase()))
             }
         },
         created() {
@@ -275,32 +271,26 @@
                     this.makeToast('danger', error.response.data.success, error.response.data.message + ' , Please refresh the page.')
                 })
             },
-            push: async function () {
+            push: function () {
                 this.pushLoading = true
-                await this.fetchOas();
-                if (this.content.sha) {
-                    axios.put(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/contents/' + this.path,
-                        {
-                            message: this.message,
-                            projectId: this.projectId,
-                            sha: this.content.sha,
-                            branch: (this.branch == '') ? 'master' : this.branch
-                        })
-                        .then((response) => {
-                            this.commitResponse = response.data
-                            console.log(this.commitResponse)
-                            this.makeToast('success', response.data.success, "Success push to github -> " + response.data.message);
-                            this.pushLoading = false
-                            // this.$nextTick(() => {
-                            //     this.fetchOas();
-                            // })
-                        })
-                        .catch((e) => {
-                            console.error(e);
-                            this.makeToast('danger', e.response.data.success, e.response.data.message + ": " + e.response.data.errors);
-                            this.pushLoading = false
-                        })
-                }
+                console.log('push to github')
+                axios.put(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/contents/' + this.path,
+                    {
+                        message: this.message,
+                        projectId: this.projectId,
+                        branch: (this.branch == '') ? 'master' : this.branch
+                    })
+                    .then((response) => {
+                        this.commitResponse = response.data
+                        console.log(this.commitResponse)
+                        this.makeToast('success', response.data.success, "Success push to github -> " + response.data.message);
+                        this.pushLoading = false
+                    })
+                    .catch((e) => {
+                        console.error(e);
+                        this.makeToast('danger', e.response.data.success, e.response.data.message + ": " + e.response.data.errors);
+                        this.pushLoading = false
+                    })
             },
             pull: function(){
                 let self = this
@@ -348,7 +338,6 @@
                             }]
                         ]
                     })
-
             },
             fetchBranchList: function () {
                 if (this.githubData !== undefined) {
@@ -392,14 +381,12 @@
                 // if (this.githubData !== undefined) {
                 if (this.githubData.repo !== ''){
                     console.log('fetch oas')
-                    this.oasLoading = true;
                     axios.get(BASE_URL + '/github/api/repos/' + this.owner + '/' + this.repo + '/contents/' + this.path,
                         {
                             params: { ref: this.branch }
                         }
                     )
                         .then((response) => {
-                            this.oasLoading = false;
                             // this.initialOas = response.data
                             this.content = response.data
                         })
@@ -411,7 +398,6 @@
                     console.log("this fetchoas githubapi still empty")
                 }
             },
-
             fetchInitial: function(){
                 this.fetchBranchList();
                 // this.fetchOas();
@@ -425,7 +411,7 @@
                 this.filterResults();
             },
             searchFile: function(){
-              this.isPathSearch = true;
+                this.isPathSearch = true;
             },
             filterResults: function() {
                 if (this.reposData) {
@@ -452,7 +438,6 @@
         watch: {
             $route: function () {
                 this.loadData();
-                // this.fetchOas();
             },
             owner: function(newOwner, oldOwner){
                 if (oldOwner == '') return this.ownerData.login
