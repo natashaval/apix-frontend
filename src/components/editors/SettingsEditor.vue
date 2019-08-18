@@ -38,8 +38,8 @@
 
 <script>
     import axios from 'axios';
-    import {BASE_PROJECT_URL, BASE_URL} from "../../stores/consts/url"
-    import {makeToast} from "../../assets/toast"
+    import {BASE_PROJECT_URL, BASE_URL} from "@/stores/consts/url"
+    import {makeToast} from "@/assets/toast"
 
     export default {
         name: "SettingsEditor",
@@ -75,7 +75,7 @@
                     this.makeToast('success', response.data.success, "Success in generating codegen!")
                     this.fileCodegenLocation = response.data.file_url
                     this.codegenStatus = false
-                    window.open(BASE_URL+response.data.file_url,'_blank')
+                    window.open(BASE_URL + response.data.file_url,'_blank')
                 }).catch((e) => {
                     this.makeToast('danger', e.response.data.success, e.response.data.message)
                     this.codegenStatus = false
@@ -95,10 +95,6 @@
                     zindex: 999,
                     position: 'center',
                     inputs: [
-                        // ['<input type="text" />', 'change', function(instance, toast, input, e) {
-                        //     console.log(input.value)
-                        //     // this.projectTitleVerify = input.value
-                        // }, true],
                         // https://github.com/marcelodolza/iziToast/issues/98
                         ['<select>' +
                         '   <option value="JSON">json</option>' +
@@ -115,7 +111,7 @@
                                     self.makeToast('success', response.data.success, response.data.message)
                                     self.fileExportLocation = response.data.file_url
                                     self.exportStatus = false
-                                    window.open(BASE_URL+response.data.file_url,'_blank')
+                                    window.open(BASE_URL + response.data.file_url,'_blank')
                                 }).catch((e) => {
                                 self.makeToast('danger', e.response.data.success, e.response.data.message)
                                 self.exportStatus = false
@@ -146,7 +142,6 @@
                     inputs: [
                         ['<input type="text" />', 'change', function(instance, toast, input, e) {
                             console.log(input.value)
-                            // this.projectTitleVerify = input.value
                         }, true],
                     ],
                     buttons: [

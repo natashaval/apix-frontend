@@ -66,7 +66,6 @@
             },
             unassignTeam: function(teamName) {
                 let idx = this.teamData.findIndex(x => x == teamName)
-                console.log(idx)
                 let self = this
 
                 self.$toast.question('Are you sure to remove team "' + teamName + '" from project?',
@@ -86,11 +85,10 @@
                                     teamName: teamName
                                 })
                                     .then((response) => {
-                                        self.makeToast('success', response.data.success, response.data.message)
+                                        self.makeToast('warning', response.data.success, response.data.message)
                                         self.teamData.splice(idx,1)
                                     })
                                     .catch((e) => {
-                                        console.error(e);
                                         self.makeToast('danger', e.response.data.success, e.response.data.message)
                                     })
 

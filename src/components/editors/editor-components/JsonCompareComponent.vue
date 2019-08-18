@@ -1,7 +1,6 @@
 <template>
     <div>
         <b-button v-b-toggle="'collapse-json'" class="m-1" size="sm" variant="outline-info">View Diff</b-button>
-        <!--{{projectId}}-->
         <small>Click on each header to view project content</small>
         <b-collapse id="collapse-json">
         <div class="row">
@@ -19,10 +18,6 @@
                 <h4 @click="fetchOas" class="clickable text-danger">Project OAS in Github
                     <b-spinner small variant="danger" v-show="oasLoading"></b-spinner>
                 </h4>
-                <!--<p>{{owner}}</p>-->
-                <!--<p>{{repo}}</p>-->
-                <!--<p>{{branch}}</p>-->
-                <!--<p>{{path}}</p>-->
                 <vue-json-compare :oldData="contentProject" :newData="contentGithub"></vue-json-compare>
             </div>
         </div>
@@ -35,8 +30,8 @@
     import vueJsonCompare from 'vue-json-compare'
     import VueJsonPretty from 'vue-json-pretty'
     import axios from 'axios'
-    import {BASE_PROJECT_URL, BASE_URL} from "../../../stores/consts/url";
-    import {makeToast} from "../../../assets/toast";
+    import {BASE_PROJECT_URL, BASE_URL} from "@/stores/consts/url";
+    import {makeToast} from "@/assets/toast";
 
     export default {
         name: "JsonCompareComponent",
@@ -53,14 +48,6 @@
         },
         data: () => {
             return {
-                oldData: {
-                    a: 1,
-                    e: 0
-                },
-                newData: {
-                    a: 2,
-                    b: 3
-                },
                 contentGithub: {},
                 fileExportLocation: '',
                 exportStatus: false,
@@ -77,8 +64,6 @@
                     .then((response) => {
                         self.makeToast('success', response.data.success, response.data.message)
                         self.fileExportLocation = response.data.file_url
-                        // self.exportStatus = false
-
                         this.viewOas()
 
                     }).catch((e) => {
@@ -95,7 +80,6 @@
                 }
             },
             fetchOas: function() {
-                // if (this.githubData !== undefined) {
                 if (this.repo !== ''){
                     console.log('fetch oas')
                     this.oasLoading = true;
@@ -119,9 +103,6 @@
                     console.log("this fetchoas githubapi still empty")
                 }
             },
-
-        },
-        created() {
         }
     }
 </script>

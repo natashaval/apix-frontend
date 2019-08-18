@@ -81,6 +81,7 @@
     import EditorHeaderComponent from "./editor-components/EditorHeaderComponent"
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin"
     import {BASE_PROJECT_URL} from "@/stores/consts/url"
+    import {makeToast} from "@/assets/toast";
 
     export default {
         name: "ProjectEditor",
@@ -111,6 +112,7 @@
             }
         },
         methods: {
+            makeToast,
             loadData: function () {
                 if(this.apiData && this.apiData.info){
                     this.isEdited = false
@@ -157,10 +159,7 @@
                         }
                     }
                 ).catch(error => {
-                    this.$bvToast.toast(error.response.data.message + ' , Please refresh the page.', {
-                        title: 'Failed',
-                        variant: 'danger'
-                    })
+                    this.makeToast('danger', error.response.data.success, error.response.data.message + ' , Please refresh the page.')
                 })
 
             },

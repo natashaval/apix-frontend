@@ -46,6 +46,7 @@
     import EditorHeaderComponent from "./editor-components/EditorHeaderComponent";
     import ProjectPrivilegeMixin from "@/mixins/ProjectPrivilegeMixin";
     import KeyCheckerUtil from "@/utils/KeyCheckerUtil";
+    import {makeToast} from "@/assets/toast";
 
     export default {
         name: "SectionEditor",
@@ -88,6 +89,7 @@
             }
         },
         methods: {
+            makeToast,
             loadData: function() {
                 this.$_changeObserverMixin_unObserve()
                 this.isEdited = false
@@ -144,10 +146,7 @@
             },
             submit: function(){
                 if(!this.$_changeObserverMixin_allIsValid()){
-                    this.$bvToast.toast('Can\'t submit due to invalid input', {
-                        title: 'Failed',
-                        variant: 'danger'
-                    })
+                    this.makeToast('danger', false, 'Can\'t submit due to invalid input!')
                     return
                 }
 
@@ -240,10 +239,7 @@
                     }
                 ).catch(error => {
                     console.log(error)
-                    this.$bvToast.toast(error.response.data.message + ' , Please refresh the page.', {
-                        title: 'Failed',
-                        variant: 'danger'
-                    })
+                    this.makeToast('danger', error.response.data.success, error.response.data.message + ' ,Please refresh the page.')
                 })
                 return tree.root
             },

@@ -8,12 +8,12 @@
 
         <b-row class="my-2">
             <b-col md="10">
-<!--                {{profile}}-->
                 <ProjectBar :apiData="projectData"/>
             </b-col>
             <b-col md="2">
                 <b-button v-if="$_projectPrivilege_canEdit" :to="{name: 'section-create'}" pill size="sm" variant="outline-light"
-                          class="float-right btn-circle">
+                          class="float-right btn-circle"
+                          v-b-tooltip.hover title="new section">
                     <i class="fa fa-plus-circle"></i>
                 </b-button>
             </b-col>
