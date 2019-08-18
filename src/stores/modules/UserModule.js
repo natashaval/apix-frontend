@@ -14,7 +14,7 @@ export default {
         isProfileLoaded: state => !!state.profile.username,
     },
     actions: {
-        [USER_REQUEST]: ({commit, dispatch, state}) => {
+        [USER_REQUEST]: ({commit, dispatch}) => {
             axios({url: BASE_URL + '/user/profile'})
                 .then(resp => {
                     commit(USER_SUCCESS, resp)

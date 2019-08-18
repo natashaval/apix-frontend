@@ -13,7 +13,8 @@ export default {
     },
     getters: {
         isAuthenticated: state => !!state.token,
-        authStatus: state => state.status
+        authStatus: state => state.status,
+        getToken: state => state.token
     },
     mutations: {
         [AUTH_REQUEST]: (state) => {

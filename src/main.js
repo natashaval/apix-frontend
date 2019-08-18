@@ -16,7 +16,7 @@ Vue.use(VueIziToast)
 Vue.config.productionTip = false
 
 axios.interceptors.request.use(function (config) {
-    const apixToken = localStorage.getItem('apix-token')
+    const apixToken = store.getters['auth/getToken'];
     if (apixToken) {
         config.headers.Authorization = `Bearer ${apixToken}`
     }

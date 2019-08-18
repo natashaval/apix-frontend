@@ -18,7 +18,6 @@ export default {
             fetchUsers()
         },
         addUser: ({ commit }, payload) => {
-            console.log('dispatch add user', payload)
             commit('PUSH_DATA', payload)
         },
     },

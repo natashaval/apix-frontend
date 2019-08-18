@@ -4,7 +4,6 @@ import Vuex from 'vuex'
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import {BASE_URL} from "@/stores/consts/url";
-import {COMPLETE, IN_PROCESS, NOT_START} from "@/stores/consts/FetchStatus";
 import {USER_REQUEST, USER_ERROR, USER_SUCCESS} from "@/stores/actions/user.js";
 import { AUTH_LOGOUT } from "@/stores/actions/auth.js";
 import flushPromises from "flush-promises";
@@ -19,20 +18,12 @@ describe('user module test', () => {
             status: '',
             profile: {},
             editingPrivilege: undefined,
-            fetchStatus : NOT_START,
         }
         const mutations = UserModule.mutations;
         const getters = UserModule.getters;
         const actions = UserModule.actions;
 
         store = new Vuex.Store({state, getters, mutations, actions})
-    })
-
-    test('mutation in fetchStatus', () => {
-        expect(store.state.fetchStatus).toEqual(NOT_START)
-        store.commit('SET_STATUS', COMPLETE)
-        expect(store.state.fetchStatus).toEqual(COMPLETE)
-        expect(store.getters.getFetchStatus).toEqual(COMPLETE)
     })
 
     test('mutation in User Request', () => {
@@ -68,7 +59,6 @@ describe('user module test', () => {
     })
 
     test('action user request and should success', async () => {
-        store.state.status = NOT_START
         expect(store.state.profile).toEqual({})
         let http = new MockAdapter(axios);
         let expected = {
@@ -86,13 +76,11 @@ describe('user module test', () => {
         store.dispatch('USER_REQUEST');
         await flushPromises();
         expect(store.state.profile).toEqual({data: expected})
-        expect(store.state.fetchStatus).toEqual(COMPLETE)
         http.reset();
         http.restore();
     })
 
     test('action user request and give error',async () => {
-        store.state.status = NOT_START
         expect(store.state.profile).toEqual({})
         let http = new MockAdapter(axios);
         http.onGet(BASE_URL + '/user/profile').reply(403, {
@@ -106,7 +94,6 @@ describe('user module test', () => {
         store.dispatch('USER_REQUEST');
         await flushPromises();
         expect(store.state.status).toEqual('error')
-        expect(store.state.fetchStatus).toEqual(COMPLETE)
         http.reset();
         http.restore();
     })

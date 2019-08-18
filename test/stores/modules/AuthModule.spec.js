@@ -47,6 +47,7 @@ describe('auth module unit test', function () {
         expect(store.state.status).toEqual('success')
         expect(store.getters.isAuthenticated).toBeTruthy()
         expect(store.getters.authStatus).toEqual('success')
+        expect(store.getters.getToken).toEqual('token')
         http.reset();
         http.restore();
     })
@@ -62,6 +63,7 @@ describe('auth module unit test', function () {
         expect(store.state.status).toEqual('error')
         expect(store.getters.isAuthenticated).toBeFalsy()
         expect(store.getters.authStatus).toEqual('error')
+        expect(store.getters.getToken).toEqual('')
         http.reset();
         http.restore();
     })
@@ -73,6 +75,7 @@ describe('auth module unit test', function () {
         expect(store.state.status).toEqual('logout')
         expect(store.getters.isAuthenticated).toBeFalsy()
         expect(store.getters.authStatus).toEqual('logout')
+        expect(store.getters.getToken).toEqual('')
 
     })
 

@@ -136,11 +136,9 @@ export default{
         },
 
         assignTeamToProject({state, commit}, payload){
-            console.log('assign team')
             if (!state.project.teams.includes(payload)) commit('PUSH_TEAM', payload)
         },
         unassignTeamFromProject({state, commit}, payload) {
-            console.log('unassign team')
             if(state.project.teams.includes(payload)) commit('REMOVE_TEAM', payload)
         }
     }
