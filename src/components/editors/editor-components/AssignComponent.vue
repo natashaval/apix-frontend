@@ -2,16 +2,16 @@
     <div>
         <div v-if="assignNew">
             <div class="col-12">
-                <h6>Assign Team</h6>
+                <h6>Assign Team *</h6>
                 <div class="row">
                     <div class="col-md-8" v-if="!isNewTeam">
                         <select class="form-control" v-model="selectedTeamName" v-if="!assignAllTeam">
-                            <option value="" disabled selected>-- Select team (where you are the owner) --</option>
+                            <option value="" disabled selected>-- Select your team --</option>
                             <option v-for="(myTeam, i) in teamAsCreator" :key="i" :value="myTeam.name">{{myTeam.name}}</option>
                         </select>
                     </div>
                     <div class="col-md-8" v-if="isNewTeam">
-                        <input class="form-control" v-model="inputTeamName" placeholder="Input new team name (you will be the owner)" required />
+                        <input class="form-control" v-model="inputTeamName" placeholder="Input new team name" required />
                     </div>
                     <div class="col-md-4">
                         <b-form-checkbox v-model="isNewTeam" switch>

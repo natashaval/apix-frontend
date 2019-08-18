@@ -11,24 +11,18 @@
                     <!--kolom kiri-->
                     <div class="col-6">
                         <div v-if="showEdit" class="form-row">
-<!--                            <div class="form-row">-->
                                 <b-form-group v-if="nameable" class="mb-2 w-100"
                                               :state="nameState" :invalid-feedback="nameInvalidFeedback"
                                               label="name* :"
-                                              label-cols="2"
-                                              >
-<!--                                    <slot v-if="disableName">-->
+                                              label-cols="2">
+
                                         <b-form-input v-if="disableName"
                                                       disabled v-model="name"
                                                       :name="_uid+'-name'"></b-form-input>
-<!--                                    </slot>-->
-<!--                                    <slot v-else>-->
                                         <b-form-input v-model="name" v-else
                                                       :state="nameState"
                                                       :name="_uid+'-name'"></b-form-input>
-<!--                                    </slot>-->
                                 </b-form-group>
-<!--                            </div>-->
                             <div class="form-row w-100 mb-2">
                                 <label class="shrinkable-text col-2 mt-auto">{{(isSubArray)?'Of :':'Type :'}}</label>
                                 <b-select class="form-control col-10" :name="_uid+'-select-type'" v-model="selectedType">

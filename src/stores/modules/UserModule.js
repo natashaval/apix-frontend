@@ -12,6 +12,7 @@ export default {
     getters: {
         getProfile: state => state.profile,
         isProfileLoaded: state => !!state.profile.username,
+        getFetchStatus : state => state.fetchStatus
     },
     actions: {
         [USER_REQUEST]: ({commit, dispatch}) => {
@@ -38,6 +39,9 @@ export default {
         },
         [AUTH_LOGOUT]: (state) => {
             state.profile = {}
+        },
+        SET_STATUS : (state,fetchStatus) => {
+            state.fetchStatus = fetchStatus
         }
     }
 }

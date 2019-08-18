@@ -3,12 +3,12 @@
         <form ref="form" @submit.stop.prevent="handleSubmit">
             <b-row>
                 <b-col cols="8">
-                    <b-form-group :state="title.state" label="Title" label-for="title-input" :invalid-feedback="requiredField('Title')">
+                    <b-form-group :state="title.state" label="Title *" label-for="title-input" :invalid-feedback="requiredField('Title')">
                         <b-form-input id="title-input" v-model="title.field" :state="title.state" required />
                     </b-form-group>
                 </b-col>
                 <b-col cols="4">
-                    <b-form-group :state="version.state" label="Version" label-for="version-input" :invalid-feedback="requiredField('Version')">
+                    <b-form-group :state="version.state" label="Version *" label-for="version-input" invalid-feedback="Version is required">
                         <b-form-input id="version-input" v-model="version.field" :state="version.state" required></b-form-input>
                     </b-form-group>
                 </b-col>
@@ -42,7 +42,6 @@
 <script>
     import {makeToast} from "@/assets/toast";
     import AssignComponent from "@/components/editors/editor-components/AssignComponent";
-    import {USER_REQUEST} from "@/stores/actions/user";
 
     export default {
         name: "ProjectModal",
@@ -54,7 +53,7 @@
                     state: null
                 },
                 version: {
-                    field: '',
+                    field: '1.0.0-SNAPSHOT',
                     state: null
                 },
                 host: {
@@ -135,15 +134,12 @@
                     }
                 }
 
-                console.log(newProject)
                 let self = this
 
                 self.$store.dispatch('project/createProjectData', newProject)
                     .then((response) => {
-                        console.log('response csreate', response.data)
                         if (response.data.success){
                             self.newProject.id = response.data.new_project
-                            console.log('newProject Id', this.newProject.id)
                             self.makeToast('success', response.data.success, response.data.message, 1000)
                             // this.$store.dispatch('user/' + USER_REQUEST)
 
@@ -154,12 +150,9 @@
                                 })
                             }, 1500);
 
-                        } else {
-                            console.log('failed to create project')
                         }
                     })
                     .catch((e) => {
-                        console.log('reject',e.response.data.message)
                         self.makeToast('danger', e.response.data.success, e.response.data.message, 1000)
                     })
 

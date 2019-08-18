@@ -4,9 +4,8 @@ import Vuex from 'vuex'
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import {BASE_URL} from "@/stores/consts/url";
-import {USER_REQUEST, USER_ERROR, USER_SUCCESS} from "@/stores/actions/user.js";
-import { AUTH_LOGOUT } from "@/stores/actions/auth.js";
 import flushPromises from "flush-promises";
+import {COMPLETE, NOT_START} from "@/stores/consts/FetchStatus";
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
@@ -18,12 +17,20 @@ describe('user module test', () => {
             status: '',
             profile: {},
             editingPrivilege: undefined,
+            fetchStatus : NOT_START
         }
         const mutations = UserModule.mutations;
         const getters = UserModule.getters;
         const actions = UserModule.actions;
 
         store = new Vuex.Store({state, getters, mutations, actions})
+    })
+
+    test('mutation in fetchStatus', () => {
+        expect(store.state.fetchStatus).toEqual(NOT_START)
+        store.commit('SET_STATUS', COMPLETE)
+        expect(store.state.fetchStatus).toEqual(COMPLETE)
+        expect(store.getters.getFetchStatus).toEqual(COMPLETE)
     })
 
     test('mutation in User Request', () => {
