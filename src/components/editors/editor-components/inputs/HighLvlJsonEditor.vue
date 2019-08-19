@@ -162,7 +162,7 @@
                                    :$_changeObserverMixin_parent="$_changeObserverMixin_this"
                                    v-on:delete="deleteChild" class="col-11 border-right-0"/>
                 </div>
-                <a :ref="_uid+'-add-child-btn'" @click="addNewProperty" class="btn-text">
+                <a v-if="editable" :ref="_uid+'-add-child-btn'" @click="addNewProperty" class="btn-text">
                     <i class="fas fa-plus"></i> Add more property
                 </a>
             </div>
