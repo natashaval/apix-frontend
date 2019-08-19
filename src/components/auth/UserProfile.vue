@@ -1,7 +1,5 @@
 <template>
     <div>
-        <!--{{ profile }}-->
-
         <div>
             <b-media right-align>
                 <b-img slot="aside" blank blank-color="#ccc" width="70" rounded="circle" alt="profile picture"></b-img>

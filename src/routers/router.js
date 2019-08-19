@@ -13,22 +13,22 @@ import TeamCreate from "../components/teams/TeamCreate";
 import TeamViewer from "../components/teams/TeamViewer";
 import ProjectsList from "../components/projects/ProjectsList";
 import UserViewer from "../components/auth/admin-components/UserViewer";
-import ErrorNotFound from "../ErrorNotFound";
+import ErrorNotFound from "../components/error/ErrorNotFound";
 import SettingsEditor from "../components/editors/SettingsEditor";
 import ClientEditor from "../components/editors/ClientEditor";
 import SwaggerClient from "../components/editors/SwaggerClient";
 import TeamList from "../components/teams/TeamList";
 import TeamEditor from "../components/editors/TeamEditor";
 import {DEFAULT_LAYOUT, EDITOR_LAYOUT} from "../consts/LayoutMode"
-import ErrorForbidden from "../ErrorForbidden";
+import ErrorForbidden from "../components/error/ErrorForbidden";
 
 Vue.use(VueRouter)
 const initProject = (to, from, next) => {
     // jika project id dari url sebelum dan sesudah berbeda, maka fetch ulang datanya
     if(from.params.projectId !== to.params.projectId){
-        console.log('begin outer call')
+        // console.log('begin outer call')
         store.dispatch('project/fetchProjectData',to.params.projectId)
-        console.log('end outer call')
+        // console.log('end outer call')
     }
     next()
 }
@@ -196,7 +196,6 @@ routeLayoutConfigs.forEach(config => {
         }
         route.beforeEnter = fn
         routes.push(route)
-
     })
 })
 

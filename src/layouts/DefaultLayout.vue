@@ -18,7 +18,6 @@
     .all-layout {
         width: 95%;
         margin: auto;
-        /*background-color: beige;*/
     }
 
 </style>

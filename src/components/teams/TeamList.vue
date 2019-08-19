@@ -2,7 +2,7 @@
     <div>
         <div class="row">
             <div class="col-8">
-                <h4>Need Confirmation</h4>
+                <h4><i class="fas fa-clipboard"></i> Need Confirmation</h4>
                 <small>You are invited as a member of this team</small>
             </div>
             <div class="col-4">
@@ -36,8 +36,6 @@
             </div>
         </div>
 
-        <!--{{grantUser}}-->
-
         <b-card-group columns class="mb-2">
             <TeamCard :teams="filterTeam" :isGrant="true" name="grantUser"></TeamCard>
         </b-card-group>
@@ -55,7 +53,6 @@
         data: function(){
             return {
                 teams: null,
-                dump: false,
                 searchTeam: ''
             }
         },

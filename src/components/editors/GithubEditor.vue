@@ -412,6 +412,7 @@
             },
             searchFile: function(){
                 this.isPathSearch = true;
+                this.fetchFileList();
             },
             filterResults: function() {
                 if (this.reposData) {

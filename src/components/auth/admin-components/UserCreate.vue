@@ -40,7 +40,6 @@
                         </b-input-group>
 
                         <b-input-group>
-                            <!--                            <b-input-group-text slot="prepend"><i class="fas fa-key"></i></b-input-group-text>-->
                             <b-input id="input-confirm-password" type="password"
                                      placeholder="Confirm Password"
                                      name="confirm-password"
@@ -72,9 +71,9 @@
 </template>
 
 <script>
-    import {BASE_URL} from "../../../stores/consts/url";
+    import {BASE_URL} from "@/stores/consts/url";
     import axios from 'axios';
-    import {makeToast} from '../../../assets/toast.js'
+    import {makeToast} from '@/assets/toast.js'
 
     export default {
         name: "UserCreate",

@@ -1,34 +1,28 @@
 <template>
     <div>
         <div v-for="team in teams" :key="team.id">
-            <b-card class="mb-2 team-header" no-body header-bg-variant="info"
-                    v-if="team.creator == profile.username">
-                <h5 slot="header" class="mb-0 text-white team-title" @click="viewTeam(team.name)"> {{team.name}}</h5>
+            <b-card class="mb-2 team-header" no-body
+                    :header-bg-variant="(team.creator == profile.username) ? 'info' : 'light'"
+            >
+                <h5 slot="header" class="mb-0 team-title"
+                    :class="(team.creator == profile.username) ? 'text-white' : ''"
+                    @click="viewTeam(team.name)">{{team.name}}</h5>
                 <b-card-body class="m-0">
                     <b-card-text>
                         Owner: {{team.creator}}
                     </b-card-text>
                 </b-card-body>
-<!--                <button slot="footer" class="btn btn-primary confirm-team" v-if="!isGrant" @click="confirm(team.name)">Confirm</button>-->
-            </b-card>
-
-            <b-card class="mb-2 team-header" no-body header-bg-variant="light" v-else>
-                <h5 slot="header" class="mb-0 team-title" @click="viewTeam(team.name)">{{team.name}}</h5>
-                <b-card-body class="m-0">
-                    <b-card-text>
-                        Owner: {{team.creator}}
-                    </b-card-text>
-                </b-card-body>
-                <button slot="footer" class="btn btn-primary confirm-team" v-if="!isGrant" @click="confirm(team.name)">Confirm</button>
+                <button slot="footer" class="btn btn-primary confirm-team" v-if="!isGrant"
+                        @click="confirm(team.name)">Confirm</button>
             </b-card>
         </div>
     </div>
 </template>
 
 <script>
-    import {BASE_URL} from "../../../stores/consts/url";
+    import {BASE_URL} from "@/stores/consts/url";
     import axios from 'axios'
-    import {makeToast} from "../../../assets/toast";
+    import {makeToast} from "@/assets/toast";
 
     export default {
         name: "TeamCard",
@@ -44,18 +38,15 @@
         methods: {
             makeToast,
             confirm: function (teamName) {
-                console.log('confirm')
                 let res = {}
                 res.teamName = teamName
                 res.members = [this.profile.username]
                 res.invite = true
-                console.log(res)
 
                 axios.put(BASE_URL + '/teams/' + teamName + '/grant', res).then((resp) => {
                     this.makeToast('success', resp.data.success, resp.data.message);
                     this.$emit('update');
                 }).catch((e) => {
-                    console.error(e);
                     this.makeToast('danger', e.response.data.success, e.response.data.message);
                 })
 

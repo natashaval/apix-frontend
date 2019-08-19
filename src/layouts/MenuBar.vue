@@ -35,7 +35,6 @@
             profile() {
                 if (!this.isProfile) {
                     this.$store.dispatch('user/' + USER_REQUEST)
-                    // return undefined;
                 }
                 return this.$store.getters['user/getProfile']
             },
@@ -55,7 +54,7 @@
                 this.$store.dispatch('auth/' + AUTH_LOGOUT).then(() => {
                     this.$router.push({path: '/login'});
                 }, (err) => {
-                    console.log('login', err)
+                    console.log('error login', err)
                 })
             }
         }

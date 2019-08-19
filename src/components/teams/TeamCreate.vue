@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="row mb-3">
-            <div class="">
+            <div>
                 <b-button v-if="isInvite || isRemove" :to="{name: 'team-viewer', params: {name: teamInvite.name }}" size="sm" variant="outline-secondary">
                     <i class="fas fa-angle-left"></i> Back</b-button>
                 <b-button v-else :to="{name: 'team-list'}" size="sm" variant="outline-secondary">
@@ -28,7 +28,6 @@
                                     class="btn btn-info">Submit</button>
                         </div>
                         <div class="col-md-1 mb-2">
-                            <!--                    <label for="create-submit" class="invisible">Reset</label>-->
                             <button type="reset" id="create-reset"
                                     class="btn btn-outline-secondary">Reset</button>
                         </div>
@@ -91,12 +90,6 @@
                 users: [],
                 searchUser: '',
                 selectedMember: [],
-                response: {
-                    show: false,
-                    success: false,
-                    message: '',
-                    errors: []
-                },
                 show: true
             }
         },
@@ -143,7 +136,6 @@
             submit: function () {
                 let payload = this.createPayload()
                 if (this.isInvite) { // invite members to team
-                    console.log('invite', payload);
                     axios.put(BASE_URL + '/teams/' + payload.teamName + '/invite', payload).then((res) => {
                         this.makeToast('success', res.data.success, res.data.message)
                         for (let i = 0; i < payload.members.length; i++) {
@@ -153,24 +145,20 @@
                             })
                         }
                         setTimeout(() => {
-                            console.log('habis invite', this.teamInvite);
                             this.selectedMember = []
                         }, 1000);
                     }).catch((e) => {
-                        console.error(e)
                         this.makeToast('danger', e.response.data.success, e.response.data.message)
                     })
                 }
                 else if (this.isRemove) { // remove members from team
-                    console.log('remove', payload);
                     axios.put(BASE_URL + '/teams/' + payload.teamName + '/remove', payload).then((res) => {
-                        this.makeToast('success', res.data.success, res.data.message)
+                        this.makeToast('warning', res.data.success, res.data.message)
                         let membersArray = this.teamInvite.members
                         for (let i = 0; i < payload.members.length; i++) {
                             membersArray.splice(membersArray.findIndex(u => u.username === payload.members[i]), 1)
                         }
                         setTimeout(() => {
-                            console.log('habis remove apakah berhasil', this.teamInvite);
                             this.selectedMember = []
                         }, 1000);
                     }).catch((e) => {
@@ -181,9 +169,7 @@
                 else { //create new team
                     axios.post(BASE_URL + '/teams', payload).then((res) => {
                         this.makeToast('success', res.data.success, res.data.message)
-                        // this.reset();
                     }).catch((e) => {
-                        console.error(e)
                         this.makeToast('danger', e.response.data.success, e.response.data.message)
                     })
                 }

@@ -140,14 +140,16 @@
         methods: {
             getSortIcon : function(field) {
                 if(this.pageable.sort === field){
-                   return (this.pageable.direction === 'desc')? '<i class="fas fa-sort-down"></i>':'<i class="fas fa-sort-up"></i>'
+                   return (this.pageable.direction === 'desc') ?
+                       '<i class="fas fa-sort-down float-sm-right"></i>':
+                       '<i class="fas fa-sort-up float-sm-right"></i>'
                 }
                 return ''
             },
             setOrderBy : function(orderBy) {
                 let isDesc = this.pageable.direction === 'desc'
                 if(this.pageable.sort === orderBy){
-                    isDesc = !isDesc
+                        isDesc = !isDesc
                 }
                 if(isDesc){
                     this.pageable.direction = 'desc'

@@ -1,7 +1,6 @@
 <template>
     <div>
         <b-container fluid>
-<!--            <h3>Project Table List</h3>-->
             <b-row class="my-3" no-gutters>
                 <b-col class="mx-0">
                     <b-button v-b-modal="'project-modal'" variant="primary" class="mr-2">New Project</b-button>
@@ -16,7 +15,6 @@
                              title="Create New Project"
                              hide-footer
                              header-bg-variant="info">
-
                         <ProjectCreate></ProjectCreate>
                     </b-modal>
                 </b-col>
@@ -44,8 +42,6 @@
         methods : {
             makeToast,
             onImportComplete : function () {
-                // this.$bvModal.hide('project-import')
-                // this.makeToast('success', true, 'import success')
                 this.$refs.projectTable.fetchData()
             }
         }
